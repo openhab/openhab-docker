@@ -1,6 +1,6 @@
-# OpenHAB Docker Containers [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker)
+# openHAB Docker Containers [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker)
 
-Repository for building docker containers for [OpenHAB](http://openhab.org) (Home Automation Server).
+Repository for building docker containers for [openHAB](http://openhab.org) (Home Automation Server).
 
 Comments, suggestions and contributions are welcome!
 
@@ -14,7 +14,7 @@ Comments, suggestions and contributions are welcome!
 
 If you are unsure about what your needs are, you probably want to use ``openhab/openhab:amd64-online``.
 
-prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/u/openhab/openhab)
+prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
 ## Usage
 
