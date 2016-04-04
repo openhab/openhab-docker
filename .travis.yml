@@ -1,0 +1,29 @@
+sudo: required
+language: bash
+branches:
+  only:
+    - master
+services:
+  - docker
+before_install:
+  - docker info
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+env:
+  #global:
+  # -  DOCKER_REPO=openhab/openhab
+  # Encrypted:
+  # -  DOCKER_EMAIL
+  # -  DOCKER_USERNAME
+  # -  DOCKER_PASSWORD
+  matrix:
+    - TARGET=amd64 FLAVOR=online
+    - TARGET=amd64 FLAVOR=offline
+    - TARGET=armhf FLAVOR=online
+    - TARGET=armhf FLAVOR=offline
+    - TARGET=arm64 FLAVOR=online
+    - TARGET=arm64 FLAVOR=offline
+matrix:
+  fast_finish: true
+script:
+  - make build && (make push || (sleep 15; make push) || (sleep 15; make push))
