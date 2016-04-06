@@ -2,8 +2,8 @@ TARGET ?= amd64
 ARCHS ?= amd64 armhf arm64
 BASE_ARCH ?= amd64
 DOCKER_REPO ?= openhab/openhab
-GIT_REPO ?= openhab/openhab-docker
-GIT_BRANCH ?= master
+TRAVIS_GIT_REPO ?= openhab/openhab-docker
+TRAVIS_GIT_BRANCH ?= master
 FLAVOR ?= online
 TRAVIS_TOKEN ?= secretsecret
 
@@ -49,5 +49,5 @@ trigger:
 	  -H "Accept: application/json" \
 	  -H "Travis-API-Version: 3" \
 	  -H "Authorization: token $(TRAVIS_TOKEN)" \
-	  -d '{ "request": { "branch":"$(GIT_BRANCH)", "token": "$(TRAVIS_TOKEN)" }}' \
-	  https://api.travis-ci.org/repo/$(subst /,%2F,$(GIT_REPO))/requests
+	  -d '{ "request": { "branch":"$(TRAVIS_GIT_BRANCH)", "token": "$(TRAVIS_TOKEN)" }}' \
+	  https://api.travis-ci.org/repo/$(subst /,%2F,$(TRAVIS_GIT_REPO))/requests
