@@ -12,7 +12,7 @@ fi
 if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
   # Copy userdata dir
   echo "No configuration found... initializing."
-  sudo cp -av "${APPDIR}/conf.dist/. ${APPDIR}/conf/"
+  sudo cp -av "${APPDIR}/conf.dist/." "${APPDIR}/conf/"
 fi
 
 # Prettier interface
