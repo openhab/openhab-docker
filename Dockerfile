@@ -53,4 +53,4 @@ USER openhab
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 EXPOSE 8080 8443 5555
-CMD server
+CMD ["server"]
