@@ -1,5 +1,7 @@
 # openHAB Docker Containers [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker)
 
+[![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Repository for building docker containers for [openHAB](http://openhab.org) (Home Automation Server).
 
 Comments, suggestions and contributions are welcome!
