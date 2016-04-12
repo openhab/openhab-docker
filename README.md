@@ -63,6 +63,9 @@ openhab:
 ```
 then start with ``docker-compose up -d``
 
+**Accessing the console**
+``docker exec -it openhab console``
+
 **Debug Mode**
 
 You can start the container with the command ``docker run -it openhab/openhab debug`` to get into the debug shell.
