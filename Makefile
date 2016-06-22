@@ -14,7 +14,7 @@ else
 endif
 
 build: tmp-$(TARGET)/Dockerfile
-	docker build --build-arg ARCH=$(TARGET) --build-arg DOWNLOAD_URL=$(DOWNLOAD_URL) -t $(DOCKER_REPO):$(TARGET)-$(FLAVOR) tmp-$(TARGET)
+	docker build --build-arg ARCH=$(TARGET) --build-arg DOWNLOAD_URL=$(DOWNLOAD_URL) --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` -t $(DOCKER_REPO):$(TARGET)-$(FLAVOR) tmp-$(TARGET)
 	docker run --rm $(DOCKER_REPO):$(TARGET)-$(FLAVOR) uname -a
 
 tmp-$(TARGET)/Dockerfile: Dockerfile $(shell find files)
