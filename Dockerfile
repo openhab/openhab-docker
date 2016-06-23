@@ -7,18 +7,6 @@ ARG ARCH=amd64
 ARG DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-online/target/openhab-online-2.0.0-SNAPSHOT.zip"
 ENV APPDIR="/openhab" OPENHAB_HTTP_PORT='8080' OPENHAB_HTTPS_PORT='8443' EXTRA_JAVA_OPTS=''
 
-# Basic build-time metadata as defined at http://label-schema.org
-ARG BUILD_DATE
-ARG VCS_REF
-LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.docker.dockerfile="/Dockerfile" \
-    org.label-schema.license="EPL" \
-    org.label-schema.name="openHAB" \
-    org.label-schema.url="http://www.openhab.com/" \
-    org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-type="Git" \
-    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
-
 # Install Basepackages
 RUN \
     apt-get update && \
