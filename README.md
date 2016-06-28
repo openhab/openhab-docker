@@ -6,6 +6,19 @@ Repository for building docker containers for [openHAB](http://openhab.org) (Hom
 
 Comments, suggestions and contributions are welcome!
 
+
+## Contributing
+
+[![GitHub issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues) [![Issue Stats](http://www.issuestats.com/github/openhab/openhab-docker/badge/issue?style=flat)](http://www.issuestats.com/github/openhab/openhab-docker) [![GitHub forks](https://img.shields.io/github/forks/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/network) [![Issue Stats](http://www.issuestats.com/github/openhab/openhab-docker/badge/pr?style=flat)](http://www.issuestats.com/github/openhab/openhab-docker) [![GitHub stars](https://img.shields.io/github/stars/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/stargazers)
+
+[Contribution guidelines](https://github.com/openhab/openhab-docker/blob/master/CONTRIBUTING.md)
+
+
+## License
+
+When not explicitly set, files are placed under [![Eclipse license](https://img.shields.io/badge/license-Eclipse-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
+
+
 ## Image Variants
 
 ### ``openhab/openhab:<architecture>-<[on|off]line>``
@@ -88,13 +101,4 @@ Checkout the github repository and then run these commands:
 ```
 $ docker build -t openhab/openhab .
 $ docker run -it openhab/openhab server
-
 ```
-
-## Contributing
-
-[Contribution guidelines](https://github.com/openhab/openhab-docker/blob/master/CONTRIBUTING.md)
-
-## License
-
-When not explicitly set, files are placed under [EPL](https://github.com/openhab/openhab-docker/blob/master/LICENSE) license.
