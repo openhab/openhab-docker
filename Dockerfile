@@ -39,10 +39,20 @@ RUN \
   rm -rf /var/cache/oracle-jdk8-installer
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
-# Add openhab user
+# Add openhab user & handle possible device groups for different host systems
+# Container base image puts dialout on group id 20, uucp on id 10
 RUN adduser --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     adduser openhab sudo &&\
+    groupadd -g 14 uucp2 &&\
+    groupadd -g 16 dialout2 &&\
+    groupadd -g 18 dialout3 &&\
+    groupadd -g 32 uucp3 &&\
     adduser openhab dialout &&\
+    adduser openhab uucp &&\
+    adduser openhab uucp2 &&\
+    adduser openhab dialout2 &&\
+    adduser openhab dialout3 &&\
+    adduser openhab uucp3 &&\
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/openhab
 
 WORKDIR ${APPDIR}
@@ -61,6 +71,7 @@ COPY files/entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 
 RUN chown -R openhab:openhab ${APPDIR}
+
 USER openhab
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
