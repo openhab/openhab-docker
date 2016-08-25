@@ -41,18 +41,22 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
+# GPIO Group for RPI access
 RUN adduser --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     adduser openhab sudo &&\
     groupadd -g 14 uucp2 &&\
     groupadd -g 16 dialout2 &&\
     groupadd -g 18 dialout3 &&\
     groupadd -g 32 uucp3 &&\
+    groupadd -g 997 gpio &&\
     adduser openhab dialout &&\
     adduser openhab uucp &&\
     adduser openhab uucp2 &&\
     adduser openhab dialout2 &&\
     adduser openhab dialout3 &&\
     adduser openhab uucp3 &&\
+    adduser openhab gpio &&\
+
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/openhab
 
 WORKDIR ${APPDIR}
