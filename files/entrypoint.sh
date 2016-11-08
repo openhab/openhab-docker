@@ -21,7 +21,7 @@ if [ "$1" = 'server' ] || [ "$1" = 'openhab' ]; then
 elif [ "$1" = 'debug' ]; then
   eval "${APPDIR}/start_debug.sh"
 elif [ "$1" = 'console' ] || [ "$1" = 'shell' ]; then
-  exec "${APPDIR}/runtime/karaf/bin/client"
+  exec "${APPDIR}/runtime/bin/client"
 else
   exec "$@"
 fi
