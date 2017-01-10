@@ -4,7 +4,7 @@ FROM multiarch/ubuntu-debootstrap:amd64-wily
 #FROM multiarch/ubuntu-debootstrap:arm64-wily   # arch=arm64
 ARG ARCH=amd64
 
-ARG DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-online/target/openhab-online-2.0.0-SNAPSHOT.zip"
+ARG DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.0.0-SNAPSHOT.zip"
 ENV APPDIR="/openhab" OPENHAB_HTTP_PORT='8080' OPENHAB_HTTPS_PORT='8443' EXTRA_JAVA_OPTS=''
 
 # Basic build-time metadata as defined at http://label-schema.org
