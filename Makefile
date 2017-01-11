@@ -4,18 +4,13 @@ BASE_ARCH ?= amd64
 DOCKER_REPO ?= openhab/openhab
 TRAVIS_GIT_REPO ?= openhab/openhab-docker
 TRAVIS_GIT_BRANCH ?= master
-FLAVOR ?= online
 TRAVIS_TOKEN ?= secretsecret
 
-ifeq ($(FLAVOR),offline)
-  DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.0.0-SNAPSHOT.zip"
-else
-  DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.0.0-SNAPSHOT.zip"
-endif
+DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.0.0-SNAPSHOT.zip"
 
 build: tmp-$(TARGET)/Dockerfile
-	docker build --build-arg ARCH=$(TARGET) --build-arg DOWNLOAD_URL=$(DOWNLOAD_URL) --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` -t $(DOCKER_REPO):$(TARGET)-$(FLAVOR) tmp-$(TARGET)
-	docker run --rm $(DOCKER_REPO):$(TARGET)-$(FLAVOR) uname -a
+	docker build --build-arg ARCH=$(TARGET) --build-arg DOWNLOAD_URL=$(DOWNLOAD_URL) --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` -t $(DOCKER_REPO):$(TARGET) tmp-$(TARGET)
+	docker run --rm $(DOCKER_REPO):$(TARGET) uname -a
 
 tmp-$(TARGET)/Dockerfile: Dockerfile $(shell find files)
 	rm -rf tmp-$(TARGET)
@@ -32,7 +27,7 @@ tmp-$(TARGET)/Dockerfile: Dockerfile $(shell find files)
 	cat $@
 
 test:
-	env IMAGE="$(DOCKER_REPO):$(TARGET)-$(FLAVOR)" \
+	env IMAGE="$(DOCKER_REPO):$(TARGET)" \
 	bundle exec rspec
 
 clean:
@@ -41,7 +36,7 @@ clean:
 	done
 
 push:
-	docker push $(DOCKER_REPO):$(TARGET)-$(FLAVOR)
+	docker push $(DOCKER_REPO):$(TARGET)
 
 trigger:
 	@curl -s -X POST \

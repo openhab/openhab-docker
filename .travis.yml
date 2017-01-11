@@ -17,12 +17,9 @@ env:
   # -  DOCKER_USERNAME
   # -  DOCKER_PASSWORD
   matrix:
-    - TARGET=amd64 FLAVOR=online
-    - TARGET=amd64 FLAVOR=offline
-    - TARGET=armhf FLAVOR=online
-    - TARGET=armhf FLAVOR=offline
-    - TARGET=arm64 FLAVOR=online
-    - TARGET=arm64 FLAVOR=offline
+    - TARGET=amd64
+    - TARGET=armhf
+    - TARGET=arm64
 matrix:
   fast_finish: true
 script:
