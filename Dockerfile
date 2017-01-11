@@ -1,7 +1,7 @@
 # openhab image 
-FROM multiarch/ubuntu-debootstrap:amd64-wily
-#FROM multiarch/ubuntu-debootstrap:armhf-wily   # arch=armhf
-#FROM multiarch/ubuntu-debootstrap:arm64-wily   # arch=arm64
+FROM multiarch/debian-debootstrap:amd64-jessie  # arch=amd64
+#FROM multiarch/debian-debootstrap:armhf-jessie  # arch=armhf
+#FROM multiarch/debian-debootstrap:arm64-jessie  # arch=arm64
 ARG ARCH=amd64
 
 ARG DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.0.0-SNAPSHOT.zip"
@@ -19,11 +19,12 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
 
-# Install Basepackages
+# Install Basepackages & OpenJDK8
 RUN \
+    echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
-      software-properties-common \
+      openjdk-8-jdk \
       unzip \
       wget \
     && rm -rf /var/lib/apt/lists/*
@@ -39,16 +40,6 @@ RUN set -x \
     && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
-
-# Install Oracle Java
-RUN \
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  add-apt-repository -y ppa:webupd8team/java && \
-  apt-get update && \
-  apt-get install --no-install-recommends -y oracle-java8-installer && \
-  rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk8-installer
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
