@@ -21,13 +21,13 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 ## Image Variants
 
-### ``openhab/openhab:<architecture>-<[on|off]line>``
+### ``openhab/openhab:<architecture>``
 
-* ``amd64``: ``online``, ``offline``
-* ``armhf``: ``online``, ``offline``
-* ``arm64``: ``online``, ``offline``
+* ``amd64`` for most desktop computer
+* ``armhf`` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
+* ``arm64`` for ARMv8 devices 64Bit (not RaspberryPi 3)
 
-If you are unsure about what your needs are, you probably want to use ``openhab/openhab:amd64-online``.
+If you are unsure about what your needs are, you probably want to use ``openhab/openhab:amd64``.
 
 prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
@@ -37,7 +37,7 @@ prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 The following will run openHAB in demo mode on the host machine:
 ```
-docker run -it --name openhab --net=host openhab/openhab:amd64-online server
+docker run -it --name openhab --net=host openhab/openhab:amd64 server
 ```
 
 **NOTE** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method. To properly run the container, please specify a **host volume** for the ``conf`` and ``userdata`` directory:
@@ -53,35 +53,35 @@ docker run \
         -v /opt/openhab/userdata:/openhab/userdata \
         -d \
         --restart=always \
-        openhab/openhab:amd64-online
+        openhab/openhab:amd64
 ```
 
-or with ``docker-compose.yml``
+or with ``docker-compose.yml`` and UPnP for discovery:
 ```
----
 openhab:
-  image: 'openhab/openhab:amd64-online'
+  image: "openhab/openhab:amd64"
   restart: always
-  ports:
-    - "8080:8080"
-    - "8443:8443"
-    - "5555:5555"
-  net: "host"
+  net: host
   volumes:
-    - '/etc/localtime:/etc/localtime:ro'
-    - '/etc/timezone:/etc/timezone:ro'
-    - '/opt/openhab/userdata:/openhab/userdata'
-    - '/opt/openhab/conf:/openhab/conf'
-  command: "server"
+    - "/etc/localtime:/etc/localtime:ro"
+    - "/etc/timezone:/etc/timezone:ro"
+    - "/opt/openhab/userdata:/openhab/userdata"
+    - "/opt/openhab/conf:/openhab/conf"
+  environment:
+    OPENHAB_HTTP_PORT: "8080"
+    OPENHAB_HTTPS_PORT: "8443"
+  command: server
 ```
-then start with ``docker-compose up -d``
+Create and start the container with ``docker-compose up -d``
 
 **Accessing the console**
-``docker exec -it openhab /openhab/runtime/bin/client``
+You can connect to a console of an already running openhab container with following command:
+``docker ps``  - lists all your currently running container
+``docker exec -it openhab /openhab/runtime/bin/client`` - connect to given container by name
+``docker exec -it c4ad98f24423 /openhab/runtime/bin/client`` - connect to given container by id
 
 **Debug Mode**
-
-You can start the container with the command ``docker run -it openhab/openhab debug`` to get into the debug shell.
+You can run a new container with the command ``docker run -it openhab/openhab:<architecture> debug`` to get into the debug shell.
 
 **Environment variables**
 *  `OPENHAB_HTTP_PORT`=8080
@@ -89,7 +89,6 @@ You can start the container with the command ``docker run -it openhab/openhab de
 *  `EXTRA_JAVA_OPTS`
 
 **Parameters**
-
 * `-p 8080` - the port of the webinterface
 * `-v /openhab/conf` - openhab configs
 * `-v /openhab/userdata` - openhab userdata directory
