@@ -29,7 +29,7 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 If you are unsure about what your needs are, you probably want to use ``openhab/openhab:amd64``.
 
-prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
+prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab) ([Dokerfile](https://github.com/openhab/openhab-docker/blob/master/Dockerfile))
 
 ## Usage
 
