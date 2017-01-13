@@ -21,10 +21,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 # Install Basepackages & OpenJDK8
 RUN \
-    echo deb http://http.debian.net/debian jessie-backports main >> /etc/apt/sources.list && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
-      openjdk-8-jdk \
       unzip \
       wget \
     && rm -rf /var/lib/apt/lists/*
@@ -40,6 +38,18 @@ RUN set -x \
     && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
+
+# Install Oracle Java
+RUN \
+  echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list && \
+  echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list && \
+  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  apt-get update && \
+  apt-get install --no-install-recommends -y oracle-java8-installer && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
