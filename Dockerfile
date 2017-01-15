@@ -83,7 +83,9 @@ RUN cp -a /openhab/userdata /openhab/userdata.dist && \
 COPY files/entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 
-RUN chown -R openhab:openhab ${APPDIR}
+# Set permissions for openhab. Export TERM variable. See issue #30 for details!
+RUN chown -R openhab:openhab ${APPDIR} && \
+    echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
