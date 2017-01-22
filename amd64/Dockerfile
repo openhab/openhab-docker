@@ -1,7 +1,5 @@
 # openhab image 
-FROM multiarch/debian-debootstrap:amd64-jessie  # arch=amd64
-#FROM multiarch/debian-debootstrap:armhf-jessie  # arch=armhf
-#FROM multiarch/debian-debootstrap:arm64-jessie  # arch=arm64
+FROM multiarch/debian-debootstrap:amd64-jessie
 ARG ARCH=amd64
 
 ARG DOWNLOAD_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.0.0-SNAPSHOT.zip"
