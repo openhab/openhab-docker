@@ -22,10 +22,9 @@ env:
   # -  DOCKER_USERNAME
   # -  DOCKER_PASSWORD
   matrix:
-    - TARGET=amd64
-    - TARGET=armhf
-    - TARGET=arm64
-    - VERSION=2.0.0
+    - TARGET=amd64 VERSION=2.0.0
+    - TARGET=armhf VERSION=2.0.0
+    - TARGET=arm64 VERSION=2.0.0
 matrix:
   fast_finish: true
 
