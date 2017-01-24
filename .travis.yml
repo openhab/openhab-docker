@@ -9,7 +9,7 @@ before_install:
   - docker info
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 install:
-  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") -t $DOCKER_REPO:$TARGET $TARGET
+  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") -t $DOCKER_REPO:$VERSION-$TARGET $VERSION/$TARGET
   - docker run --rm $DOCKER_REPO:$TARGET uname -a
 after_success:
   - docker login -e=$DOCKER_EMAIL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
@@ -25,6 +25,7 @@ env:
     - TARGET=amd64
     - TARGET=armhf
     - TARGET=arm64
+    - VERSION=2.0.0
 matrix:
   fast_finish: true
 
