@@ -8,7 +8,12 @@ services:
 before_install:
   - docker info
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+install:
+  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") -t $DOCKER_REPO:$TARGET $TARGET
+  - docker run --rm $DOCKER_REPO:$TARGET uname -a
+after_success:
+  - docker login -e=$DOCKER_EMAIL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+  - docker push $DOCKER_REPO:$TARGET
 env:
   #global:
   # -  DOCKER_REPO=openhab/openhab
@@ -22,5 +27,4 @@ env:
     - TARGET=arm64
 matrix:
   fast_finish: true
-script:
-  - make build && (make push || (sleep 15; make push) || (sleep 15; make push))
+
