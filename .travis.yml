@@ -13,7 +13,7 @@ install:
   - docker run --rm $DOCKER_REPO:$TARGET uname -a
 after_success:
   - docker login -e=$DOCKER_EMAIL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
-  - docker push $DOCKER_REPO:$TARGET
+  - docker push $DOCKER_REPO:$VERSION-$TARGET
 env:
   #global:
   # -  DOCKER_REPO=openhab/openhab
