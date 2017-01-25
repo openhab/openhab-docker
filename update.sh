@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.0.0"
+versions="2.1.0-snapshot"
 arches="amd64 armhf arm64"
 
 # Generate header
