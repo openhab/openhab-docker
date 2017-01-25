@@ -1,6 +1,13 @@
-# openhab image 
+# openhab image
+#
+# ------------------------------------------------------------------------------
+#               NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+#                       PLEASE DO NOT EDIT IT DIRECTLY.
+# ------------------------------------------------------------------------------
+#
+
 FROM multiarch/debian-debootstrap:amd64-jessie
-ARG ARCH=amd64
 
 ARG DOWNLOAD_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
 ENV APPDIR="/openhab" OPENHAB_HTTP_PORT='8080' OPENHAB_HTTPS_PORT='8443' EXTRA_JAVA_OPTS=''
@@ -17,7 +24,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
 
-# Install Basepackages & OpenJDK8
+# Install Basepackages
 RUN \
     apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -78,7 +85,7 @@ RUN mkdir -p ${APPDIR}/userdata/logs && touch ${APPDIR}/userdata/logs/openhab.lo
 # Copy directories for host volumes
 RUN cp -a /openhab/userdata /openhab/userdata.dist && \
     cp -a /openhab/conf /openhab/conf.dist
-COPY files/entrypoint.sh /
+COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
@@ -89,3 +96,4 @@ RUN chown -R openhab:openhab ${APPDIR} && \
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 EXPOSE 8080 8443 5555
 CMD ["server"]
+
