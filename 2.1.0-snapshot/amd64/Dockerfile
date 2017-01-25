@@ -9,8 +9,17 @@
 
 FROM multiarch/debian-debootstrap:amd64-jessie
 
-ARG DOWNLOAD_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
-ENV APPDIR="/openhab" OPENHAB_HTTP_PORT='8080' OPENHAB_HTTPS_PORT='8443' EXTRA_JAVA_OPTS=''
+# Set download urls
+ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
+ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+
+# Set variables
+ENV \
+    APPDIR="/openhab" \
+    OPENHAB_HTTP_PORT='8080' \
+    OPENHAB_HTTPS_PORT='8443' \
+    EXTRA_JAVA_OPTS='' \
+    JAVA_HOME='/usr/lib/java-8'
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -24,37 +33,18 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
 
-# Install Basepackages
-RUN \
-    apt-get update && \
+# Install basepackages
+RUN apt-get update && \
     apt-get install --no-install-recommends -y \
+      ca-certificates \
       unzip \
       wget \
-    && rm -rf /var/lib/apt/lists/*
+      && rm -rf /var/lib/apt/lists/*
 
-# Install gosu
-ENV GOSU_VERSION 1.10
-RUN set -x \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
-
-# Install Oracle Java
-RUN \
-  echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list && \
-  echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list && \
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  apt-get update && \
-  apt-get install --no-install-recommends -y oracle-java8-installer && \
-  rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk8-installer
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+# Install java
+RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
+    mkdir ${JAVA_HOME} && \
+    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME}
 
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
@@ -73,27 +63,22 @@ RUN adduser --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     adduser openhab uucp3 &&\
     adduser openhab gpio
 
-WORKDIR ${APPDIR}
-
-RUN \
-    wget -nv -O /tmp/openhab.zip ${DOWNLOAD_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip
-
-RUN mkdir -p ${APPDIR}/userdata/logs && touch ${APPDIR}/userdata/logs/openhab.log
-
-# Copy directories for host volumes
-RUN cp -a /openhab/userdata /openhab/userdata.dist && \
-    cp -a /openhab/conf /openhab/conf.dist
-COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
-
+# Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
-RUN chown -R openhab:openhab ${APPDIR} && \
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
+    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
+    rm /tmp/openhab.zip &&\
+    mkdir -p ${APPDIR}/userdata/logs &&\
+    touch ${APPDIR}/userdata/logs/openhab.log && \
+    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
+    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
+    chown -R openhab:openhab ${APPDIR} && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
+WORKDIR ${APPDIR}
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 EXPOSE 8080 8443 5555
-CMD ["server"]
+USER openhab
+CMD ["./start.sh"]
 
