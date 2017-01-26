@@ -1,4 +1,5 @@
 # openHAB2 Docker Containers
+![](https://github.com/microsoft/openhab/openhab-docker/raw/master/images/openhab.png)
 
 [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/images/openhab/openhab:2.0.0-amd64 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/#/images/openhab/openhab:2.0.0-amd64) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -26,8 +27,8 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 #### Version:
 
-* ``2.0.0`` Stable OH2 version
-* ``2.1.0-SNAPSHOT`` Current OH2 snapshot version
+* ``2.0.0`` Stable Openhab version
+* ``2.1.0-SNAPSHOT`` Experimental Openhab snapshot version
 
 #### Architecture:
 
@@ -36,7 +37,6 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 * ``arm64`` for ARMv8 devices 64Bit (not RaspberryPi 3)
 
 If you are unsure about what your needs are, you probably want to use ``openhab/openhab:2.0.0-amd64``.
-
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/Dockerfile))
 
@@ -49,8 +49,9 @@ The following will run openHAB in demo mode on the host machine:
 docker run -it --name openhab --net=host openhab/openhab:2.0.0-amd64 server
 ```
 
-**NOTE** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method. To properly run the container, please specify a **host volume** for the ``conf`` and ``userdata`` directory:
+**NOTE** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method.
 
+To properly run the container, please specify a **host volume** for the ``conf`` and ``userdata`` directory:
 
 ```SHELL
 docker run \
@@ -100,6 +101,11 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `OPENHAB_HTTP_PORT`=8080
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `EXTRA_JAVA_OPTS`=""
+*  `USER_ID`=9001 (*)
+
+(*) `USER_ID` is available since version 2.1.0-snapshot. By default the openhab user in the container is running with:
+
+* `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
 
 **Parameters**
 
