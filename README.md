@@ -2,6 +2,7 @@
 
 [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/images/openhab/openhab:2.0.0-amd64 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/#/images/openhab/openhab:2.0.0-amd64) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+
 Repository for building docker containers for [openHAB](http://openhab.org) (Home Automation Server).
 
 Comments, suggestions and contributions are welcome!
@@ -23,9 +24,16 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 ### ``openhab/openhab:<version>-<architecture>``
 
-* ``2.0.0-amd64`` for most desktop computer (e.g. x64, x86-64, x86_64)
-* ``2.0.0-armhf`` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
-* ``2.0.0-arm64`` for ARMv8 devices 64Bit (not RaspberryPi 3)
+#### Version:
+
+* ``2.0.0`` Stable OH2 version
+* ``2.1.0-SNAPSHOT`` Current OH2 snapshot version
+
+#### Architecture:
+
+* ``amd64`` for most desktop computer (e.g. x64, x86-64, x86_64)
+* ``armhf`` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
+* ``arm64`` for ARMv8 devices 64Bit (not RaspberryPi 3)
 
 If you are unsure about what your needs are, you probably want to use ``openhab/openhab:2.0.0-amd64``.
 
