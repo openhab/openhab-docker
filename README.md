@@ -27,8 +27,8 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 #### Version:
 
-* ``2.0.0`` Stable Openhab version
-* ``2.1.0-SNAPSHOT`` Experimental Openhab snapshot version
+* ``2.0.0`` Stable openHAB version
+* ``2.1.0-SNAPSHOT`` Experimental openHAB snapshot version
 
 #### Architecture:
 
@@ -87,7 +87,7 @@ Create and start the container with ``docker-compose up -d``
 
 **Accessing the console**
 
-You can connect to a console of an already running openhab container with following command:
+You can connect to a console of an already running openHAB container with following command:
 * ``docker ps``  - lists all your currently running container
 * ``docker exec -it openhab /openhab/runtime/bin/client`` - connect to given container by name
 * ``docker exec -it c4ad98f24423 /openhab/runtime/bin/client`` - connect to given container by id
@@ -103,15 +103,15 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `EXTRA_JAVA_OPTS`=""
 *  `USER_ID`=9001 (*)
 
-(*) `USER_ID` is available since version 2.1.0-snapshot. By default the openhab user in the container is running with:
+(*) `USER_ID` is available since version 2.1.0-snapshot. By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
 
 **Parameters**
 
 * `-p 8080` - the port of the webinterface
-* `-v /openhab/conf` - openhab configs
-* `-v /openhab/userdata` - openhab userdata directory
+* `-v /openhab/conf` - openHAB configs
+* `-v /openhab/userdata` - openHAB userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
 
 ## Building the image
@@ -121,5 +121,3 @@ Checkout the github repository and then run these commands:
 $ docker build -t openhab/openhab .
 $ docker run -it openhab/openhab server
 ```
-
-
