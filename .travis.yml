@@ -10,7 +10,7 @@ before_install:
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 install:
   - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") -t $DOCKER_REPO:$VERSION-$TARGET $VERSION/$TARGET
-  - docker run --rm $DOCKER_REPO:$TARGET uname -a
+  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET uname -a
 after_success:
   - docker login -e=$DOCKER_EMAIL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
   - docker push $DOCKER_REPO:$VERSION-$TARGET

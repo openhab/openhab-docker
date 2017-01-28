@@ -16,10 +16,11 @@ ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
 # Set variables
 ENV \
     APPDIR="/openhab" \
-    OPENHAB_HTTP_PORT='8080' \
-    OPENHAB_HTTPS_PORT='8443' \
-    EXTRA_JAVA_OPTS='' \
-    JAVA_HOME='/usr/lib/java-8'
+    EXTRA_JAVA_OPTS="" \
+    JAVA_HOME='/usr/lib/java-8' \
+    OPENHAB_HTTP_PORT="8080" \
+    OPENHAB_HTTPS_PORT="8443" \
+    USER_ID="9001"
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -49,7 +50,7 @@ RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
-RUN adduser --disabled-password --gecos '' --home ${APPDIR} openhab &&\
+RUN adduser -u $USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     groupadd -g 14 uucp2 &&\
     groupadd -g 16 dialout2 &&\
     groupadd -g 18 dialout3 &&\
