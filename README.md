@@ -4,7 +4,7 @@
 [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/images/openhab/openhab:2.0.0-amd64 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/#/images/openhab/openhab:2.0.0-amd64) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-Repository for building docker containers for [openHAB](http://openhab.org) (Home Automation Server).
+Repository for building Docker containers for [openHAB](http://openhab.org) (Home Automation Server).
 
 Comments, suggestions and contributions are welcome!
 
@@ -27,8 +27,8 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 #### Version:
 
-* ``2.0.0`` Stable openHAB version
-* ``2.1.0-SNAPSHOT`` Experimental openHAB snapshot version
+* [``2.0.0`` Stable openHAB version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
+* [``2.1.0-SNAPSHOT`` Experimental openHAB snapshot version](https://github.com/openhab/openhab-docker/blob/master/2.1.0-snapshot/amd64/Dockerfile)
 
 #### Architecture:
 
@@ -38,7 +38,8 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 If you are unsure about what your needs are, you probably want to use ``openhab/openhab:2.0.0-amd64``.
 
-Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/Dockerfile))
+Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
+
 
 ## Usage
 
@@ -48,25 +49,31 @@ The following will run openHAB in demo mode on the host machine:
 ```
 docker run -it --name openhab --net=host openhab/openhab:2.0.0-amd64 server
 ```
+_**NOTE** Although this is the simplest method to getting openHAB up and running, but it is not the prefered method. To properly run the container, please specify a **host volume** for the directories._
 
-**NOTE** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method.
 
-To properly run the container, please specify a **host volume** for the ``conf`` and ``userdata`` directory:
+### Starting using Docker named volumes
 
+Following configuration uses Docker named data volumes. These volumes will survive, if you delete or upgrade your container. It is a good starting point for beginners. The volumes are created in the Docker volume directory. You can use ``docker inspect openhab`` to locate the directories (e.g. /var/lib/docker/volumes) on your host system. For more information visit  [Manage data in containers](https://docs.docker.com/engine/tutorials/dockervolumes/):
+
+#### Running from command line
 ```SHELL
 docker run \
         --name openhab \
         --net=host \
         -v /etc/localtime:/etc/localtime:ro \
         -v /etc/timezone:/etc/timezone:ro \
-        -v /opt/openhab/conf:/openhab/conf \
-        -v /opt/openhab/userdata:/openhab/userdata \
+        -v openhab_addons:/openhab/addons \
+        -v openhab_conf:/openhab/conf \
+        -v openhab_userdata:/openhab/userdata \
         -d \
         --restart=always \
         openhab/openhab:2.0.0-amd64
 ```
 
-or with ``docker-compose.yml`` and UPnP for discovery:
+#### Running from compose-file.yml
+
+Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
 openhab:
@@ -76,21 +83,20 @@ openhab:
   volumes:
     - "/etc/localtime:/etc/localtime:ro"
     - "/etc/timezone:/etc/timezone:ro"
-    - "/opt/openhab/userdata:/openhab/userdata"
-    - "/opt/openhab/conf:/openhab/conf"
+    - "openhab_addons:/openhab/addons"
+    - "openhab_conf:/openhab/conf"
+    - "openhab_userdata:/openhab/userdata"
   environment:
     OPENHAB_HTTP_PORT: "8080"
     OPENHAB_HTTPS_PORT: "8443"
-  command: server
 ```
-Create and start the container with ``docker-compose up -d``
 
-**Accessing the console**
+### Accessing the console
 
 You can connect to a console of an already running openHAB container with following command:
 * ``docker ps``  - lists all your currently running container
-* ``docker exec -it openhab /openhab/runtime/bin/client`` - connect to given container by name
-* ``docker exec -it c4ad98f24423 /openhab/runtime/bin/client`` - connect to given container by id
+* ``docker exec -it openhab /openhab/runtime/bin/client`` - connect to openHAB container by name
+* ``docker exec -it c4ad98f24423 /openhab/runtime/bin/client`` - connect to openHAB container by id
 
 The default password for the login is ``habopen``.
 
@@ -98,7 +104,7 @@ The default password for the login is ``habopen``.
 
 You can run a new container with the command ``docker run -it openhab/openhab:2.0.0-amd64 debug`` to get into the debug shell.
 
-**Environment variables**
+### Environment variables
 
 *  `OPENHAB_HTTP_PORT`=8080
 *  `OPENHAB_HTTPS_PORT`=8443
@@ -109,11 +115,12 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
 
-**Parameters**
+### Parameters
 
 * `-p 8080` - the port of the webinterface
-* `-v /openhab/conf` - openHAB configs
-* `-v /openhab/userdata` - openHAB userdata directory
+* `-v /openhab/addons` - custom openhab addons
+* `-v /openhab/conf` - openhab configs
+* `-v /openhab/userdata` - openhab userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
 
 ## Building the image
