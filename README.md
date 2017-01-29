@@ -27,8 +27,9 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 #### Version:
 
-* ``2.0.0`` Stable openHAB version
-* ``2.1.0-SNAPSHOT`` Experimental openHAB snapshot version
+* ``1.8.3`` Stable openHAB 1 version
+* ``2.0.0`` Stable openHAB 2 version
+* ``2.1.0-snapshot`` Experimental openHAB 2 SNAPSHOT version
 
 #### Architecture:
 
