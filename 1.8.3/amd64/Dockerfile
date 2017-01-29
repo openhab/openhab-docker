@@ -81,6 +81,7 @@ RUN \
     rm /tmp/openhab.zip
 
 COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
