@@ -9,8 +9,18 @@
 
 FROM multiarch/debian-debootstrap:arm64-jessie
 
-ARG DOWNLOAD_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
-ENV APPDIR="/openhab" OPENHAB_HTTP_PORT='8080' OPENHAB_HTTPS_PORT='8443' EXTRA_JAVA_OPTS=''
+# Set download urls
+ENV OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
+ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
+
+# Set variables
+ENV \
+    APPDIR="/openhab" \
+    EXTRA_JAVA_OPTS="" \
+    JAVA_HOME='/usr/lib/java-8' \
+    OPENHAB_HTTP_PORT="8080" \
+    OPENHAB_HTTPS_PORT="8443" \
+    USER_ID="9001"
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -24,42 +34,23 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
 
-# Install Basepackages
-RUN \
-    apt-get update && \
+# Install basepackages
+RUN apt-get update && \
     apt-get install --no-install-recommends -y \
+      ca-certificates \
       unzip \
       wget \
-    && rm -rf /var/lib/apt/lists/*
+      && rm -rf /var/lib/apt/lists/*
 
-# Install gosu
-ENV GOSU_VERSION 1.10
-RUN set -x \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
-
-# Install Oracle Java
-RUN \
-  echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list && \
-  echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list && \
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  apt-get update && \
-  apt-get install --no-install-recommends -y oracle-java8-installer && \
-  rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk8-installer
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+# Install java
+RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
+    mkdir ${JAVA_HOME} && \
+    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME}
 
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
-RUN adduser --disabled-password --gecos '' --home ${APPDIR} openhab &&\
+RUN adduser -u $USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     groupadd -g 14 uucp2 &&\
     groupadd -g 16 dialout2 &&\
     groupadd -g 18 dialout3 &&\
@@ -73,23 +64,18 @@ RUN adduser --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     adduser openhab uucp3 &&\
     adduser openhab gpio
 
-WORKDIR ${APPDIR}
-
-RUN \
-    wget -nv -O /tmp/openhab.zip ${DOWNLOAD_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip
-
-COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
-
+# Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
-RUN chown -R openhab:openhab ${APPDIR} && \
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
+    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
+    rm /tmp/openhab.zip &&\
+    chown -R openhab:openhab ${APPDIR} && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
+WORKDIR ${APPDIR}
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 EXPOSE 8080 8443 5555
-CMD ["server"]
+USER openhab
+CMD ["./start.sh"]
 
