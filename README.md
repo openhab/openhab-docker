@@ -47,12 +47,12 @@ Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 The following will run openHAB in demo mode on the host machine:
 ```
-docker run -it --name openhab --net=host openhab/openhab:2.0.0-amd64 server
+docker run -it --name openhab --net=host openhab/openhab:2.0.0-amd64
 ```
 _**NOTE** Although this is the simplest method to getting openHAB up and running, but it is not the prefered method. To properly run the container, please specify a **host volume** for the directories._
 
 
-### Starting using Docker named volumes
+### Starting using Docker named volumes (for beginners)
 
 Following configuration uses Docker named data volumes. These volumes will survive, if you delete or upgrade your container. It is a good starting point for beginners. The volumes are created in the Docker volume directory. You can use ``docker inspect openhab`` to locate the directories (e.g. /var/lib/docker/volumes) on your host system. For more information visit  [Manage data in containers](https://docs.docker.com/engine/tutorials/dockervolumes/):
 
@@ -91,6 +91,46 @@ openhab:
     OPENHAB_HTTPS_PORT: "8443"
 ```
 
+### Mount a host directory as a data volume (for advanced user)
+
+You can mount a local host directory to store your configuration files. If you followed the beginners guide, you do not need to read this section. When using mounted volumes Docker only mounts existing data into the openHAB container. If you have no configuration files in this folder, openHAB will not start. You can copy the initial configutration files from the openHab image to the mounted volume. First you need to create the host directories.
+
+```SHELL
+mkdir /opt/openhab/ && \
+mkdir /opt/openhab/addons/ && \
+mkdir /opt/openhab/conf/ && \
+mkdir /opt/openhab/userdata/ && \
+chown 9001.9001 /opt/openhab -R
+```
+
+By default the openHAB user runs as user id 9001. Next copy the initial configuration files from the openHAB image to your host folder:
+
+```SHELL
+docker run --rm \
+  --user 9001
+  -v /opt/openhab/addons:/openhab/addons \
+  -v /opt/openhab/conf:/openhab/conf \
+  -v /opt/openhab/userdata:/openhab/userdata \
+  openhab/openhab:2.0.0-amd64 \
+  sh -c 'cp -av /openhab/userdata.dist/* /openhab/userdata/ && \
+  cp -av /openhab/conf.dist/* /openhab/conf/'
+```
+
+You should now be able to run the container with following command:
+
+```SHELL
+sudo docker run \
+  --user 9001 \
+  --name openhab \
+  --net=host \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v /opt/openhab/addons:/openhab/addons \
+  -v /opt/openhab/conf:/openhab/conf \
+  -v /opt/openhab/userdata:/openhab/userdata \
+  openhab/openhab:2.0.0-amd64
+```
+
 ### Accessing the console
 
 You can connect to a console of an already running openHAB container with following command:
@@ -102,16 +142,16 @@ The default password for the login is ``habopen``.
 
 **Debug Mode**
 
-You can run a new container with the command ``docker run -it openhab/openhab:2.0.0-amd64 debug`` to get into the debug shell.
+You can run a new container with the command ``docker run -it openhab/openhab:2.0.0-amd64 ./start_debug.sh`` to get into the debug shell.
 
 ### Environment variables
 
 *  `OPENHAB_HTTP_PORT`=8080
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `EXTRA_JAVA_OPTS`=""
-*  `USER_ID`=9001 (*)
+*  `USER_ID`=9001
 
-(*) `USER_ID` is available since version 2.1.0-snapshot. By default the openHAB user in the container is running with:
+By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
 
