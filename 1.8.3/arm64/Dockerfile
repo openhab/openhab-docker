@@ -7,6 +7,7 @@
 # ------------------------------------------------------------------------------
 #
 
+
 FROM multiarch/debian-debootstrap:arm64-jessie
 
 # Set download urls
@@ -41,6 +42,12 @@ RUN apt-get update && \
       unzip \
       wget \
       && rm -rf /var/lib/apt/lists/*
+
+RUN dpkg --add-architecture armhf && \
+    apt-get update && \
+    apt-get install --no-install-recommends -y \
+    libc6:armhf \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install java
 RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
