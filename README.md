@@ -146,9 +146,12 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 
 ### Environment variables
 
+*  `EXTRA_JAVA_OPTS`=""
+*  `LC_ALL`=en_US.UTF-8
+*  `LANG`=en_US.UTF-8
+*  `LANGUAGE`=en_US.UTF-8
 *  `OPENHAB_HTTP_PORT`=8080
 *  `OPENHAB_HTTPS_PORT`=8443
-*  `EXTRA_JAVA_OPTS`=""
 *  `USER_ID`=9001
 
 By default the openHAB user in the container is running with:
