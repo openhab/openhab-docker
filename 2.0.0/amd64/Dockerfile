@@ -42,6 +42,7 @@ RUN apt-get update && \
       locales \
       locales-all \
       libpcap-dev \
+      netbase \
       unzip \
       wget \
       && rm -rf /var/lib/apt/lists/*
