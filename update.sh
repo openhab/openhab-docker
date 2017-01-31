@@ -49,6 +49,7 @@ print_basepackages() {
 	# Set variables
 	ENV \
 	    APPDIR="/openhab" \
+	    DEBIAN_FRONTEND=noninteractive \
 	    EXTRA_JAVA_OPTS="" \
 	    JAVA_HOME='/usr/lib/java-8' \
 	    OPENHAB_HTTP_PORT="8080" \
@@ -71,9 +72,18 @@ print_basepackages() {
 	RUN apt-get update && \
 	    apt-get install --no-install-recommends -y \
 	      ca-certificates \
+	      locales \
+	      locales-all \
+	      libpcap-dev \
 	      unzip \
 	      wget \
 	      && rm -rf /var/lib/apt/lists/*
+
+	# Set locales
+	ENV \
+	    LC_ALL=en_US.UTF-8 \
+	    LANG=en_US.UTF-8 \
+	    LANGUAGE=en_US.UTF-8
 
 EOI
 }
