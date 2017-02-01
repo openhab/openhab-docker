@@ -16,6 +16,7 @@ ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
 # Set variables
 ENV \
     APPDIR="/openhab" \
+    DEBIAN_FRONTEND=noninteractive \
     EXTRA_JAVA_OPTS="" \
     JAVA_HOME='/usr/lib/java-8' \
     OPENHAB_HTTP_PORT="8080" \
@@ -38,9 +39,19 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       ca-certificates \
+      locales \
+      locales-all \
+      libpcap-dev \
+      netbase \
       unzip \
       wget \
       && rm -rf /var/lib/apt/lists/*
+
+# Set locales
+ENV \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
 
 # Install java
 RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
@@ -75,8 +86,10 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
-WORKDIR ${APPDIR}
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
+
+# Execute command
+WORKDIR ${APPDIR}
 EXPOSE 8080 8443 5555
 USER openhab
 CMD ["./start.sh"]

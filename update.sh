@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.1.0-snapshot 2.0.0"
+versions="2.1.0-snapshot 2.0.0 1.8.3"
 arches="amd64 armhf arm64"
 
 # Generate header
@@ -29,6 +29,9 @@ print_baseimage() {
 		;;
 	2.0.0)
 		openhab_url="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
+		;;
+	1.8.3)
+		openhab_url="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
 		;;
 	default)
 		openhab_url="error"
@@ -121,13 +124,15 @@ print_java() {
 	# Install java
 	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
 	    mkdir ${JAVA_HOME} && \
-	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME}
+	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
+	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
 
 EOI
 }
 
 # Add user and install Openhab
-print_openhab() {
+print_openhab_user() {
 	cat >> $1 <<-'EOI'
 	# Add openhab user & handle possible device groups for different host systems
 	# Container base image puts dialout on group id 20, uucp on id 10
@@ -146,6 +151,12 @@ print_openhab() {
 	    adduser openhab uucp3 &&\
 	    adduser openhab gpio
 
+EOI
+}
+
+# Install openhab for 2.0.0 and newer
+print_openhab_install() {
+	cat >> $1 <<-'EOI'
 	# Install openhab
 	# Set permissions for openhab. Export TERM variable. See issue #30 for details!
 	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
@@ -158,9 +169,46 @@ print_openhab() {
 	    chown -R openhab:openhab ${APPDIR} && \
 	    echo "export TERM=dumb" | tee -a ~/.bashrc
 
+EOI
+}
+
+# Install openhab for 1.8.3
+print_openhab_install_old() {
+	cat >> $1 <<-'EOI'
+	# Install openhab
+	# Set permissions for openhab. Export TERM variable. See issue #30 for details!
+	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
+	    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
+	    rm /tmp/openhab.zip &&\
+	    chown -R openhab:openhab ${APPDIR} && \
+	    echo "export TERM=dumb" | tee -a ~/.bashrc
+
+EOI
+}
+
+# Add volumes for 2.0.0 and newer
+print_volumes() {
+	cat >> $1 <<-'EOI'
 	# Expose volume with configuration and userdata dir
-	WORKDIR ${APPDIR}
 	VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+
+EOI
+}
+
+# Add volumes for 1.8.3
+print_volumes_old() {
+	cat >> $1 <<-'EOI'
+	# Expose volume with configuration and userdata dir
+	VOLUME ${APPDIR}/configurations ${APPDIR}/addons
+
+EOI
+}
+
+# Set working directory and execute command
+print_command() {
+	cat >> $1 <<-'EOI'
+	# Execute command
+	WORKDIR ${APPDIR}
 	EXPOSE 8080 8443 5555
 	USER openhab
 	CMD ["./start.sh"]
@@ -183,7 +231,15 @@ do
 				print_lib32_support_arm64 $file;
 			fi
 			print_java $file;
-			print_openhab $file;
+			print_openhab_user $file;
+			if [ "$version" == "1.8.3" ]; then
+				print_openhab_install_old $file;
+				print_volumes_old $file
+			else
+				print_openhab_install $file;
+				print_volumes $file
+			fi
+			print_command $file
 			echo "done"
 	done
 done
