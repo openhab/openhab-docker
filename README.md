@@ -27,8 +27,9 @@ When not explicitly set, files are placed under [![Eclipse license](https://img.
 
 #### Version:
 
-* [``2.0.0`` Stable openHAB version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
-* [``2.1.0-SNAPSHOT`` Experimental openHAB snapshot version](https://github.com/openhab/openhab-docker/blob/master/2.1.0-snapshot/amd64/Dockerfile)
+* [``1.8.3`` Stable openHAB 1 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/Dockerfile)
+* [``2.0.0`` Stable openHAB 2 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
+* [``2.1.0-snapshot`` Experimental openHAB 2 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.1.0-snapshot/amd64/Dockerfile)
 
 #### Architecture:
 
