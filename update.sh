@@ -91,7 +91,6 @@ print_basepackages() {
 	      locales \
 	      locales-all \
 	      libpcap-dev \
-	      patchelf \
 	      netbase \
 	      unzip \
 	      wget \

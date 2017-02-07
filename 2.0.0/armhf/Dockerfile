@@ -41,7 +41,6 @@ RUN apt-get update && \
       locales \
       locales-all \
       libpcap-dev \
-      patchelf \
       netbase \
       unzip \
       wget \
