@@ -20,8 +20,7 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     JAVA_HOME='/usr/lib/java-8' \
     OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443" \
-    USER_ID="9001"
+    OPENHAB_HTTPS_PORT="8443"
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -42,6 +41,7 @@ RUN apt-get update && \
       locales \
       locales-all \
       libpcap-dev \
+      patchelf \
       netbase \
       unzip \
       wget \
@@ -72,29 +72,11 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
 
-# Add openhab user & handle possible device groups for different host systems
-# Container base image puts dialout on group id 20, uucp on id 10
-# GPIO Group for RPI access
-RUN adduser -u $USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
-    groupadd -g 14 uucp2 &&\
-    groupadd -g 16 dialout2 &&\
-    groupadd -g 18 dialout3 &&\
-    groupadd -g 32 uucp3 &&\
-    groupadd -g 997 gpio &&\
-    adduser openhab dialout &&\
-    adduser openhab uucp &&\
-    adduser openhab uucp2 &&\
-    adduser openhab dialout2 &&\
-    adduser openhab dialout3 &&\
-    adduser openhab uucp3 &&\
-    adduser openhab gpio
-
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
 RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
     unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
     rm /tmp/openhab.zip &&\
-    chown -R openhab:openhab ${APPDIR} && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir

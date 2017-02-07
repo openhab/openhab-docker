@@ -70,8 +70,7 @@ print_basepackages() {
 	    EXTRA_JAVA_OPTS="" \
 	    JAVA_HOME='/usr/lib/java-8' \
 	    OPENHAB_HTTP_PORT="8080" \
-	    OPENHAB_HTTPS_PORT="8443" \
-	    USER_ID="9001"
+	    OPENHAB_HTTPS_PORT="8443"
 
 	# Basic build-time metadata as defined at http://label-schema.org
 	ARG BUILD_DATE
@@ -92,6 +91,7 @@ print_basepackages() {
 	      locales \
 	      locales-all \
 	      libpcap-dev \
+	      patchelf \
 	      netbase \
 	      unzip \
 	      wget \
@@ -149,29 +149,6 @@ print_java() {
 EOI
 }
 
-# Add user and install Openhab
-print_openhab_user() {
-	cat >> $1 <<-'EOI'
-	# Add openhab user & handle possible device groups for different host systems
-	# Container base image puts dialout on group id 20, uucp on id 10
-	# GPIO Group for RPI access
-	RUN adduser -u $USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
-	    groupadd -g 14 uucp2 &&\
-	    groupadd -g 16 dialout2 &&\
-	    groupadd -g 18 dialout3 &&\
-	    groupadd -g 32 uucp3 &&\
-	    groupadd -g 997 gpio &&\
-	    adduser openhab dialout &&\
-	    adduser openhab uucp &&\
-	    adduser openhab uucp2 &&\
-	    adduser openhab dialout2 &&\
-	    adduser openhab dialout3 &&\
-	    adduser openhab uucp3 &&\
-	    adduser openhab gpio
-
-EOI
-}
-
 # Install openhab for 2.0.0 and newer
 print_openhab_install() {
 	cat >> $1 <<-'EOI'
@@ -184,7 +161,6 @@ print_openhab_install() {
 	    touch ${APPDIR}/userdata/logs/openhab.log && \
 	    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
 	    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
-	    chown -R openhab:openhab ${APPDIR} && \
 	    echo "export TERM=dumb" | tee -a ~/.bashrc
 
 EOI
@@ -198,7 +174,6 @@ print_openhab_install_old() {
 	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
 	    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
 	    rm /tmp/openhab.zip &&\
-	    chown -R openhab:openhab ${APPDIR} && \
 	    echo "export TERM=dumb" | tee -a ~/.bashrc
 
 EOI
@@ -251,7 +226,6 @@ do
 			fi
 			print_java $file;
 			print_gosu $file;
-			print_openhab_user $file;
 			if [ "$version" == "1.8.3" ]; then
 				print_openhab_install_old $file;
 				print_volumes_old $file
