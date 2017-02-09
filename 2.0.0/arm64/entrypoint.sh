@@ -6,8 +6,10 @@ IFS=$'\n\t'
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
-echo "Starting with UID : $NEW_USER_ID"
-adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
+echo "Starting with openhab user id: $NEW_USER_ID"
+if ! id openhab >/dev/null 2>&1; then
+  echo "Create user openhab with id 9001"
+  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     groupadd -g 14 uucp2 &&\
     groupadd -g 16 dialout2 &&\
     groupadd -g 18 dialout3 &&\
@@ -20,7 +22,7 @@ adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab 
     adduser openhab dialout3 &&\
     adduser openhab uucp3 &&\
     adduser openhab gpio
-chown -R openhab:openhab ${APPDIR}
+fi
 
 # Initialize empty host volumes
 if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
@@ -34,6 +36,9 @@ if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
   echo "No configuration found... initializing."
   cp -av "${APPDIR}/conf.dist/." "${APPDIR}/conf/"
 fi
+
+# Set openhab folder permission
+chown -R openhab:openhab ${APPDIR}
 
 # Prettier interface
 if [ "$1" = 'server' ] || [ "$1" = 'openhab' ]; then
