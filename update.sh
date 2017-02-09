@@ -206,7 +206,7 @@ print_command() {
 	EXPOSE 8080 8443 5555
 	COPY entrypoint.sh /
 	ENTRYPOINT ["/entrypoint.sh"]
-	CMD ["server"]
+	CMD ["gosu", "openhab", "./start.sh"]
 
 EOI
 }

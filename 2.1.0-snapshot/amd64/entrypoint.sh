@@ -55,12 +55,5 @@ esac
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
 
-# Prettier interface
-if [ "$1" = 'server' ] || [ "$1" = 'openhab' ]; then
-  gosu openhab "${APPDIR}/start.sh"
-elif [ "$1" = 'debug' ]; then
-  gosu openhab "${APPDIR}/start_debug.sh"
-else
-  gosu openhab "$@"
-fi
+exec "$@"
 
