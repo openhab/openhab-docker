@@ -10,8 +10,9 @@
 FROM multiarch/debian-debootstrap:arm64-jessie
 
 # Set download urls
-ENV OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
 ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
+ENV OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
+ENV OPENHAB_VERSION="1.8.3"
 
 # Set variables
 ENV \
@@ -82,6 +83,7 @@ RUN set -x \
 RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
     unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
     rm /tmp/openhab.zip &&\
+    cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir

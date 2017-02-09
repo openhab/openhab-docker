@@ -54,8 +54,9 @@ print_baseimage() {
 	FROM multiarch/debian-debootstrap:$arch-jessie
 	
 	# Set download urls
-	ENV OPENHAB_URL="$openhab_url"
 	ENV JAVA_URL="$java_url"
+	ENV OPENHAB_URL="$openhab_url"
+	ENV OPENHAB_VERSION="$version"
 
 	EOI
 }
@@ -173,6 +174,7 @@ print_openhab_install_old() {
 	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
 	    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
 	    rm /tmp/openhab.zip &&\
+	    cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
 	    echo "export TERM=dumb" | tee -a ~/.bashrc
 
 EOI
