@@ -108,7 +108,6 @@ openhab:
   image: "openhab/openhab:2.0.0-amd64"
   restart: always
   net: host
-  user: root
   cap_add:
     - NET_ADMIN
     - NET_RAW
@@ -118,39 +117,18 @@ openhab:
     - "openhab_conf:/openhab/conf"
     - "openhab_userdata:/openhab/userdata"
     - "openhab_addons:/openhab/addons"
+  # The command node is very important. It overrides
+  # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
+  command: "./start.sh"
 ```
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
 
 ### Starting with Docker mounting a host directory (for advanced user)
 
-You can mount a local host directory to store your configuration files. If you followed the beginners guide, you do not need to read this section. When using mounted volumes Docker only mounts existing data into the openHAB container. If you have no configuration files in this folder, openHAB will not start. You can copy the initial configutration files from the openHab image to the mounted volume. First you need to create the host directories.
+You can mount a local host directory to store your configuration files. If you followed the beginners guide, you do not need to read this section. The following ``run`` command will create the folders and copy the initial configuration files for you.
 
 ```SHELL
-mkdir /opt/openhab/ && \
-mkdir /opt/openhab/addons/ && \
-mkdir /opt/openhab/conf/ && \
-mkdir /opt/openhab/userdata/ && \
-chown 9001.9001 /opt/openhab -R
-```
-
-By default the openHAB user runs as user id 9001. Next copy the initial configuration files from the openHAB image to your host folder:
-
-```SHELL
-docker run --rm \
-  --user 9001
-  -v /opt/openhab/addons:/openhab/addons \
-  -v /opt/openhab/conf:/openhab/conf \
-  -v /opt/openhab/userdata:/openhab/userdata \
-  openhab/openhab:2.0.0-amd64 \
-  sh -c 'cp -av /openhab/userdata.dist/* /openhab/userdata/ && \
-  cp -av /openhab/conf.dist/* /openhab/conf/'
-```
-
-You should now be able to run the container with following command:
-
-```SHELL
-sudo docker run \
-  --user 9001 \
+docker run \
   --name openhab \
   --net=host \
   -v /etc/localtime:/etc/localtime:ro \
