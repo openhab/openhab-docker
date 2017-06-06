@@ -69,8 +69,7 @@ RUN set -x \
     && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
     && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
+    && chmod +x /usr/local/bin/gosu
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
