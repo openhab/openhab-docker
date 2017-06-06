@@ -10,17 +10,18 @@
 FROM multiarch/debian-debootstrap:amd64-jessie
 
 # Set download urls
-ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
 ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
+ENV OPENHAB_VERSION="2.1.0-snapshot"
 
 # Set variables
 ENV \
     APPDIR="/openhab" \
+    DEBIAN_FRONTEND=noninteractive \
     EXTRA_JAVA_OPTS="" \
     JAVA_HOME='/usr/lib/java-8' \
     OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443" \
-    USER_ID="9001"
+    OPENHAB_HTTPS_PORT="8443"
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -38,31 +39,38 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       ca-certificates \
+      locales \
+      locales-all \
+      libpcap-dev \
+      netbase \
       unzip \
       wget \
       && rm -rf /var/lib/apt/lists/*
 
+# Set locales
+ENV \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
+
 # Install java
 RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
     mkdir ${JAVA_HOME} && \
-    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME}
+    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
+    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
 
-# Add openhab user & handle possible device groups for different host systems
-# Container base image puts dialout on group id 20, uucp on id 10
-# GPIO Group for RPI access
-RUN adduser -u $USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
-    groupadd -g 14 uucp2 &&\
-    groupadd -g 16 dialout2 &&\
-    groupadd -g 18 dialout3 &&\
-    groupadd -g 32 uucp3 &&\
-    groupadd -g 997 gpio &&\
-    adduser openhab dialout &&\
-    adduser openhab uucp &&\
-    adduser openhab uucp2 &&\
-    adduser openhab dialout2 &&\
-    adduser openhab dialout3 &&\
-    adduser openhab uucp3 &&\
-    adduser openhab gpio
+# Install gosu
+ENV GOSU_VERSION 1.10
+RUN set -x \
+    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+    && export GNUPGHOME="$(mktemp -d)" \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+    && chmod +x /usr/local/bin/gosu \
+    && gosu nobody true
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
@@ -73,13 +81,15 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
     touch ${APPDIR}/userdata/logs/openhab.log && \
     cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
     cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
-    chown -R openhab:openhab ${APPDIR} && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
-WORKDIR ${APPDIR}
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+
+# Execute command
+WORKDIR ${APPDIR}
 EXPOSE 8080 8443 5555
-USER openhab
-CMD ["./start.sh"]
+COPY entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gosu", "openhab", "./start.sh"]
 

@@ -11,8 +11,8 @@ FROM multiarch/debian-debootstrap:amd64-jessie
 
 # Set download urls
 ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
-ENV OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
-ENV OPENHAB_VERSION="2.0.0"
+ENV OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
+ENV OPENHAB_VERSION="1.8.3"
 
 # Set variables
 ENV \
@@ -77,14 +77,11 @@ RUN set -x \
 RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
     unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
     rm /tmp/openhab.zip &&\
-    mkdir -p ${APPDIR}/userdata/logs &&\
-    touch ${APPDIR}/userdata/logs/openhab.log && \
-    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
-    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
+    cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
-VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 
 # Execute command
 WORKDIR ${APPDIR}
