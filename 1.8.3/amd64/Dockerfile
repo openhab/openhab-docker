@@ -87,6 +87,7 @@ VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 WORKDIR ${APPDIR}
 EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gosu", "openhab", "./start.sh"]
 

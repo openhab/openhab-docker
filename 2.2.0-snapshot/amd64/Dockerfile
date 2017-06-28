@@ -7,12 +7,12 @@
 # ------------------------------------------------------------------------------
 #
 
-FROM multiarch/debian-debootstrap:armhf-jessie
+FROM multiarch/debian-debootstrap:amd64-jessie
 
 # Set download urls
-ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
-ENV OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
-ENV OPENHAB_VERSION="2.0.0"
+ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.2.0-SNAPSHOT.zip"
+ENV OPENHAB_VERSION="2.2.0-snapshot"
 
 # Set variables
 ENV \
@@ -90,7 +90,6 @@ VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 WORKDIR ${APPDIR}
 EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gosu", "openhab", "./start.sh"]
 

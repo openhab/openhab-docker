@@ -8,7 +8,7 @@ IFS=$'\n\t'
 NEW_USER_ID=${USER_ID:-9001}
 echo "Starting with openhab user id: $NEW_USER_ID"
 if ! id -u openhab >/dev/null 2>&1; then
-  echo "Create user openhab with id 9001"
+  echo "Create user openhab with id ${NEW_USER_ID}"
   adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
     groupadd -g 14 uucp2 &&\
     groupadd -g 16 dialout2 &&\
@@ -33,7 +33,7 @@ case ${OPENHAB_VERSION} in
         cp -av "${APPDIR}/configurations.dist/." "${APPDIR}/configurations/"
       fi
     ;;
-  2.0.0|2.1.0-snapshot)
+  2.0.0|2.1.0|2.1.0-snapshot)
       # Initialize empty host volumes
       if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
         # Copy userdata dir for version 2.0.0
@@ -56,4 +56,3 @@ esac
 chown -R openhab:openhab ${APPDIR}
 
 exec "$@"
-

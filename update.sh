@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.1.0-snapshot 2.0.0 1.8.3"
+versions="2.1.0-snapshot 2.1.0 2.0.0 1.8.3"
 arches="amd64 armhf arm64"
 
 # Generate header
@@ -26,6 +26,9 @@ print_baseimage() {
 	case $version in
 	2.1.0-snapshot)
 		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
+		;;
+	2.1.0)
+		openhab_url="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip"
 		;;
 	2.0.0)
 		openhab_url="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
@@ -52,7 +55,7 @@ print_baseimage() {
 	esac
 	cat >> $1 <<-EOI
 	FROM multiarch/debian-debootstrap:$arch-jessie
-	
+
 	# Set download urls
 	ENV JAVA_URL="$java_url"
 	ENV OPENHAB_URL="$openhab_url"
@@ -205,6 +208,7 @@ print_command() {
 	WORKDIR ${APPDIR}
 	EXPOSE 8080 8443 5555
 	COPY entrypoint.sh /
+	RUN chmod +x /entrypoint.sh
 	ENTRYPOINT ["/entrypoint.sh"]
 	CMD ["gosu", "openhab", "./start.sh"]
 
@@ -239,4 +243,3 @@ do
 			echo "done"
 	done
 done
-

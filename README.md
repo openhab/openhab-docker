@@ -1,7 +1,7 @@
 # openHAB2 Docker Containers
 ![](https://github.com/openhab/openhab-docker/raw/master/images/openhab.png)
 
-[![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/images/openhab/openhab:2.0.0-amd64 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.0.0-amd64.svg)](https://microbadger.com/#/images/openhab/openhab:2.0.0-amd64) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.1.0-amd64.svg)](https://microbadger.com/images/openhab/openhab:2.1.0-amd64 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.1.0-amd64.svg)](https://microbadger.com/#/images/openhab/openhab:2.1.0-amd64) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![GitHub issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues) [![Issue Stats](http://www.issuestats.com/github/openhab/openhab-docker/badge/issue?style=flat)](http://www.issuestats.com/github/openhab/openhab-docker) [![GitHub forks](https://img.shields.io/github/forks/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/network) [![Issue Stats](http://www.issuestats.com/github/openhab/openhab-docker/badge/pr?style=flat)](http://www.issuestats.com/github/openhab/openhab-docker) [![GitHub stars](https://img.shields.io/github/stars/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/stargazers)
 
@@ -34,9 +34,10 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 
 **Version**
 
-* [``1.8.3`` Stable openHAB 1 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/Dockerfile)
-* [``2.0.0`` Stable openHAB 2 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
-* [``2.1.0-snapshot`` Experimental openHAB 2 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.1.0-snapshot/amd64/Dockerfile)
+* [``1.8.3`` Stable openHAB 1.8 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/Dockerfile)
+* [``2.0.0`` Stable openHAB 2.0 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
+* [``2.1.0`` Stable openHAB 2.1 version](https://github.com/openhab/openhab-docker/blob/master/2.1.0/amd64/Dockerfile)
+* [``2.1.0-snapshot`` Experimental openHAB 2.1 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.1.0-snapshot/amd64/Dockerfile)
 
 **Architecture:**
 
@@ -44,7 +45,7 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 * ``armhf`` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
 * ``arm64`` for ARMv8 devices 64 Bit (not RaspberryPi 3)
 
-If you are unsure about what your needs are, you probably want to use ``openhab/openhab:2.0.0-amd64``.
+If you are unsure about what your needs are, you probably want to use ``openhab/openhab:2.1.0-amd64``.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
@@ -54,7 +55,7 @@ Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 The following will run openHAB in demo mode on the host machine:
 ```
-docker run -it --name openhab --net=host openhab/openhab:2.0.0-amd64
+docker run -it --name openhab --net=host openhab/openhab:2.1.0-amd64
 ```
 _**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the prefered method. To properly run the container, please specify a **host volume** for the directories._
 
@@ -75,7 +76,7 @@ docker run \
         -v openhab_userdata:/openhab/userdata \
         -d \
         --restart=always \
-        openhab/openhab:2.0.0-amd64
+        openhab/openhab:2.1.0-amd64
 ```
 
 #### Running from compose-file.yml
@@ -84,7 +85,7 @@ Create the following ``docker-compose.yml`` and start the container with ``docke
 
 ```YAML
 openhab:
-  image: "openhab/openhab:2.0.0-amd64"
+  image: "openhab/openhab:2.1.0-amd64"
   restart: always
   net: host
   volumes:
@@ -105,7 +106,7 @@ You can run all openHAB images with libpcap support. This enables you to use the
 ```YAML
 openhab:
   container_name: openhab
-  image: "openhab/openhab:2.0.0-amd64"
+  image: "openhab/openhab:2.1.0-amd64"
   restart: always
   net: host
   cap_add:
@@ -136,7 +137,7 @@ docker run \
   -v /opt/openhab/addons:/openhab/addons \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
-  openhab/openhab:2.0.0-amd64
+  openhab/openhab:2.1.0-amd64
 ```
 
 ### Accessing the console
@@ -150,7 +151,7 @@ The default password for the login is ``habopen``.
 
 **Debug Mode**
 
-You can run a new container with the command ``docker run -it openhab/openhab:2.0.0-amd64 ./start_debug.sh`` to get into the debug shell.
+You can run a new container with the command ``docker run -it openhab/openhab:2.1.0-amd64 ./start_debug.sh`` to get into the debug shell.
 
 ## Environment variables
 
@@ -189,4 +190,3 @@ $ docker run -it openhab/openhab server
 ## License
 
 When not explicitly set, files are placed under [![Eclipse license](https://img.shields.io/badge/license-Eclipse-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
-
