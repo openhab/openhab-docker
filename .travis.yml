@@ -31,9 +31,8 @@ env:
     - TARGET=amd64 VERSION=2.1.0
     - TARGET=armhf VERSION=2.1.0
     - TARGET=arm64 VERSION=2.1.0
-    - TARGET=amd64 VERSION=2.2.0-snapshot
-    - TARGET=armhf VERSION=2.2.0-snapshot
-    - TARGET=arm64 VERSION=2.2.0-snapshot
+    - TARGET=amd64 VERSION=2.1.0-snapshot
+    - TARGET=armhf VERSION=2.1.0-snapshot
+    - TARGET=arm64 VERSION=2.1.0-snapshot
 matrix:
   fast_finish: true
-

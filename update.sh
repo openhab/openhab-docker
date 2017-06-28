@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.2.0-snapshot 2.1.0 2.0.0 1.8.3"
+versions="2.1.0-snapshot 2.1.0 2.0.0 1.8.3"
 arches="amd64 armhf arm64"
 
 # Generate header
@@ -24,8 +24,8 @@ print_header() {
 print_baseimage() {
 	# Set download url for openhab version
 	case $version in
-	2.2.0-snapshot)
-		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.2.0-SNAPSHOT.zip"
+	2.1.0-snapshot)
+		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
 		;;
 	2.1.0)
 		openhab_url="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip"
@@ -55,7 +55,7 @@ print_baseimage() {
 	esac
 	cat >> $1 <<-EOI
 	FROM multiarch/debian-debootstrap:$arch-jessie
-	
+
 	# Set download urls
 	ENV JAVA_URL="$java_url"
 	ENV OPENHAB_URL="$openhab_url"
@@ -242,4 +242,3 @@ do
 			echo "done"
 	done
 done
-
