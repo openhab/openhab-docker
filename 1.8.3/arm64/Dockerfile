@@ -9,6 +9,8 @@
 
 FROM multiarch/debian-debootstrap:arm64-jessie
 
+MAINTAINER openHAB <info@openhabfoundation.org>
+
 # Set download urls
 ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
 ENV OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
