@@ -56,6 +56,8 @@ print_baseimage() {
 	cat >> $1 <<-EOI
 	FROM multiarch/debian-debootstrap:$arch-jessie
 
+	MAINTAINER openHAB <info@openhabfoundation.org>
+
 	# Set download urls
 	ENV JAVA_URL="$java_url"
 	ENV OPENHAB_URL="$openhab_url"
