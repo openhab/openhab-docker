@@ -28,6 +28,10 @@ Table of Contents
 
 Repository for building Docker containers for [openHAB](http://openhab.org) (Home Automation Server). Comments, suggestions and contributions are welcome!
 
+## Docker Image
+
+[![dockeri.co](http://dockeri.co/image/openhab/openhab)](https://hub.docker.com/r/openhab/openhab/)
+
 ## Image Variants
 
 ``openhab/openhab:<version>-<architecture>``
