@@ -73,6 +73,7 @@ Following configuration uses Docker named data volumes. These volumes will survi
 docker run \
         --name openhab \
         --net=host \
+        --tty \
         -v /etc/localtime:/etc/localtime:ro \
         -v /etc/timezone:/etc/timezone:ro \
         -v openhab_addons:/openhab/addons \
@@ -88,19 +89,23 @@ docker run \
 Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
-openhab:
-  image: "openhab/openhab:2.1.0-amd64"
-  restart: always
-  net: host
-  volumes:
-    - "/etc/localtime:/etc/localtime:ro"
-    - "/etc/timezone:/etc/timezone:ro"
-    - "openhab_addons:/openhab/addons"
-    - "openhab_conf:/openhab/conf"
-    - "openhab_userdata:/openhab/userdata"
-  environment:
-    OPENHAB_HTTP_PORT: "8080"
-    OPENHAB_HTTPS_PORT: "8443"
+version: '2.1'
+
+services:
+  openhab:
+    image: "openhab/openhab:2.1.0-amd64"
+    restart: always
+    network_mode: host
+    tty: true
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "openhab_addons:/openhab/addons"
+      - "openhab_conf:/openhab/conf"
+      - "openhab_userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
 ```
 
 #### Running openHAB with libpcap support
@@ -108,23 +113,27 @@ openhab:
 You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container. For that feature to work correctly, you need to run the image as **root user**. Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
-openhab:
-  container_name: openhab
-  image: "openhab/openhab:2.1.0-amd64"
-  restart: always
-  net: host
-  cap_add:
-    - NET_ADMIN
-    - NET_RAW
-  volumes:
-    - "/etc/localtime:/etc/localtime:ro"
-    - "/etc/timezone:/etc/timezone:ro"
-    - "openhab_conf:/openhab/conf"
-    - "openhab_userdata:/openhab/userdata"
-    - "openhab_addons:/openhab/addons"
-  # The command node is very important. It overrides
-  # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
-  command: "./start.sh"
+version: '2.1'
+
+services:
+  openhab:
+    container_name: openhab
+    image: "openhab/openhab:2.1.0-amd64"
+    restart: always
+    tty: true
+    net: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "openhab_conf:/openhab/conf"
+      - "openhab_userdata:/openhab/userdata"
+      - "openhab_addons:/openhab/addons"
+    # The command node is very important. It overrides
+    # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
+    command: "./start.sh"
 ```
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
 
@@ -136,6 +145,7 @@ You can mount a local host directory to store your configuration files. If you f
 docker run \
   --name openhab \
   --net=host \
+  --tty \
   -v /etc/localtime:/etc/localtime:ro \
   -v /etc/timezone:/etc/timezone:ro \
   -v /opt/openhab/addons:/openhab/addons \
