@@ -63,7 +63,7 @@ The following will run openHAB in demo mode on the host machine:
 ```
 docker run -it --name openhab --net=host openhab/openhab:2.1.0-amd64
 ```
-_**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the prefered method. To properly run the container, please specify a **host volume** for the directories._
+_**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method. To properly run the container, please specify a **host volume** for the directories._
 
 ### Starting with Docker named volumes (for beginners)
 
@@ -178,10 +178,9 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `OPENHAB_HTTP_PORT`=8080
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `USER_ID`=9001
+*  `GROUP_ID`=9001
 
-## User configuration
-
-By default the openHAB user in the container is running with:
+Group id will default to the same value as the user id. By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
 
