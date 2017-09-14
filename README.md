@@ -57,6 +57,8 @@ Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 **Important:** To be able to use UPnP for discovery the container needs to be started with ``--net=host``.
 
+**Important:** In the container openHAB runs with user "openhab" (id 9001) by default. See user configuration section below!
+
 The following will run openHAB in demo mode on the host machine:
 ```
 docker run -it --name openhab --net=host openhab/openhab:2.1.0-amd64
@@ -177,9 +179,29 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `USER_ID`=9001
 
+## User configuration
+
 By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
+
+Make sure that either
+
+* You create the same user with the same uid and gid on your docker host system
+```
+groupadd -g 9001 openhab
+useradd -u 9001 -g openhab -r -s /sbin/nologin openhab
+usermod -a -G openhab myownuser
+```
+
+* Or run the docker container with your own user AND passing the userid to openHAB through env
+```
+docker run \
+(...)
+--user <myownuserid> \
+-e USER_ID=<myownuserid>
+```
+
 
 ## Parameters
 
