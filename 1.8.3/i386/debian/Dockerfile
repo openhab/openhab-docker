@@ -7,12 +7,14 @@
 # ------------------------------------------------------------------------------
 #
 
-FROM multiarch/debian-debootstrap:armhf-jessie
+FROM multiarch/debian-debootstrap:i386-jessie
+
+MAINTAINER openHAB <info@openhabfoundation.org>
 
 # Set download urls
-ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
-ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
-ENV OPENHAB_VERSION="2.1.0-snapshot"
+ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+ENV OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip"
+ENV OPENHAB_VERSION="1.8.3"
 
 # Set variables
 ENV \
@@ -77,14 +79,11 @@ RUN set -x \
 RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
     unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
     rm /tmp/openhab.zip &&\
-    mkdir -p ${APPDIR}/userdata/logs &&\
-    touch ${APPDIR}/userdata/logs/openhab.log && \
-    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
-    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
+    cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
-VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 
 # Execute command
 WORKDIR ${APPDIR}

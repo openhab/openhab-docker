@@ -7,12 +7,14 @@
 # ------------------------------------------------------------------------------
 #
 
-FROM multiarch/debian-debootstrap:arm64-jessie
+FROM multiarch/alpine:i386-latest-stable
+
+MAINTAINER openHAB <info@openhabfoundation.org>
 
 # Set download urls
-ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
-ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.1.0-SNAPSHOT.zip"
-ENV OPENHAB_VERSION="2.1.0-snapshot"
+ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+ENV OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip"
+ENV OPENHAB_VERSION="2.1.0"
 
 # Set variables
 ENV \
@@ -53,12 +55,6 @@ ENV \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
-
-RUN dpkg --add-architecture armhf && \
-    apt-get update && \
-    apt-get install --no-install-recommends -y \
-    libc6:armhf \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install java
 RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
