@@ -28,6 +28,10 @@ Table of Contents
 
 Repository for building Docker containers for [openHAB](http://openhab.org) (Home Automation Server). Comments, suggestions and contributions are welcome!
 
+## Docker Image
+
+[![dockeri.co](http://dockeri.co/image/openhab/openhab)](https://hub.docker.com/r/openhab/openhab/)
+
 ## Image Variants
 
 ``openhab/openhab:<version>-<architecture>``
@@ -53,11 +57,13 @@ Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 **Important:** To be able to use UPnP for discovery the container needs to be started with ``--net=host``.
 
+**Important:** In the container openHAB runs with user "openhab" (id 9001) by default. See user configuration section below!
+
 The following will run openHAB in demo mode on the host machine:
 ```
 docker run -it --name openhab --net=host openhab/openhab:2.1.0-amd64
 ```
-_**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the prefered method. To properly run the container, please specify a **host volume** for the directories._
+_**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method. To properly run the container, please specify a **host volume** for the directories._
 
 ### Starting with Docker named volumes (for beginners)
 
@@ -69,6 +75,7 @@ Following configuration uses Docker named data volumes. These volumes will survi
 docker run \
         --name openhab \
         --net=host \
+        --tty \
         -v /etc/localtime:/etc/localtime:ro \
         -v /etc/timezone:/etc/timezone:ro \
         -v openhab_addons:/openhab/addons \
@@ -84,19 +91,23 @@ docker run \
 Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
-openhab:
-  image: "openhab/openhab:2.1.0-amd64"
-  restart: always
-  net: host
-  volumes:
-    - "/etc/localtime:/etc/localtime:ro"
-    - "/etc/timezone:/etc/timezone:ro"
-    - "openhab_addons:/openhab/addons"
-    - "openhab_conf:/openhab/conf"
-    - "openhab_userdata:/openhab/userdata"
-  environment:
-    OPENHAB_HTTP_PORT: "8080"
-    OPENHAB_HTTPS_PORT: "8443"
+version: '2.1'
+
+services:
+  openhab:
+    image: "openhab/openhab:2.1.0-amd64"
+    restart: always
+    network_mode: host
+    tty: true
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "openhab_addons:/openhab/addons"
+      - "openhab_conf:/openhab/conf"
+      - "openhab_userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
 ```
 
 #### Running openHAB with libpcap support
@@ -104,23 +115,27 @@ openhab:
 You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container. For that feature to work correctly, you need to run the image as **root user**. Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
-openhab:
-  container_name: openhab
-  image: "openhab/openhab:2.1.0-amd64"
-  restart: always
-  net: host
-  cap_add:
-    - NET_ADMIN
-    - NET_RAW
-  volumes:
-    - "/etc/localtime:/etc/localtime:ro"
-    - "/etc/timezone:/etc/timezone:ro"
-    - "openhab_conf:/openhab/conf"
-    - "openhab_userdata:/openhab/userdata"
-    - "openhab_addons:/openhab/addons"
-  # The command node is very important. It overrides
-  # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
-  command: "./start.sh"
+version: '2.1'
+
+services:
+  openhab:
+    container_name: openhab
+    image: "openhab/openhab:2.1.0-amd64"
+    restart: always
+    tty: true
+    net: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "openhab_conf:/openhab/conf"
+      - "openhab_userdata:/openhab/userdata"
+      - "openhab_addons:/openhab/addons"
+    # The command node is very important. It overrides
+    # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
+    command: "./start.sh"
 ```
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
 
@@ -132,6 +147,7 @@ You can mount a local host directory to store your configuration files. If you f
 docker run \
   --name openhab \
   --net=host \
+  --tty \
   -v /etc/localtime:/etc/localtime:ro \
   -v /etc/timezone:/etc/timezone:ro \
   -v /opt/openhab/addons:/openhab/addons \
@@ -162,10 +178,29 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `OPENHAB_HTTP_PORT`=8080
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `USER_ID`=9001
+*  `GROUP_ID`=9001
 
-By default the openHAB user in the container is running with:
+Group id will default to the same value as the user id. By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
+
+Make sure that either
+
+* You create the same user with the same uid and gid on your docker host system
+```
+groupadd -g 9001 openhab
+useradd -u 9001 -g openhab -r -s /sbin/nologin openhab
+usermod -a -G openhab myownuser
+```
+
+* Or run the docker container with your own user AND passing the userid to openHAB through env
+```
+docker run \
+(...)
+--user <myownuserid> \
+-e USER_ID=<myownuserid>
+```
+
 
 ## Parameters
 
