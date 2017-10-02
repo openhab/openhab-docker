@@ -56,7 +56,7 @@ print_baseimage() {
 	esac
 
 	# Set java download based on architecture
-	case $bases in
+	case $base in
 	debian)
 		base_image="debian-debootstrap:$arch-jessie"
 		;;
@@ -69,7 +69,7 @@ print_baseimage() {
 	esac
 
 	cat >> $1 <<-EOI
-	FROM FROM multiarch/$base_image
+	FROM multiarch/$base_image
 
 	MAINTAINER openHAB <info@openhabfoundation.org>
 
