@@ -55,7 +55,7 @@ print_baseimage() {
 		;;
 	esac
 
-	# Set java download based on architecture
+	# Set docker base image based on distributions
 	case $base in
 	debian)
 		base_image="debian-debootstrap:$arch-jessie"
@@ -81,15 +81,13 @@ print_baseimage() {
 	EOI
 }
 
-# Print metadata && basepackages
-print_basepackages() {
+# Print metadata
+print_basemetadata() {
 	cat >> $1 <<-'EOI'
 	# Set variables
 	ENV \
 	    APPDIR="/openhab" \
-	    DEBIAN_FRONTEND=noninteractive \
 	    EXTRA_JAVA_OPTS="" \
-	    JAVA_HOME='/usr/lib/java-8' \
 	    OPENHAB_HTTP_PORT="8080" \
 	    OPENHAB_HTTPS_PORT="8443"
 
@@ -105,24 +103,48 @@ print_basepackages() {
 	    org.label-schema.vcs-type="Git" \
 	    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
 
-	# Install basepackages
-	RUN apt-get update && \
-	    apt-get install --no-install-recommends -y \
-	      ca-certificates \
-	      fontconfig \
-	      locales \
-	      locales-all \
-	      libpcap-dev \
-	      netbase \
-	      unzip \
-	      wget \
-	      && rm -rf /var/lib/apt/lists/*
-
 	# Set locales
 	ENV \
 	    LC_ALL=en_US.UTF-8 \
 	    LANG=en_US.UTF-8 \
 	    LANGUAGE=en_US.UTF-8
+
+EOI
+}
+
+# Print basepackages for debian
+print_basepackages() {
+	cat >> $1 <<-'EOI'
+	# Install basepackages
+	RUN apt-get update && \
+			apt-get install --no-install-recommends -y \
+				ca-certificates \
+				fontconfig \
+				locales \
+				locales-all \
+				libpcap-dev \
+				netbase \
+				unzip \
+				wget \
+				&& rm -rf /var/lib/apt/lists/*
+	ENV DEBIAN_FRONTEND=noninteractive
+
+EOI
+}
+
+# Print basepackages for alpine
+print_basepackages_alpine() {
+	cat >> $1 <<-'EOI'
+	# Install basepackages
+	RUN apk update && \
+			apk add \
+				ca-certificates \
+				fontconfig \
+				libpcap-dev \
+				unzip \
+				dpkg \
+				gnupg \
+				wget
 
 EOI
 }
@@ -145,8 +167,9 @@ print_gosu() {
 	# Install gosu
 	ENV GOSU_VERSION 1.10
 	RUN set -x \
-	    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-	    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+			&& dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+			&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
+	    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
 	    && export GNUPGHOME="$(mktemp -d)" \
 	    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
 	    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
@@ -156,15 +179,34 @@ print_gosu() {
 EOI
 }
 
-# Install java
+# Install su-exec
+print_su-exec() {
+	cat >> $1 <<-'EOI'
+  # Install su-exec
+	RUN apk add su-exec
+
+EOI
+}
+
+# Install java for debian
 print_java() {
 	cat >> $1 <<-'EOI'
 	# Install java
+	ENV JAVA_HOME='/usr/lib/java-8'
 	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
 	    mkdir ${JAVA_HOME} && \
 	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
+
+EOI
+}
+
+# Install java for alpine
+print_java_alpine() {
+	cat >> $1 <<-'EOI'
+  # Install java
+	RUN apk add openjdk8
 
 EOI
 }
@@ -190,7 +232,6 @@ EOI
 print_openhab_install_old() {
 	cat >> $1 <<-'EOI'
 	# Install openhab
-	# Set permissions for openhab. Export TERM variable. See issue #30 for details!
 	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
 	    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
 	    rm /tmp/openhab.zip &&\
@@ -218,16 +259,22 @@ print_volumes_old() {
 EOI
 }
 
-# Set working directory and execute command
+# Set working directory, expose, entrypoint and command
 print_command() {
+	if [ "$base" == "alpine" ]; then
+		su_command="su-exec";
+	else
+		su_command="gosu";
+	fi
 	cat >> $1 <<-'EOI'
-	# Execute command
+	# Set working directory, expose, entrypoint and command
 	WORKDIR ${APPDIR}
 	EXPOSE 8080 8443 5555
 	COPY entrypoint.sh /
 	RUN chmod +x /entrypoint.sh
 	ENTRYPOINT ["/entrypoint.sh"]
-	CMD ["gosu", "openhab", "./start.sh"]
+	# Execute command
+	CMD ["$su_command", "openhab", "./start.sh"]
 
 EOI
 }
@@ -244,12 +291,19 @@ do
 				echo -n "Writing $file..."
 				print_header $file;
 				print_baseimage $file;
-				print_basepackages $file;
+				print_basemetadata $file;
+				if [ "$base" == "alpine" ]; then
+					print_basepackages_alpine $file;
+					print_java_alpine $file;
+					print_su-exec $file;
+				else
+					print_basepackages $file;
+					print_java $file;
+					print_gosu $file;
+				fi
 				if [ "$arch" == "arm64" ] && [ "$base" == "debian" ]; then
 					print_lib32_support_arm64 $file;
 				fi
-				print_java $file;
-				print_gosu $file;
 				if [ "$version" == "1.8.3" ]; then
 					print_openhab_install_old $file;
 					print_volumes_old $file
