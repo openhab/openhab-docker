@@ -3,7 +3,8 @@ set -eo pipefail
 
 # Dockerfiles to be generated
 versions="2.2.0-snapshot 2.1.0 2.0.0 1.8.3"
-arches="amd64 armhf arm64"
+arches="i386 amd64 armhf arm64"
+bases="debian alpine"
 
 # Generate header
 print_header() {
@@ -43,7 +44,7 @@ print_baseimage() {
 
 	# Set java download based on architecture
 	case $arch in
-	amd64)
+	i386|amd64)
 		java_url="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
 		;;
 	armhf|arm64)
@@ -53,8 +54,22 @@ print_baseimage() {
 		java_url="error"
 		;;
 	esac
+
+	# Set java download based on architecture
+	case $bases in
+	debian)
+		base_image="debian-debootstrap:$arch-jessie"
+		;;
+	alpine)
+		base_image="alpine:$arch-latest-stable"
+		;;
+	default)
+		base_image="error"
+		;;
+	esac
+
 	cat >> $1 <<-EOI
-	FROM multiarch/debian-debootstrap:$arch-jessie
+	FROM FROM multiarch/$base_image
 
 	MAINTAINER openHAB <info@openhabfoundation.org>
 
@@ -220,28 +235,31 @@ EOI
 # Build the Dockerfiles
 for version in $versions
 do
-	for arch in $arches
+	for base in $bases
 	do
-		file=$version/$arch/Dockerfile
-			mkdir -p `dirname $file` 2>/dev/null
-			echo -n "Writing $file..."
-			print_header $file;
-			print_baseimage $file;
-			print_basepackages $file;
-			if [ "$arch" == "arm64" ]; then
-				print_lib32_support_arm64 $file;
-			fi
-			print_java $file;
-			print_gosu $file;
-			if [ "$version" == "1.8.3" ]; then
-				print_openhab_install_old $file;
-				print_volumes_old $file
-			else
-				print_openhab_install $file;
-				print_volumes $file
-			fi
-			print_command $file
-			cp entrypoint.sh $version/$arch/entrypoint.sh
-			echo "done"
+		for arch in $arches
+		do
+			file=$version/$arch/$base/Dockerfile
+				mkdir -p `dirname $file` 2>/dev/null
+				echo -n "Writing $file..."
+				print_header $file;
+				print_baseimage $file;
+				print_basepackages $file;
+				if [ "$arch" == "arm64" ] && [ "$base" == "debian" ]; then
+					print_lib32_support_arm64 $file;
+				fi
+				print_java $file;
+				print_gosu $file;
+				if [ "$version" == "1.8.3" ]; then
+					print_openhab_install_old $file;
+					print_volumes_old $file
+				else
+					print_openhab_install $file;
+					print_volumes $file
+				fi
+				print_command $file
+				cp entrypoint.sh $version/$arch/$base/entrypoint.sh
+				echo "done"
+		done
 	done
 done
