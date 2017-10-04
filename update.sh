@@ -259,24 +259,39 @@ print_volumes_old() {
 EOI
 }
 
-# Set working directory, expose, entrypoint and command
-print_command() {
-	if [ "$base" == "alpine" ]; then
-		su_command="su-exec";
-	else
-		su_command="gosu";
-	fi
+# Set working directory, expose and entrypoint
+print_entrypoint() {
 	cat >> $1 <<-'EOI'
-	# Set working directory, expose, entrypoint and command
+	# Set working directory, expose and entrypoint
 	WORKDIR ${APPDIR}
 	EXPOSE 8080 8443 5555
 	COPY entrypoint.sh /
 	RUN chmod +x /entrypoint.sh
 	ENTRYPOINT ["/entrypoint.sh"]
 	# Execute command
-	CMD ["$su_command", "openhab", "./start.sh"]
 
 EOI
+}
+
+# Set command
+print_command() {
+	case $base in
+	debian)
+		cat >> $1 <<-'EOI'
+		CMD ["gosu", "openhab", "./start.sh"]
+		EOI
+		;;
+	alpine)
+		cat >> $1 <<-'EOI'
+		CMD ["su-exec", "openhab", "./start.sh"]
+		EOI
+		;;
+	default)
+		cat >> $1 <<-'EOI'
+		CMD ["./start.sh"]
+		EOI
+		;;
+	esac
 }
 
 # Build the Dockerfiles
@@ -311,6 +326,7 @@ do
 					print_openhab_install $file;
 					print_volumes $file
 				fi
+				print_entrypoint $file
 				print_command $file
 				cp entrypoint.sh $version/$arch/$base/entrypoint.sh
 				echo "done"
