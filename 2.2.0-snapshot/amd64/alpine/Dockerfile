@@ -52,7 +52,8 @@ unzip \
 dpkg \
 gnupg \
 wget \
-bash
+bash \
+shadow
 
   # Install java
 RUN apk add openjdk8

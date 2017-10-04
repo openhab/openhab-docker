@@ -146,7 +146,8 @@ print_basepackages_alpine() {
 				dpkg \
 				gnupg \
 				wget \
-				bash
+				bash \
+				shadow
 
 EOI
 }
