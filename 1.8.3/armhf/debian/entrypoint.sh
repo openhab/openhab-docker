@@ -6,10 +6,13 @@ IFS=$'\n\t'
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
-echo "Starting with openhab user id: $NEW_USER_ID"
+NEW_GROUP_ID=${GROUP_ID:-$NEW_USER_ID}
+echo "Starting with openhab user id: $NEW_USER_ID and group id: $NEW_GROUP_ID"
 if ! id -u openhab >/dev/null 2>&1; then
+  echo "Create group openhab with id ${NEW_GROUP_ID}"
+  groupadd -g $NEW_GROUP_ID openhab
   echo "Create user openhab with id ${NEW_USER_ID}"
-  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} openhab &&\
+  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} --gid $NEW_GROUP_ID openhab &&\
     groupadd -g 14 uucp2 &&\
     groupadd -g 16 dialout2 &&\
     groupadd -g 18 dialout3 &&\
