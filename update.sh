@@ -101,7 +101,8 @@ print_basemetadata() {
 	    org.label-schema.url="http://www.openhab.com/" \
 	    org.label-schema.vcs-ref=$VCS_REF \
 	    org.label-schema.vcs-type="Git" \
-	    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
+	    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
+			maintainer="openHAB <info@openhabfoundation.org>"
 
 	# Set locales
 	ENV \
@@ -144,7 +145,8 @@ print_basepackages_alpine() {
 				unzip \
 				dpkg \
 				gnupg \
-				wget
+				wget \
+				bash
 
 EOI
 }
