@@ -33,7 +33,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.url="http://www.openhab.com/" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
-    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git"
+    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
+maintainer="openHAB <info@openhabfoundation.org>"
 
 # Set locales
 ENV \
@@ -89,12 +90,12 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 
-# Set working directory, expose, entrypoint and command
+# Set working directory, expose and entrypoint
 WORKDIR ${APPDIR}
 EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 # Execute command
-CMD ["$su_command", "openhab", "./start.sh"]
 
+CMD ["gosu", "openhab", "./start.sh"]
