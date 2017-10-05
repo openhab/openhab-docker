@@ -331,7 +331,11 @@ do
 				fi
 				print_entrypoint $file
 				print_command $file
-				cp entrypoint.sh $version/$arch/$base/entrypoint.sh
+				if [ "$base" == "alpine" ]; then
+					cp entrypoint_alpine.sh $version/$arch/$base/entrypoint.sh
+				else
+					cp entrypoint_debian.sh $version/$arch/$base/entrypoint.sh
+				fi
 				echo "done"
 		done
 	done
