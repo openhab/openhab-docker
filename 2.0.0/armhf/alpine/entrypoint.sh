@@ -12,17 +12,33 @@ if ! id -u openhab >/dev/null 2>&1; then
   adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} openhab
 fi
 
-# Initialize empty host volumes
-if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
-  # Copy userdata dir for version 2.0.0
-  echo "No userdata found... initializing."
-  cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
-fi
-if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
-  # Copy userdata dir for version 2.0.0
-  echo "No configuration found... initializing."
-  cp -av "${APPDIR}/conf.dist/." "${APPDIR}/conf/"
-fi
+# Copy initial files to host volume
+case ${OPENHAB_VERSION} in
+  1.8.3)
+      if [ -z "$(ls -A "${APPDIR}/configurations")" ]; then
+        # Copy userdata dir for version 1.8.3
+        echo "No configuration found... initializing."
+        cp -av "${APPDIR}/configurations.dist/." "${APPDIR}/configurations/"
+      fi
+    ;;
+  2.0.0|2.1.0|2.2.0-snapshot)
+      # Initialize empty host volumes
+      if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
+        # Copy userdata dir for version 2.0.0
+        echo "No userdata found... initializing."
+        cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
+      fi
+
+      if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
+        # Copy userdata dir for version 2.0.0
+        echo "No configuration found... initializing."
+        cp -av "${APPDIR}/conf.dist/." "${APPDIR}/conf/"
+      fi
+    ;;
+  *)
+      echo openHAB version ${OPENHAB_VERSION} not supported!
+    ;;
+esac
 
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
