@@ -59,12 +59,6 @@ If you are unsure about what your needs are, you probably want to use
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
-### Known issue with alpine
-
-Openhab alpine images have a known issue preventing their containers from restarting. They display the following error:
-``karaf: There is a Root instance already running with name main and pid x``
-The container must be removed and re-run.
-
 ## Usage
 
 **Important:** To be able to use UPnP for discovery the container needs to be started with ``--net=host``.
