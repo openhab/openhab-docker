@@ -52,15 +52,16 @@ locales-all \
 libpcap-dev \
 netbase \
 unzip \
-wget \
-&& rm -rf /var/lib/apt/lists/*
+wget && \
+rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
-RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
+RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     mkdir ${JAVA_HOME} && \
     tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
 
@@ -77,9 +78,9 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu
 
 # Install openhab
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip &&\
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+    rm /tmp/openhab.zip && \
     cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 

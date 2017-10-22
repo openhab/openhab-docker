@@ -53,18 +53,15 @@ dpkg \
 gnupg \
 wget \
 bash \
-shadow
-
-  # Install java
-RUN apk add openjdk8
-
-  # Install su-exec
-RUN apk add su-exec
+shadow \
+openjdk8 \
+su-exec && \
+rm -rf /var/cache/apk/*
 
 # Install openhab
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip &&\
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+    rm /tmp/openhab.zip && \
     cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 

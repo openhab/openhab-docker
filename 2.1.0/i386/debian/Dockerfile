@@ -52,15 +52,16 @@ locales-all \
 libpcap-dev \
 netbase \
 unzip \
-wget \
-&& rm -rf /var/lib/apt/lists/*
+wget && \
+rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
-RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
+RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     mkdir ${JAVA_HOME} && \
     tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
 
@@ -78,10 +79,10 @@ RUN set -x \
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip &&\
-    mkdir -p ${APPDIR}/userdata/logs &&\
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+    rm /tmp/openhab.zip && \
+    mkdir -p ${APPDIR}/userdata/logs && \
     touch ${APPDIR}/userdata/logs/openhab.log && \
     cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
     cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \

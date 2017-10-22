@@ -53,20 +53,17 @@ dpkg \
 gnupg \
 wget \
 bash \
-shadow
-
-  # Install java
-RUN apk add openjdk8
-
-  # Install su-exec
-RUN apk add su-exec
+shadow \
+openjdk8 \
+su-exec && \
+rm -rf /var/cache/apk/*
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip &&\
-    mkdir -p ${APPDIR}/userdata/logs &&\
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+    rm /tmp/openhab.zip && \
+    mkdir -p ${APPDIR}/userdata/logs && \
     touch ${APPDIR}/userdata/logs/openhab.log && \
     cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
     cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
