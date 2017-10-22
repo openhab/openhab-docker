@@ -1,5 +1,5 @@
 # openHAB2 Docker Containers
-![](https://github.com/openhab/openhab-docker/raw/master/images/openhab.png)
+![](images/openhab.png)
 
 [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.1.0-amd64-debian.svg)](https://microbadger.com/images/openhab/openhab:2.1.0-amd64-debian "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.1.0-amd64-debian.svg)](https://microbadger.com/#/images/openhab/openhab:2.1.0-amd64-debian) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -58,12 +58,6 @@ If you are unsure about what your needs are, you probably want to use
  ``openhab/openhab:2.1.0-amd64-debian``.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
-
-### Known issue with alpine
-
-Openhab alpine images have a known issue preventing their containers from restarting. They display the following error:
-``karaf: There is a Root instance already running with name main and pid x``
-The container must be removed and re-run.
 
 ## Usage
 
