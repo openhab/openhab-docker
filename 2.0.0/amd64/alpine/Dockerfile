@@ -43,8 +43,7 @@ ENV \
     LANGUAGE=en_US.UTF-8
 
 # Install basepackages
-RUN apk update && \
-apk add \
+RUN apk update && apk add \
 ca-certificates \
 fontconfig \
 libpcap-dev \

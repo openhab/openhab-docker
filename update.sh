@@ -127,7 +127,7 @@ print_basepackages() {
 			netbase \
 			unzip \
 			wget && \
-		rm -rf /var/lib/apt/lists/*
+			rm -rf /var/lib/apt/lists/*
 	ENV DEBIAN_FRONTEND=noninteractive
 
 EOI
@@ -137,8 +137,7 @@ EOI
 print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
-	RUN apk update && \
-		apk add \
+	RUN apk update && apk add \
 			ca-certificates \
 			fontconfig \
 			libpcap-dev \
@@ -150,7 +149,7 @@ print_basepackages_alpine() {
 			shadow \
 			openjdk8 \
 			su-exec && \
-		rm -rf /var/cache/apk/*
+			rm -rf /var/cache/apk/*
 
 EOI
 }
