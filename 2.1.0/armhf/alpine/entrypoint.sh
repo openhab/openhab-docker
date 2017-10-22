@@ -2,6 +2,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Deleting instance.properties to avoid karaf PID conflict on restart
+# See: https://github.com/openhab/openhab-docker/issues/99
+rm -f /openhab/runtime/instances/instance.properties
+
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
