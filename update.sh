@@ -118,16 +118,16 @@ print_basepackages() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apt-get update && \
-			apt-get install --no-install-recommends -y \
-				ca-certificates \
-				fontconfig \
-				locales \
-				locales-all \
-				libpcap-dev \
-				netbase \
-				unzip \
-				wget \
-				&& rm -rf /var/lib/apt/lists/*
+		apt-get install --no-install-recommends -y \
+			ca-certificates \
+			fontconfig \
+			locales \
+			locales-all \
+			libpcap-dev \
+			netbase \
+			unzip \
+			wget && \
+		rm -rf /var/lib/apt/lists/*
 	ENV DEBIAN_FRONTEND=noninteractive
 
 EOI
@@ -138,16 +138,19 @@ print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apk update && \
-			apk add \
-				ca-certificates \
-				fontconfig \
-				libpcap-dev \
-				unzip \
-				dpkg \
-				gnupg \
-				wget \
-				bash \
-				shadow
+		apk add \
+			ca-certificates \
+			fontconfig \
+			libpcap-dev \
+			unzip \
+			dpkg \
+			gnupg \
+			wget \
+			bash \
+			shadow \
+			openjdk8 \
+			su-exec && \
+		rm -rf /var/cache/apk/*
 
 EOI
 }
@@ -158,8 +161,8 @@ print_lib32_support_arm64() {
 	RUN dpkg --add-architecture armhf && \
 	    apt-get update && \
 	    apt-get install --no-install-recommends -y \
-	    libc6:armhf \
-	    && rm -rf /var/lib/apt/lists/*
+	    libc6:armhf && \
+	    rm -rf /var/lib/apt/lists/*
 
 EOI
 }
@@ -182,34 +185,17 @@ print_gosu() {
 EOI
 }
 
-# Install su-exec
-print_su-exec() {
-	cat >> $1 <<-'EOI'
-  # Install su-exec
-	RUN apk add su-exec
-
-EOI
-}
-
 # Install java for debian
 print_java() {
 	cat >> $1 <<-'EOI'
 	# Install java
 	ENV JAVA_HOME='/usr/lib/java-8'
-	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} &&\
+	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
 	    mkdir ${JAVA_HOME} && \
 	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+		rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
-
-EOI
-}
-
-# Install java for alpine
-print_java_alpine() {
-	cat >> $1 <<-'EOI'
-  # Install java
-	RUN apk add openjdk8
 
 EOI
 }
@@ -219,10 +205,10 @@ print_openhab_install() {
 	cat >> $1 <<-'EOI'
 	# Install openhab
 	# Set permissions for openhab. Export TERM variable. See issue #30 for details!
-	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-	    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-	    rm /tmp/openhab.zip &&\
-	    mkdir -p ${APPDIR}/userdata/logs &&\
+	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+	    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+	    rm /tmp/openhab.zip && \
+	    mkdir -p ${APPDIR}/userdata/logs && \
 	    touch ${APPDIR}/userdata/logs/openhab.log && \
 	    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
 	    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
@@ -235,9 +221,9 @@ EOI
 print_openhab_install_old() {
 	cat >> $1 <<-'EOI'
 	# Install openhab
-	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-	    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-	    rm /tmp/openhab.zip &&\
+	RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+	    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+	    rm /tmp/openhab.zip && \
 	    cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
 	    echo "export TERM=dumb" | tee -a ~/.bashrc
 
@@ -312,8 +298,6 @@ do
 				print_basemetadata $file;
 				if [ "$base" == "alpine" ]; then
 					print_basepackages_alpine $file;
-					print_java_alpine $file;
-					print_su-exec $file;
 				else
 					print_basepackages $file;
 					print_java $file;
