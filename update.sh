@@ -141,6 +141,7 @@ print_basepackages_alpine() {
 			apk add \
 				ca-certificates \
 				fontconfig \
+				ttf-dejavu \
 				libpcap-dev \
 				unzip \
 				dpkg \

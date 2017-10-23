@@ -47,6 +47,7 @@ RUN apk update && \
 apk add \
 ca-certificates \
 fontconfig \
+ttf-dejavu \
 libpcap-dev \
 unzip \
 dpkg \
