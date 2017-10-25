@@ -325,7 +325,7 @@ do
 					# remove bug fix for version 2 from entrypoint_alpine.sh
 					if [ "$version" == "1.8.3" ]; then
 						line=$(sed "/rm -f \/openhab\/userdata\/tmp\/instances\/instance.properties/=; d" entrypoint_alpine.sh)
-						sed -i "$((line-3)),${line}"d $dstFile
+						sed -i "$((line-7)),${line}"d $dstFile
 					fi
 				else
 					cp entrypoint_debian.sh $dstFile
