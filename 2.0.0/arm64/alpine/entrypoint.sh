@@ -6,6 +6,10 @@ IFS=$'\n\t'
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f /openhab/runtime/instances/instance.properties
 
+# The instance.properties file in OH2.2-SNAP is installed in the tmp
+# directory
+rm -f /openhab/userdata/tmp/instances/instance.properties
+
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
