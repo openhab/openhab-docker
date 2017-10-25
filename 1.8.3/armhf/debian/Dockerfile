@@ -26,15 +26,19 @@ ENV \
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
 ARG VCS_REF
+ARG VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.docker.dockerfile="/Dockerfile" \
     org.label-schema.license="EPL" \
     org.label-schema.name="openHAB" \
+    org.label-schema.vendor="penHAB Foundation e.V." \
+    org.label-schema.version=$VERSION \
+    org.label-schema.description = "An open source, technology agnostic home automation platform" \
     org.label-schema.url="http://www.openhab.com/" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
-maintainer="openHAB <info@openhabfoundation.org>"
+    maintainer="openHAB <info@openhabfoundation.org>"
 
 # Set locales
 ENV \
@@ -44,16 +48,16 @@ ENV \
 
 # Install basepackages
 RUN apt-get update && \
-apt-get install --no-install-recommends -y \
-ca-certificates \
-fontconfig \
-locales \
-locales-all \
-libpcap-dev \
-netbase \
-unzip \
-wget && \
-rm -rf /var/lib/apt/lists/*
+    apt-get install --no-install-recommends -y \
+    ca-certificates \
+    fontconfig \
+    locales \
+    locales-all \
+    libpcap-dev \
+    netbase \
+    unzip \
+    wget && \
+    rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install java
@@ -61,15 +65,15 @@ ENV JAVA_HOME='/usr/lib/java-8'
 RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     mkdir ${JAVA_HOME} && \
     tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
-rm /tmp/java.tar.gz && \
+    rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
 
 # Install gosu
 ENV GOSU_VERSION 1.10
 RUN set -x \
-&& dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
+    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
@@ -93,6 +97,6 @@ EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-# Execute command
 
+# Execute command
 CMD ["gosu", "openhab", "./start.sh"]
