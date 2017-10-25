@@ -101,7 +101,7 @@ print_basemetadata() {
 	    org.label-schema.name="openHAB" \
 	    org.label-schema.vendor="penHAB Foundation e.V." \
 	    org.label-schema.version=$VERSION \
-	    org.label-schema.description = "An open source, technology agnostic home automation platform" \
+	    org.label-schema.description="An open source, technology agnostic home automation platform" \
 	    org.label-schema.url="http://www.openhab.com/" \
 	    org.label-schema.vcs-ref=$VCS_REF \
 	    org.label-schema.vcs-type="Git" \
