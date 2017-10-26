@@ -26,15 +26,19 @@ ENV \
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
 ARG VCS_REF
+ARG VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.docker.dockerfile="/Dockerfile" \
     org.label-schema.license="EPL" \
     org.label-schema.name="openHAB" \
+    org.label-schema.vendor="penHAB Foundation e.V." \
+    org.label-schema.version=$VERSION \
+    org.label-schema.description="An open source, technology agnostic home automation platform" \
     org.label-schema.url="http://www.openhab.com/" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
-maintainer="openHAB <info@openhabfoundation.org>"
+    maintainer="openHAB <info@openhabfoundation.org>"
 
 # Set locales
 ENV \
@@ -43,29 +47,24 @@ ENV \
     LANGUAGE=en_US.UTF-8
 
 # Install basepackages
-RUN apk update && \
-apk add \
-ca-certificates \
-fontconfig \
-ttf-dejavu \
-libpcap-dev \
-unzip \
-dpkg \
-gnupg \
-wget \
-bash \
-shadow
-
-  # Install java
-RUN apk add openjdk8
-
-  # Install su-exec
-RUN apk add su-exec
+RUN apk update && apk add \
+    ca-certificates \
+    fontconfig \
+    libpcap-dev \
+    unzip \
+    dpkg \
+    gnupg \
+    wget \
+    bash \
+    shadow \
+    openjdk8 \
+    su-exec && \
+    rm -rf /var/cache/apk/*
 
 # Install openhab
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} &&\
-    unzip -q /tmp/openhab.zip -d ${APPDIR} &&\
-    rm /tmp/openhab.zip &&\
+RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
+    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+    rm /tmp/openhab.zip && \
     cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
@@ -78,6 +77,6 @@ EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-# Execute command
 
+# Execute command
 CMD ["su-exec", "openhab", "./start.sh"]
