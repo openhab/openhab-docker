@@ -48,16 +48,17 @@ ENV \
 
 # Install basepackages
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
-    ca-certificates \
-    fontconfig \
-    locales \
-    locales-all \
-    libpcap-dev \
-    netbase \
-    unzip \
-    wget && \
-    rm -rf /var/lib/apt/lists/*
+apt-get install --no-install-recommends -y \
+ca-certificates \
+fontconfig \
+locales \
+locales-all \
+libpcap-dev \
+netbase \
+unzip \
+wget && \
+zip \
+rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install java
