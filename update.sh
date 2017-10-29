@@ -122,17 +122,17 @@ print_basepackages() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apt-get update && \
-		apt-get install --no-install-recommends -y \
-		ca-certificates \
-		fontconfig \
-		locales \
-		locales-all \
-		libpcap-dev \
-		netbase \
-		unzip \
-		wget && \
-		zip \
-		rm -rf /var/lib/apt/lists/*
+	    apt-get install --no-install-recommends -y \
+	    ca-certificates \
+	    fontconfig \
+	    locales \
+	    locales-all \
+	    libpcap-dev \
+	    netbase \
+	    unzip \
+	    wget && \
+	    zip \
+	    rm -rf /var/lib/apt/lists/*
 	ENV DEBIAN_FRONTEND=noninteractive
 
 EOI
@@ -143,19 +143,19 @@ print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apk update && apk add \
-		ca-certificates \
-		fontconfig \
-		libpcap-dev \
-		unzip \
-		dpkg \
-		gnupg \
-		wget \
-		bash \
-		shadow \
-		openjdk8 \
-		zip \
-		su-exec && \
-		rm -rf /var/cache/apk/*
+	    ca-certificates \
+	    fontconfig \
+	    libpcap-dev \
+	    unzip \
+	    dpkg \
+	    gnupg \
+	    wget \
+	    bash \
+	    shadow \
+	    openjdk8 \
+	    zip \
+	    su-exec && \
+	    rm -rf /var/cache/apk/*
 
 EOI
 }

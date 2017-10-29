@@ -48,19 +48,19 @@ ENV \
 
 # Install basepackages
 RUN apk update && apk add \
-ca-certificates \
-fontconfig \
-libpcap-dev \
-unzip \
-dpkg \
-gnupg \
-wget \
-bash \
-shadow \
-openjdk8 \
-zip \
-su-exec && \
-rm -rf /var/cache/apk/*
+    ca-certificates \
+    fontconfig \
+    libpcap-dev \
+    unzip \
+    dpkg \
+    gnupg \
+    wget \
+    bash \
+    shadow \
+    openjdk8 \
+    zip \
+    su-exec && \
+    rm -rf /var/cache/apk/*
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
