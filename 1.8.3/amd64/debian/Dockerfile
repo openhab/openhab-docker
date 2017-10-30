@@ -57,6 +57,7 @@ RUN apt-get update && \
     netbase \
     unzip \
     wget && \
+    zip \
     rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=noninteractive
 

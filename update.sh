@@ -131,6 +131,7 @@ print_basepackages() {
 	    netbase \
 	    unzip \
 	    wget && \
+	    zip \
 	    rm -rf /var/lib/apt/lists/*
 	ENV DEBIAN_FRONTEND=noninteractive
 
@@ -152,6 +153,7 @@ print_basepackages_alpine() {
 	    bash \
 	    shadow \
 	    openjdk8 \
+	    zip \
 	    su-exec && \
 	    rm -rf /var/cache/apk/*
 

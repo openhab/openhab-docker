@@ -58,6 +58,7 @@ RUN apk update && apk add \
     bash \
     shadow \
     openjdk8 \
+    zip \
     su-exec && \
     rm -rf /var/cache/apk/*
 
