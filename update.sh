@@ -99,7 +99,7 @@ print_basemetadata() {
 	    org.label-schema.docker.dockerfile="/Dockerfile" \
 	    org.label-schema.license="EPL" \
 	    org.label-schema.name="openHAB" \
-	    org.label-schema.vendor="penHAB Foundation e.V." \
+	    org.label-schema.vendor="openHAB Foundation e.V." \
 	    org.label-schema.version=$VERSION \
 	    org.label-schema.description="An open source, technology agnostic home automation platform" \
 	    org.label-schema.url="http://www.openhab.com/" \
@@ -130,8 +130,8 @@ print_basepackages() {
 	    libpcap-dev \
 	    netbase \
 	    unzip \
-	    wget && \
-	    zip \
+	    wget \
+	    zip && \
 	    rm -rf /var/lib/apt/lists/*
 	ENV DEBIAN_FRONTEND=noninteractive
 
