@@ -71,30 +71,26 @@ print_baseimage() {
 	cat >> $1 <<-EOI
 	FROM multiarch/$base_image
 
-	MAINTAINER openHAB <info@openhabfoundation.org>
-
-	# Set download urls
-	ENV JAVA_URL="$java_url"
-	ENV OPENHAB_URL="$openhab_url"
-	ENV OPENHAB_VERSION="$version"
-
 	EOI
 }
 
 # Print metadata
 print_basemetadata() {
 	cat >> $1 <<-'EOI'
-	# Set variables
+	# Set variables and download urls
 	ENV \
 	    APPDIR="/openhab" \
 	    EXTRA_JAVA_OPTS="" \
 	    OPENHAB_HTTP_PORT="8080" \
-	    OPENHAB_HTTPS_PORT="8443"
+	    OPENHAB_HTTPS_PORT="8443" \
+		OPENHAB_URL="$openhab_url" \
+		OPENHAB_VERSION="$version"
 
 	# Basic build-time metadata as defined at http://label-schema.org
-	ARG BUILD_DATE
-	ARG VCS_REF
-	ARG VERSION
+	ARG \
+		BUILD_DATE \
+		VCS_REF \
+		VERSION
 	LABEL org.label-schema.build-date=$BUILD_DATE \
 	    org.label-schema.docker.dockerfile="/Dockerfile" \
 	    org.label-schema.license="EPL" \
@@ -133,7 +129,9 @@ print_basepackages() {
 	    wget \
 	    zip && \
 	    rm -rf /var/lib/apt/lists/*
-	ENV DEBIAN_FRONTEND=noninteractive
+	ENV \
+		DEBIAN_FRONTEND=noninteractive \
+		JAVA_URL="$java_url"
 
 EOI
 }
@@ -142,7 +140,9 @@ EOI
 print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
-	RUN apk update && apk add \
+	RUN apk update && \
+    	apk upgrade && \
+    	apk add --no-cache \
 	    ca-certificates \
 	    fontconfig \
 	    ttf-dejavu \
