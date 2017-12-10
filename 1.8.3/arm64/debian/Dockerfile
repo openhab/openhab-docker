@@ -55,7 +55,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install java
-RUN JAVA_HOME='/usr/lib/java-8' wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
+ENV JAVA_HOME='/usr/lib/java-8'
+RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     mkdir ${JAVA_HOME} && \
     tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
     rm /tmp/java.tar.gz && \
@@ -63,8 +64,9 @@ RUN JAVA_HOME='/usr/lib/java-8' wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
 
 # Install gosu
+ENV GOSU_VERSION 1.10
 RUN set -x \
-    && GOSU_VERSION 1.10 dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
     && export GNUPGHOME \
