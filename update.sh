@@ -17,7 +17,6 @@ print_header() {
 	#                       PLEASE DO NOT EDIT IT DIRECTLY.
 	# ------------------------------------------------------------------------------
 	#
-
 	EOI
 }
 
@@ -71,25 +70,34 @@ print_baseimage() {
 	cat >> $1 <<-EOI
 	FROM multiarch/$base_image
 
+	# Set download urls
+	ENV \
+	    JAVA_URL="$java_url" \
+	    OPENHAB_URL="$openhab_url" \
+	    OPENHAB_VERSION="$version"
+
 	EOI
 }
 
 # Print metadata
 print_basemetadata() {
 	cat >> $1 <<-'EOI'
-	# Set variables and download urls
+	# Set variables and locales
 	ENV \
 	    APPDIR="/openhab" \
 	    EXTRA_JAVA_OPTS="" \
 	    OPENHAB_HTTP_PORT="8080" \
 	    OPENHAB_HTTPS_PORT="8443" \
-	    OPENHAB_URL="$openhab_url" \
-	    OPENHAB_VERSION="$version"
-
-	# Basic build-time metadata as defined at http://label-schema.org
+	    LC_ALL=en_US.UTF-8 \
+	    LANG=en_US.UTF-8 \
+	    LANGUAGE=en_US.UTF-8
+	
+	# Set arguments on build
 	ARG BUILD_DATE
 	ARG VCS_REF
 	ARG VERSION
+
+	# Basic build-time metadata as defined at http://label-schema.org
 	LABEL org.label-schema.build-date=$BUILD_DATE \
 	    org.label-schema.docker.dockerfile="/Dockerfile" \
 	    org.label-schema.license="EPL" \
@@ -103,12 +111,6 @@ print_basemetadata() {
 	    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
 	    maintainer="openHAB <info@openhabfoundation.org>"
 
-	# Set locales
-	ENV \
-	    LC_ALL=en_US.UTF-8 \
-	    LANG=en_US.UTF-8 \
-	    LANGUAGE=en_US.UTF-8
-
 EOI
 }
 
@@ -117,7 +119,7 @@ print_basepackages() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apt-get update && \
-	    apt-get install --no-install-recommends -y \
+	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 	    ca-certificates \
 	    fontconfig \
 	    locales \
@@ -128,9 +130,6 @@ print_basepackages() {
 	    wget \
 	    zip && \
 	    rm -rf /var/lib/apt/lists/*
-	ENV \
-		DEBIAN_FRONTEND=noninteractive \
-		JAVA_URL="$java_url"
 
 EOI
 }
@@ -176,13 +175,12 @@ EOI
 print_gosu() {
 	cat >> $1 <<-'EOI'
 	# Install gosu
-	ENV GOSU_VERSION 1.10
 	RUN set -x \
-	    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+	    && GOSU_VERSION 1.10 dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 	    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
 	    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
 	    && export GNUPGHOME \
-			&& GNUPGHOME="$(mktemp -d)" \
+	    && GNUPGHOME="$(mktemp -d)" \
 	    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
 	    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
 	    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
@@ -195,8 +193,7 @@ EOI
 print_java() {
 	cat >> $1 <<-'EOI'
 	# Install java
-	ENV JAVA_HOME='/usr/lib/java-8'
-	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
+	RUN JAVA_HOME='/usr/lib/java-8' wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
 	    mkdir ${JAVA_HOME} && \
 	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
 	    rm /tmp/java.tar.gz && \

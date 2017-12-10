@@ -6,22 +6,27 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-
 FROM multiarch/alpine:armhf-latest-stable
 
-# Set variables and download urls
+# Set download urls
+ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" 	    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip" 	    OPENHAB_VERSION="2.1.0"
+
+# Set variables and locales
 ENV \
     APPDIR="/openhab" \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
-    OPENHAB_URL="$openhab_url" \
-    OPENHAB_VERSION="$version"
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
 
-# Basic build-time metadata as defined at http://label-schema.org
+# Set arguments on build
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
+
+# Basic build-time metadata as defined at http://label-schema.org
 LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.docker.dockerfile="/Dockerfile" \
     org.label-schema.license="EPL" \
@@ -34,12 +39,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
     maintainer="openHAB <info@openhabfoundation.org>"
-
-# Set locales
-ENV \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
 
 # Install basepackages
 RUN apk update && \
