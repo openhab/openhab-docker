@@ -9,19 +9,14 @@
 
 FROM multiarch/alpine:armhf-latest-stable
 
-MAINTAINER openHAB <info@openhabfoundation.org>
-
-# Set download urls
-ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
-ENV OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.2.0-SNAPSHOT.zip"
-ENV OPENHAB_VERSION="2.2.0-snapshot"
-
-# Set variables
+# Set variables and download urls
 ENV \
     APPDIR="/openhab" \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443"
+    OPENHAB_HTTPS_PORT="8443" \
+    OPENHAB_URL="$openhab_url" \
+    OPENHAB_VERSION="$version"
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -47,7 +42,9 @@ ENV \
     LANGUAGE=en_US.UTF-8
 
 # Install basepackages
-RUN apk update && apk add \
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache \
     ca-certificates \
     fontconfig \
     ttf-dejavu \

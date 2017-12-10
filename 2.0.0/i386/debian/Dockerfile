@@ -9,19 +9,14 @@
 
 FROM multiarch/debian-debootstrap:i386-jessie
 
-MAINTAINER openHAB <info@openhabfoundation.org>
-
-# Set download urls
-ENV JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
-ENV OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip"
-ENV OPENHAB_VERSION="2.0.0"
-
-# Set variables
+# Set variables and download urls
 ENV \
     APPDIR="/openhab" \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443"
+    OPENHAB_HTTPS_PORT="8443" \
+    OPENHAB_URL="$openhab_url" \
+    OPENHAB_VERSION="$version"
 
 # Basic build-time metadata as defined at http://label-schema.org
 ARG BUILD_DATE
@@ -59,7 +54,9 @@ RUN apt-get update && \
     wget \
     zip && \
     rm -rf /var/lib/apt/lists/*
-ENV DEBIAN_FRONTEND=noninteractive
+ENV \
+DEBIAN_FRONTEND=noninteractive \
+JAVA_URL="$java_url"
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
