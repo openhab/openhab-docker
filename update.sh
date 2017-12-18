@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.2.0-snapshot 2.1.0 2.0.0 1.8.3"
+versions="2.3.0-snapshot 2.2.0 2.1.0 2.0.0 1.8.3"
 arches="i386 amd64 armhf arm64"
 bases="debian alpine"
 
@@ -24,8 +24,11 @@ print_header() {
 print_baseimage() {
 	# Set download url for openhab version
 	case $version in
-	2.2.0-snapshot)
-		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.2.0-SNAPSHOT.zip"
+	2.3.0-snapshot)
+		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.3.0-SNAPSHOT.zip"
+		;;
+	2.2.0)
+		openhab_url="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.2.0%2Fopenhab-2.2.0.zip"
 		;;
 	2.1.0)
 		openhab_url="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip"
