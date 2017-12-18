@@ -63,7 +63,7 @@ print_baseimage() {
 		base_image="debian-debootstrap:$arch-jessie"
 		;;
 	alpine)
-		base_image="alpine:$arch-latest-stable"
+		base_image="alpine:$arch-v3.6"
 		;;
 	default)
 		base_image="error"
