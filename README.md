@@ -1,7 +1,7 @@
 # openHAB Docker Containers
 ![](images/openhab.png)
 
-[![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.1.0-amd64-debian.svg)](https://microbadger.com/images/openhab/openhab:2.1.0-amd64-debian "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.1.0-amd64-debian.svg)](https://microbadger.com/#/images/openhab/openhab:2.1.0-amd64-debian) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.2.0-amd64-debian.svg)](https://microbadger.com/images/openhab/openhab:2.2.0-amd64-debian "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.2.0-amd64-debian.svg)](https://microbadger.com/#/images/openhab/openhab:2.2.0-amd64-debian) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![GitHub issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues) [![Issue Stats](http://www.issuestats.com/github/openhab/openhab-docker/badge/issue?style=flat)](http://www.issuestats.com/github/openhab/openhab-docker) [![GitHub forks](https://img.shields.io/github/forks/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/network) [![Issue Stats](http://www.issuestats.com/github/openhab/openhab-docker/badge/pr?style=flat)](http://www.issuestats.com/github/openhab/openhab-docker) [![GitHub stars](https://img.shields.io/github/stars/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/stargazers)
 
@@ -41,7 +41,8 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 * [``1.8.3`` Stable openHAB 1.8 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/Dockerfile)
 * [``2.0.0`` Stable openHAB 2.0 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
 * [``2.1.0`` Stable openHAB 2.1 version](https://github.com/openhab/openhab-docker/blob/master/2.1.0/amd64/Dockerfile)
-* [``2.2.0-snapshot`` Experimental openHAB 2.2 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.2.0-snapshot/amd64/Dockerfile)
+* [``2.2.0`` Stable openHAB 2.2 version](https://github.com/openhab/openhab-docker/blob/master/2.2.0/amd64/Dockerfile)
+* [``2.3.0-snapshot`` Experimental openHAB 2.3 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.3.0-snapshot/amd64/Dockerfile)
 
 **Architecture:**
 
@@ -55,7 +56,7 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 * ``alpine`` for alpine 3.6
 
 If you are unsure about what your needs are, you probably want to use
- ``openhab/openhab:2.1.0-amd64-debian``.
+ ``openhab/openhab:2.2.0-amd64-debian``.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
@@ -67,7 +68,7 @@ Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 The following will run openHAB in demo mode on the host machine:
 ```
-docker run -it --name openhab --net=host openhab/openhab:2.1.0-amd64-debian
+docker run -it --name openhab --net=host openhab/openhab:2.2.0-amd64-debian
 ```
 _**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method. To properly run the container, please specify a **host volume** for the directories._
 
@@ -89,7 +90,7 @@ docker run \
         -v openhab_userdata:/openhab/userdata \
         -d \
         --restart=always \
-        openhab/openhab:2.1.0-amd64-debian
+        openhab/openhab:2.2.0-amd64-debian
 ```
 
 #### Running from compose-file.yml
@@ -97,11 +98,11 @@ docker run \
 Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
-version: '2.1'
+version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:2.1.0-amd64-debian"
+    image: "openhab/openhab:2.2.0-amd64-debian"
     restart: always
     network_mode: host
     tty: true
@@ -121,12 +122,12 @@ services:
 You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container. For that feature to work correctly, you need to run the image as **root user**. Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
 
 ```YAML
-version: '2.1'
+version: '2.2'
 
 services:
   openhab:
     container_name: openhab
-    image: "openhab/openhab:2.1.0-amd64-debian"
+    image: "openhab/openhab:2.2.0-amd64-debian"
     restart: always
     tty: true
     net: host
@@ -159,7 +160,7 @@ docker run \
   -v /opt/openhab/addons:/openhab/addons \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
-  openhab/openhab:2.1.0-amd64-debian
+  openhab/openhab:2.2.0-amd64-debian
 ```
 
 ### Accessing the console
@@ -173,7 +174,7 @@ The default password for the login is ``habopen``.
 
 **Debug Mode**
 
-You can run a new container with the command ``docker run -it openhab/openhab:2.1.0-amd64 ./start_debug.sh`` to get into the debug shell.
+You can run a new container with the command ``docker run -it openhab/openhab:2.2.0-amd64 ./start_debug.sh`` to get into the debug shell.
 
 ## Environment variables
 
