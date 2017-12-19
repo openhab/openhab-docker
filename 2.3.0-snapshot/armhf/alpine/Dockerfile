@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:armhf-latest-stable
+FROM multiarch/alpine:armhf-v3.6
 
 # Set download urls
 ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" 	    OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.3.0-SNAPSHOT.zip" 	    OPENHAB_VERSION="2.3.0-snapshot"
