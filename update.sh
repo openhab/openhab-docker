@@ -204,6 +204,10 @@ print_java() {
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
+	RUN cd /tmp \
+	    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
+	    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
+	    && rm /tmp/ZuluJCEPolicies.zip
 
 EOI
 }
