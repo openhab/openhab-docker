@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:amd64-v3.6
+FROM multiarch/alpine:amd64-v3.7
 
 # Set download urls
 ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" 	    OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip" 	    OPENHAB_VERSION="1.8.3"
