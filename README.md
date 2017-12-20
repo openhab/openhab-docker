@@ -55,6 +55,8 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 * ``debian`` for debian jessie
 * ``alpine`` for alpine 3.6
 
+The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://docs.openhab.org/installation/#prerequisites) for known disadvantages).
+
 If you are unsure about what your needs are, you probably want to use
  ``openhab/openhab:2.2.0-amd64-debian``.
 
