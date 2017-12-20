@@ -2,6 +2,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Deleting instance.properties to avoid karaf PID conflict on restart
+# See: https://github.com/openhab/openhab-docker/issues/99
+rm -f /openhab/runtime/instances/instance.properties
+
+# The instance.properties file in OH2.x is installed in the tmp
+# directory
+rm -f /openhab/userdata/tmp/instances/instance.properties
+
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
@@ -12,19 +20,19 @@ if ! id -u openhab >/dev/null 2>&1; then
   echo "Create group openhab with id ${NEW_GROUP_ID}"
   groupadd -g $NEW_GROUP_ID openhab
   echo "Create user openhab with id ${NEW_USER_ID}"
-  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} --gid $NEW_GROUP_ID openhab &&\
-    groupadd -g 14 uucp2 &&\
-    groupadd -g 16 dialout2 &&\
-    groupadd -g 18 dialout3 &&\
-    groupadd -g 32 uucp3 &&\
-    groupadd -g 997 gpio &&\
-    adduser openhab dialout &&\
-    adduser openhab uucp &&\
-    adduser openhab uucp2 &&\
-    adduser openhab dialout2 &&\
-    adduser openhab dialout3 &&\
-    adduser openhab uucp3 &&\
-    adduser openhab gpio
+  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} --gid $NEW_GROUP_ID openhab
+  groupadd -g 14 uucp2
+  groupadd -g 16 dialout2
+  groupadd -g 18 dialout3
+  groupadd -g 32 uucp3
+  groupadd -g 997 gpio
+  adduser openhab dialout
+  adduser openhab uucp
+  adduser openhab uucp2
+  adduser openhab dialout2
+  adduser openhab dialout3
+  adduser openhab uucp3
+  adduser openhab gpio
 fi
 
 # Copy initial files to host volume
