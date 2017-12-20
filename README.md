@@ -171,6 +171,7 @@ You can connect to a console of an already running openHAB container with follow
 * ``docker ps``  - lists all your currently running container
 * ``docker exec -it openhab /openhab/runtime/bin/client`` - connect to openHAB container by name
 * ``docker exec -it c4ad98f24423 /openhab/runtime/bin/client`` - connect to openHAB container by id
+* ``docker attach openhab`` - attach to openHAB container by name, input only works when starting the container with `-i`  (or `stdin_open: true` with docker compose)
 
 The default password for the login is ``habopen``.
 
