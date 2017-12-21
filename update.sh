@@ -132,7 +132,8 @@ print_basepackages() {
 	    unzip \
 	    wget \
 	    zip && \
-	    rm -rf /var/lib/apt/lists/*
+	    rm -rf /var/lib/apt/lists/* && \
+		ln -s -f /bin/true /usr/bin/chfn
 
 EOI
 }

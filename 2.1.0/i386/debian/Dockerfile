@@ -52,7 +52,8 @@ RUN apt-get update && \
     unzip \
     wget \
     zip && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+ln -s -f /bin/true /usr/bin/chfn
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
