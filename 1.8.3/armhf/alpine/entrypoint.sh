@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
 # Karaf needs a pseudo-TTY so exit and instruct user to allocate one when necessary
-tty > /dev/null 2>&1
+test -t 0
 if [ $? -eq 1 ]; then
     echo "Please start the openHAB container with a pseudo-TTY using the -t option or 'tty: true' with docker compose"
     exit 1
