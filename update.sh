@@ -303,7 +303,7 @@ do
 		for arch in $arches
 		do
 			file=$version/$arch/$base/Dockerfile
-				mkdir -p `dirname $file` 2>/dev/null
+				mkdir -p $(dirname $file) 2>/dev/null
 				echo -n "Writing $file..."
 				print_header $file;
 				print_baseimage $file;
