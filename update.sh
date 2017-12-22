@@ -94,7 +94,7 @@ print_basemetadata() {
 	    LC_ALL=en_US.UTF-8 \
 	    LANG=en_US.UTF-8 \
 	    LANGUAGE=en_US.UTF-8
-	
+
 	# Set arguments on build
 	ARG BUILD_DATE
 	ARG VCS_REF
@@ -304,7 +304,7 @@ do
 		for arch in $arches
 		do
 			file=$version/$arch/$base/Dockerfile
-				mkdir -p `dirname $file` 2>/dev/null
+				mkdir -p $(dirname $file) 2>/dev/null
 				echo -n "Writing $file..."
 				print_header $file;
 				print_baseimage $file;
@@ -344,3 +344,4 @@ do
 		done
 	done
 done
+
