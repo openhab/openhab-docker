@@ -46,14 +46,14 @@ case ${OPENHAB_VERSION} in
       fi
 
       # Upgrade userdata if versions do not match
-      curVersion=`cat ${APPDIR}/userdata/etc/version.properties | grep build-no | cut -d : -f 2 | tr -d '[:space]'`
-      imgVersion=`cat ${APPDIR}/userdata.dist/etc/version.properties | grep build-no | cut -d : -f 2 | tr -d '[:space]'`
+      curVersion=$(< ${APPDIR}/userdata/etc/version.properties grep build-no | cut -d : -f 2 | tr -d '[:space]')
+      imgVersion=$(< ${APPDIR}/userdata.dist/etc/version.properties grep build-no | cut -d : -f 2 | tr -d '[:space]')
       echo "Current \"${curVersion}\" Image \"${imgVersion}\"" # TODO remove
       if [ "${curVersion}" != "${imgVersion}" ]; then
         echo "Image version \"${imgVersion}\" is different from userdata version \"${curVersion}\""
 
         # Make a backup of userdata
-        backupFile=userdata-`date +"%FT%H:%M:%S"`.tar
+	backupFile=userdata-$(date +"%FT%H:%M:%S").tar
         tar cf /tmp/${backupFile} ${APPDIR}/userdata
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir ${APPDIR}/userdata/backup

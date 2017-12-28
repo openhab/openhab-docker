@@ -37,6 +37,44 @@ case ${OPENHAB_VERSION} in
         cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
       fi
 
+      # Upgrade userdata if versions do not match
+      curVersion=$(< ${APPDIR}/userdata/etc/version.properties grep build-no | cut -d : -f 2 | tr -d '[:space]')
+      imgVersion=$(< ${APPDIR}/userdata.dist/etc/version.properties grep build-no | cut -d : -f 2 | tr -d '[:space]')
+      echo "Current \"${curVersion}\" Image \"${imgVersion}\"" # TODO remove
+      if [ "${curVersion}" != "${imgVersion}" ]; then
+        echo "Image version \"${imgVersion}\" is different from userdata version \"${curVersion}\""
+
+        # Make a backup of userdata
+	backupFile=userdata-$(date +"%FT%H:%M:%S").tar
+        tar cf /tmp/${backupFile} ${APPDIR}/userdata
+        if [ ! -d "${APPDIR}/userdata/backup" ]; then
+          mkdir ${APPDIR}/userdata/backup
+        fi
+        cp /tmp/${backupFile} ${APPDIR}/userdata/backup/
+        echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
+
+        # Copy over the updated files
+        cp ${APPDIR}/userdata.dist/etc/all.policy ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/branding.properties ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/branding-ssh.properties ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/config.properties ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/custom.properties ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/version.properties ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/distribution.info ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/jre.properties ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/profile.cfg ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/startup.properties ${APPDIR}/userdata/etc
+        cp ${APPDIR}/userdata.dist/etc/org.apache.karaf* ${APPDIR}/userdata/etc/
+        cp ${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg ${APPDIR}/userdata/etc/
+        echo "Replaced files in userdata/etc with newer versions"
+
+        # Clear the cache and tmp
+        rm -rf ${APPDIR}/userdata/cache/*
+        rm -rf ${APPDIR}/userdata/tmp/*
+        echo "Cleared the cache and tmp"
+
+      fi
+
       if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
         # Copy userdata dir for version 2.0.0
         echo "No configuration found... initializing."
