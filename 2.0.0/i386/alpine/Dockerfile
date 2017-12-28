@@ -52,7 +52,7 @@ RUN apk update && \
     dpkg \
     gnupg \
     wget \
-curl \
+    curl \
     bash \
     shadow \
     openjdk8 \

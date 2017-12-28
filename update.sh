@@ -153,7 +153,7 @@ print_basepackages_alpine() {
 	    dpkg \
 	    gnupg \
 	    wget \
-		curl \
+	    curl \
 	    bash \
 	    shadow \
 	    openjdk8 \
