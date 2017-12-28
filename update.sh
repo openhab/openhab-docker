@@ -94,7 +94,7 @@ print_basemetadata() {
 	    LC_ALL=en_US.UTF-8 \
 	    LANG=en_US.UTF-8 \
 	    LANGUAGE=en_US.UTF-8
-	
+
 	# Set arguments on build
 	ARG BUILD_DATE
 	ARG VCS_REF
@@ -132,7 +132,8 @@ print_basepackages() {
 	    unzip \
 	    wget \
 	    zip && \
-	    rm -rf /var/lib/apt/lists/*
+	    rm -rf /var/lib/apt/lists/* && \
+		ln -s -f /bin/true /usr/bin/chfn
 
 EOI
 }
@@ -204,6 +205,10 @@ print_java() {
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
+	RUN cd /tmp \
+	    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
+	    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
+	    && rm /tmp/ZuluJCEPolicies.zip
 
 EOI
 }
@@ -299,7 +304,7 @@ do
 		for arch in $arches
 		do
 			file=$version/$arch/$base/Dockerfile
-				mkdir -p `dirname $file` 2>/dev/null
+				mkdir -p $(dirname $file) 2>/dev/null
 				echo -n "Writing $file..."
 				print_header $file;
 				print_baseimage $file;
@@ -339,3 +344,4 @@ do
 		done
 	done
 done
+

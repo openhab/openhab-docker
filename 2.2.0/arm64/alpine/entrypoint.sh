@@ -1,4 +1,12 @@
 #!/bin/sh -x
+
+# Karaf needs a pseudo-TTY so exit and instruct user to allocate one when necessary
+test -t 0
+if [ $? -eq 1 ]; then
+    echo "Please start the openHAB container with a pseudo-TTY using the -t option or 'tty: true' with docker compose"
+    exit 1
+fi
+
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -6,7 +14,7 @@ IFS=$'\n\t'
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f /openhab/runtime/instances/instance.properties
 
-# The instance.properties file in OH2.2-SNAP is installed in the tmp
+# The instance.properties file in OH2.x is installed in the tmp
 # directory
 rm -f /openhab/userdata/tmp/instances/instance.properties
 

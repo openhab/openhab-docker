@@ -52,7 +52,8 @@ RUN apt-get update && \
     unzip \
     wget \
     zip && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+ln -s -f /bin/true /usr/bin/chfn
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
@@ -62,6 +63,10 @@ RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
+RUN cd /tmp \
+    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
+    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
+    && rm /tmp/ZuluJCEPolicies.zip
 
 # Install gosu
 ENV GOSU_VERSION 1.10
