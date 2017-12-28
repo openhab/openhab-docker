@@ -53,7 +53,7 @@ case ${OPENHAB_VERSION} in
         echo "Image version \"${imgVersion}\" is different from userdata version \"${curVersion}\""
 
         # Make a backup of userdata
-	backupFile=userdata-$(date +"%FT%H:%M:%S").tar
+        backupFile=userdata-$(date +"%FT%H:%M:%S").tar
         tar cf /tmp/${backupFile} ${APPDIR}/userdata
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir ${APPDIR}/userdata/backup
@@ -61,7 +61,7 @@ case ${OPENHAB_VERSION} in
         cp /tmp/${backupFile} ${APPDIR}/userdata/backup/
         echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
 
-        # Copy over the updated files
+	# Copy over the updated files
         cp ${APPDIR}/userdata.dist/etc/all.policy ${APPDIR}/userdata/etc/
         cp ${APPDIR}/userdata.dist/etc/branding.properties ${APPDIR}/userdata/etc/
         cp ${APPDIR}/userdata.dist/etc/branding-ssh.properties ${APPDIR}/userdata/etc/
@@ -80,7 +80,6 @@ case ${OPENHAB_VERSION} in
         rm -rf ${APPDIR}/userdata/cache/*
         rm -rf ${APPDIR}/userdata/tmp/*
         echo "Cleared the cache and tmp"
-
       fi
 
       if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
