@@ -132,7 +132,7 @@ services:
     image: "openhab/openhab:2.2.0-amd64-debian"
     restart: always
     tty: true
-    net: host
+    network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW
