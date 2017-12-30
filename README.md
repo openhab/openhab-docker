@@ -38,11 +38,11 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 
 **Version**
 
-* [``1.8.3`` Stable openHAB 1.8 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/Dockerfile)
-* [``2.0.0`` Stable openHAB 2.0 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/Dockerfile)
-* [``2.1.0`` Stable openHAB 2.1 version](https://github.com/openhab/openhab-docker/blob/master/2.1.0/amd64/Dockerfile)
-* [``2.2.0`` Stable openHAB 2.2 version](https://github.com/openhab/openhab-docker/blob/master/2.2.0/amd64/Dockerfile)
-* [``2.3.0-snapshot`` Experimental openHAB 2.3 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.3.0-snapshot/amd64/Dockerfile)
+* [``1.8.3`` Stable openHAB 1.8 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/debian/Dockerfile)
+* [``2.0.0`` Stable openHAB 2.0 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/debian/Dockerfile)
+* [``2.1.0`` Stable openHAB 2.1 version](https://github.com/openhab/openhab-docker/blob/master/2.1.0/amd64/debian/Dockerfile)
+* [``2.2.0`` Stable openHAB 2.2 version](https://github.com/openhab/openhab-docker/blob/master/2.2.0/amd64/debian/Dockerfile)
+* [``2.3.0-snapshot`` Experimental openHAB 2.3 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.3.0-snapshot/amd64/debian/Dockerfile)
 
 **Architecture:**
 
