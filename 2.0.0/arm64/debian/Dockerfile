@@ -44,7 +44,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     ca-certificates \
-    fontconfig \
     locales \
     locales-all \
     libpcap-dev \
@@ -84,6 +83,7 @@ RUN set -x \
 RUN dpkg --add-architecture armhf && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
+    fontconfig:armhf \
     libc6:armhf && \
     rm -rf /var/lib/apt/lists/*
 
