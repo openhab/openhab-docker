@@ -46,7 +46,7 @@ case ${OPENHAB_VERSION} in
 
         # Make a backup of userdata
         backupFile=userdata-$(date +"%FT%H:%M:%S").tar
-        tar --exclude="${APPDIR}/userdata/backup" cf "/tmp/${backupFile}" "${APPDIR}/userdata"
+        tar cf "/tmp/${backupFile}" "${APPDIR}/userdata"
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir "${APPDIR}/userdata/backup"
         fi
@@ -71,8 +71,8 @@ case ${OPENHAB_VERSION} in
         # Clear the cache and tmp
         rm -rf "${APPDIR}/userdata/cache"
         rm -rf "${APPDIR}/userdata/tmp"
-	mkdir "${APPDIR}/userdata/cache"
-	mkdir "${APPDIR}/userdata/tmp"
+        mkdir "${APPDIR}/userdata/cache"
+        mkdir "${APPDIR}/userdata/tmp"
         echo "Cleared the cache and tmp"
       fi
 
