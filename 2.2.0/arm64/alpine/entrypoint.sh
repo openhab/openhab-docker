@@ -54,7 +54,7 @@ case ${OPENHAB_VERSION} in
 
         # Make a backup of userdata
         backupFile=userdata-$(date +"%FT%H:%M:%S").tar
-        tar --exclude="${APPDIR}/userdata/backup" -c -f "/tmp/${backupFile}" "${APPDIR}/userdata"
+        tar -c -f "/tmp/${backupFile}" -X "${APPDIR}/userdata/backup" "${APPDIR}/userdata"
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir "${APPDIR}/userdata/backup"
         fi
