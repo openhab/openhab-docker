@@ -64,7 +64,7 @@ case ${OPENHAB_VERSION} in
       curVersion=$(< "${APPDIR}/userdata/etc/version.properties" grep build-no | cut -d : -f 2 | tr -d '[:space]')
       imgVersion=$(< "${APPDIR}/userdata.dist/etc/version.properties" grep build-no | cut -d : -f 2 | tr -d '[:space]')
       
-      if [ "${curVersion}" = "${imgVersion}" ]; then
+      if [ "${curVersion}" != "${imgVersion}" ]; then
         echo "Image build number \"${imgVersion}\" is different from userdata build number \"${curVersion}\""
 
         # Make a backup of userdata
