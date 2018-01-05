@@ -54,11 +54,10 @@ case ${OPENHAB_VERSION} in
 
         # Make a backup of userdata
         backupFile=userdata-$(date +"%FT%H:%M:%S").tar
-        tar -c -f "/tmp/${backupFile}" -X "${APPDIR}/userdata/backup" "${APPDIR}/userdata"
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir "${APPDIR}/userdata/backup"
         fi
-        cp "/tmp/${backupFile}" "${APPDIR}/userdata/backup/"
+        tar -c -f "${APPDIR}/userdata/backup/${backupFile}" -X "${APPDIR}/userdata/backup" "${APPDIR}/userdata"
         echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
 
 	# Copy over the updated files
@@ -72,7 +71,7 @@ case ${OPENHAB_VERSION} in
         cp "${APPDIR}/userdata.dist/etc/jre.properties" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/profile.cfg" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/startup.properties" "${APPDIR}/userdata/etc"
-        cp "${APPDIR}/userdata.dist/etc/org.apache.karaf*" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/org.apache.karaf"* "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg" "${APPDIR}/userdata/etc/"
         echo "Replaced files in userdata/etc with newer versions"
 
