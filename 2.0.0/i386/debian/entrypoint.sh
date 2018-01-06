@@ -86,6 +86,7 @@ case ${OPENHAB_VERSION} in
         cp "${APPDIR}/userdata.dist/etc/jre.properties" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/org.apache.karaf"* "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/overrides.properties" "${APPDIR}/userdata/etc/"	
         cp "${APPDIR}/userdata.dist/etc/profile.cfg" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/startup.properties" "${APPDIR}/userdata/etc"
 	cp "${APPDIR}/userdata.dist/etc/system.properties" "${APPDIR}/userdata/etc"
