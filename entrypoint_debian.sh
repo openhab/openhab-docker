@@ -61,9 +61,9 @@ case ${OPENHAB_VERSION} in
       fi
 
       # Upgrade userdata if versions do not match
-      curVersion=$(< "${APPDIR}/userdata/etc/version.properties" grep build-no | cut -d : -f 2 | tr -d '[:space]')
-      imgVersion=$(< "${APPDIR}/userdata.dist/etc/version.properties" grep build-no | cut -d : -f 2 | tr -d '[:space]')
-      
+      curVersion=$(grep build-no "${APPDIR}/userdata/etc/version.properties" | cut -d : -f 2 | tr -d '[:space]')
+      imgVersion=$(grep build-no "${APPDIR}/userdata.dist/etc/version.properties" | cut -d : -f 2 | tr -d '[:space]')
+
       if [ "${curVersion}" != "${imgVersion}" ]; then
         echo "Image build number \"${imgVersion}\" is different from userdata build number \"${curVersion}\""
 
@@ -81,15 +81,19 @@ case ${OPENHAB_VERSION} in
         cp "${APPDIR}/userdata.dist/etc/branding-ssh.properties" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/config.properties" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/custom.properties" "${APPDIR}/userdata/etc/"
-	cp "${APPDIR}/userdata.dist/etc/custom.system.properties" "${APPDIR}/userdata/etc/"
+        if [ -f "${APPDIR}/userdata.dist/etc/custom.system.properties" ]; then
+          cp "${APPDIR}/userdata.dist/etc/custom.system.properties" "${APPDIR}/userdata/etc/"
+        fi
         cp "${APPDIR}/userdata.dist/etc/distribution.info" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/jre.properties" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/org.apache.karaf"* "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/overrides.properties" "${APPDIR}/userdata/etc/"	
+        if [ -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
+          cp "${APPDIR}/userdata.dist/etc/overrides.properties" "${APPDIR}/userdata/etc/"
+        fi
         cp "${APPDIR}/userdata.dist/etc/profile.cfg" "${APPDIR}/userdata/etc/"
         cp "${APPDIR}/userdata.dist/etc/startup.properties" "${APPDIR}/userdata/etc"
-	cp "${APPDIR}/userdata.dist/etc/system.properties" "${APPDIR}/userdata/etc"
+        cp "${APPDIR}/userdata.dist/etc/system.properties" "${APPDIR}/userdata/etc"
         cp "${APPDIR}/userdata.dist/etc/version.properties" "${APPDIR}/userdata/etc/"
         echo "Replaced files in userdata/etc with newer versions"
 
