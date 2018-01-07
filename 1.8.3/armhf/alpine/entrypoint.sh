@@ -39,7 +39,7 @@ case ${OPENHAB_VERSION} in
 
       # Upgrade userdata if versions do not match
       if [ ! -z $(cmp "${APPDIR}/userdata/etc/version.properties" "${APPDIR}/userdata.dist/etc/version.properties") ]; then
-        echo "Image build number \"${imgVersion}\" is different from userdata build number \"${curVersion}\""
+        echo "Image and userdata versions differ! Starting an upgrade."
 
         # Make a backup of userdata
         backupFile=userdata-$(date +"%FT%H:%M:%S").tar
