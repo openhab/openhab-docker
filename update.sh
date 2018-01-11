@@ -91,9 +91,10 @@ print_basemetadata() {
 	    EXTRA_JAVA_OPTS="" \
 	    OPENHAB_HTTP_PORT="8080" \
 	    OPENHAB_HTTPS_PORT="8443" \
-	    LC_ALL=en_US.UTF-8 \
-	    LANG=en_US.UTF-8 \
-	    LANGUAGE=en_US.UTF-8
+	    LC_ALL="en_US.UTF-8" \
+	    LANG="en_US.UTF-8" \
+	    LANGUAGE="en_US.UTF-8" \
+	    CRYPTO_POLICY="limited"
 
 	# Set arguments on build
 	ARG BUILD_DATE
@@ -133,7 +134,7 @@ print_basepackages() {
 	    wget \
 	    zip && \
 	    rm -rf /var/lib/apt/lists/* && \
-		ln -s -f /bin/true /usr/bin/chfn
+	    ln -s -f /bin/true /usr/bin/chfn
 
 EOI
 }
@@ -206,10 +207,17 @@ print_java() {
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
-	RUN cd /tmp \
-	    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
-	    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
-	    && rm /tmp/ZuluJCEPolicies.zip
+
+EOI
+}
+
+# Configure java for alpine
+print_java_alpine() {
+	cat >> $1 <<-'EOI'
+	# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+	ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
+	RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
+	    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 EOI
 }
@@ -312,6 +320,7 @@ do
 				print_basemetadata $file;
 				if [ "$base" == "alpine" ]; then
 					print_basepackages_alpine $file;
+					print_java_alpine $file;
 				else
 					print_basepackages $file;
 					print_java $file;

@@ -17,9 +17,10 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+    LC_ALL="en_US.UTF-8" \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    CRYPTO_POLICY="limited"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -59,6 +60,11 @@ RUN apk update && \
     zip \
     su-exec && \
     rm -rf /var/cache/apk/*
+
+# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
+RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 # Install openhab
 RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \

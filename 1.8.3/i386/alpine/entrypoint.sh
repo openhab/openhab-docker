@@ -10,13 +10,21 @@ fi
 set -euo pipefail
 IFS=$'\n\t'
 
+# Install Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security/policy/unlimited" ]; then
+echo "Installing OpenJDK unlimited strength cryptography policy..."
+  apk update
+  apk fix --no-cache openjdk8-jre-lib
+  rm -rf /var/cache/apk/*
+fi
+
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
 echo "Starting with openhab user id: $NEW_USER_ID"
 if ! id -u openhab >/dev/null 2>&1; then
-  echo "Create user openhab with id 9001"
+  echo "Create user openhab with id $NEW_USER_ID"
   adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} openhab
 fi
 

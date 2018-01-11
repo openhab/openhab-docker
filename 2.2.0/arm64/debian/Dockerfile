@@ -17,9 +17,10 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+    LC_ALL="en_US.UTF-8" \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    CRYPTO_POLICY="limited"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -53,7 +54,7 @@ RUN apt-get update && \
     wget \
     zip && \
     rm -rf /var/lib/apt/lists/* && \
-ln -s -f /bin/true /usr/bin/chfn
+    ln -s -f /bin/true /usr/bin/chfn
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
@@ -63,10 +64,6 @@ RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
-RUN cd /tmp \
-    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
-    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
-    && rm /tmp/ZuluJCEPolicies.zip
 
 # Install gosu
 ENV GOSU_VERSION 1.10
