@@ -12,10 +12,8 @@ IFS=$'\n\t'
 
 # Install Java unlimited strength cryptography
 if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security/policy/unlimited" ]; then
-echo "Installing OpenJDK unlimited strength cryptography policy..."
-  apk update
+  echo "Installing OpenJDK unlimited strength cryptography policy..."
   apk fix --no-cache openjdk8-jre-lib
-  rm -rf /var/cache/apk/*
 fi
 
 # Add openhab user & handle possible device groups for different host systems
