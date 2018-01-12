@@ -53,7 +53,7 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 **Distributions:**
 
 * ``debian`` for debian jessie
-* ``alpine`` for alpine 3.6
+* ``alpine`` for alpine 3.7
 
 The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://docs.openhab.org/installation/#prerequisites) for known disadvantages).
 
@@ -189,6 +189,9 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `USER_ID`=9001
 *  `GROUP_ID`=9001
+*  `CRYPTO_POLICY`=limited
+
+### User and group identifiers
 
 Group id will default to the same value as the user id. By default the openHAB user in the container is running with:
 
@@ -210,6 +213,15 @@ docker run \
 --user <myownuserid> \
 -e USER_ID=<myownuserid>
 ```
+
+### Java cryptographic strength policy
+
+Due to local laws and export restrictions the containers use Java with a limited cryptographic strength policy. Some openHAB functionality (e.g. KM200 binding) may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited 
+
+Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
+
+* debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
+* alpine: [OpenJDK (Cryptographic Cautions)](http://openjdk.java.net/groups/security)
 
 ## Parameters
 

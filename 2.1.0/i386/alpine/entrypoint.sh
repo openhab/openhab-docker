@@ -10,6 +10,12 @@ fi
 set -euo pipefail
 IFS=$'\n\t'
 
+# Install Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security/policy/unlimited" ]; then
+  echo "Installing OpenJDK unlimited strength cryptography policy..."
+  apk fix --no-cache openjdk8-jre-lib
+fi
+
 # Deleting instance.properties to avoid karaf PID conflict on restart
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f /openhab/runtime/instances/instance.properties
@@ -24,7 +30,7 @@ rm -f /openhab/userdata/tmp/instances/instance.properties
 NEW_USER_ID=${USER_ID:-9001}
 echo "Starting with openhab user id: $NEW_USER_ID"
 if ! id -u openhab >/dev/null 2>&1; then
-  echo "Create user openhab with id 9001"
+  echo "Create user openhab with id $NEW_USER_ID"
   adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} openhab
 fi
 

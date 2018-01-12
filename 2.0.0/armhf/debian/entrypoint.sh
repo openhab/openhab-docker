@@ -10,6 +10,14 @@ fi
 set -euo pipefail
 IFS=$'\n\t'
 
+# Install Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -f "${JAVA_HOME}/jre/lib/security/README.txt" ]; then
+  echo "Installing Zulu Cryptography Extension Kit (\"CEK\")..."
+  wget -q -O /tmp/ZuluJCEPolicies.zip https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip
+  unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip
+  rm /tmp/ZuluJCEPolicies.zip
+fi
+
 # Deleting instance.properties to avoid karaf PID conflict on restart
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f /openhab/runtime/instances/instance.properties
