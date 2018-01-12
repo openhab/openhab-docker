@@ -53,13 +53,11 @@ RUN apk update && \
     dpkg \
     gnupg \
     wget \
-    curl \
     bash \
     shadow \
     openjdk8 \
     zip \
-    su-exec && \
-    rm -rf /var/cache/apk/*
+    su-exec
 
 # Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
@@ -79,6 +77,10 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+
+# Reduce image size by removing files that are used only for building the image
+RUN apk del dpkg gnupg && \
+    rm -rf /var/cache/apk/*
 
 # Set working directory, expose and entrypoint
 WORKDIR ${APPDIR}

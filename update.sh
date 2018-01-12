@@ -60,7 +60,7 @@ print_baseimage() {
 	# Set docker base image based on distributions
 	case $base in
 	debian)
-		base_image="debian-debootstrap:$arch-jessie"
+		base_image="debian-debootstrap:$arch-stretch"
 		;;
 	alpine)
 		base_image="alpine:$arch-v3.7"
@@ -125,7 +125,9 @@ print_basepackages() {
 	RUN apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 	    ca-certificates \
+	    dirmngr \
 	    fontconfig \
+	    gnupg \
 	    locales \
 	    locales-all \
 	    libpcap-dev \
@@ -133,7 +135,6 @@ print_basepackages() {
 	    unzip \
 	    wget \
 	    zip && \
-	    rm -rf /var/lib/apt/lists/* && \
 	    ln -s -f /bin/true /usr/bin/chfn
 
 EOI
@@ -154,16 +155,37 @@ print_basepackages_alpine() {
 	    dpkg \
 	    gnupg \
 	    wget \
-	    curl \
 	    bash \
 	    shadow \
 	    openjdk8 \
 	    zip \
-	    su-exec && \
+	    su-exec
+
+EOI
+}
+
+# Print cleanup for debian
+print_cleanup() {
+	cat >> $1 <<-'EOI'
+	# Reduce image size by removing files that are used only for building the image
+	RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
+	    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+	    rm -rf /var/lib/apt/lists/*
+
+EOI
+}
+
+# Print cleanup for alpine
+print_cleanup_alpine() {
+	cat >> $1 <<-'EOI'
+	# Reduce image size by removing files that are used only for building the image
+	RUN apk del dpkg gnupg && \
 	    rm -rf /var/cache/apk/*
 
 EOI
 }
+
+
 
 # Print 32-bit for arm64 arch
 print_lib32_support_arm64() {
@@ -171,8 +193,7 @@ print_lib32_support_arm64() {
 	RUN dpkg --add-architecture armhf && \
 	    apt-get update && \
 	    apt-get install --no-install-recommends -y \
-	    libc6:armhf && \
-	    rm -rf /var/lib/apt/lists/*
+	    libc6:armhf
 
 EOI
 }
@@ -188,9 +209,12 @@ print_gosu() {
 	    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
 	    && export GNUPGHOME \
 	    && GNUPGHOME="$(mktemp -d)" \
-	    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+	    && GPG_KEY="B42F6819007F00F88E364FD4036A9C25BF357DD4" \
+	    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys $GPG_KEY \
+	       || gpg --keyserver pgp.mit.edu --recv-keys $GPG_KEY \
+	       || gpg --keyserver keyserver.pgp.com --recv-keys $GPG_KEY \
 	    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	    && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	    && chmod +x /usr/local/bin/gosu
 
 EOI
@@ -203,7 +227,7 @@ print_java() {
 	ENV JAVA_HOME='/usr/lib/java-8'
 	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
 	    mkdir ${JAVA_HOME} && \
-	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
@@ -335,6 +359,11 @@ do
 				else
 					print_openhab_install $file;
 					print_volumes $file
+				fi
+				if [ "$base" == "alpine" ]; then
+					print_cleanup_alpine $file;
+				else
+					print_cleanup $file;
 				fi
 				print_entrypoint $file
 				print_command $file
