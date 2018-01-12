@@ -231,6 +231,17 @@ Before enabling this make sure this is allowed by local laws and you agree with 
 * `-v /openhab/userdata` - openhab userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
 
+## Upgrading
+
+Upgrading OH requires changes to the user mapped in userdata folder. The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `userdata.dist/etc/version.properties` in the Docker image. The steps performed are:
+
+* Create a `userdata/backup` folder if one does not exist.
+* Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
+* Copy over the relevant files from `userdata.dist/etc` to `userdata/etc`.
+* Delete the contents of `userdata/cache` and `userdata/tmp`.
+
+The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded, 
+
 ## Building the image
 
 Checkout the github repository and then run these commands:
