@@ -128,9 +128,9 @@ print_basepackages() {
 	    dirmngr \
 	    fontconfig \
 	    gnupg \
+	    libpcap-dev \
 	    locales \
 	    locales-all \
-	    libpcap-dev \
 	    netbase \
 	    unzip \
 	    wget \
@@ -144,22 +144,20 @@ EOI
 print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
-	RUN apk update && \
-	    apk upgrade && \
+	RUN apk upgrade --no-cache && \
+	    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
 	    apk add --no-cache \
+	    bash \
 	    ca-certificates \
 	    fontconfig \
-	    ttf-dejavu \
 	    libpcap-dev \
-	    unzip \
-	    dpkg \
-	    gnupg \
-	    wget \
-	    bash \
 	    shadow \
+	    su-exec \
+	    ttf-dejavu \
 	    openjdk8 \
-	    zip \
-	    su-exec
+	    unzip \
+	    wget \
+	    zip
 
 EOI
 }
@@ -179,13 +177,11 @@ EOI
 print_cleanup_alpine() {
 	cat >> $1 <<-'EOI'
 	# Reduce image size by removing files that are used only for building the image
-	RUN apk del dpkg gnupg && \
+	RUN apk del build-dependencies && \
 	    rm -rf /var/cache/apk/*
 
 EOI
 }
-
-
 
 # Print 32-bit for arm64 arch
 print_lib32_support_arm64() {

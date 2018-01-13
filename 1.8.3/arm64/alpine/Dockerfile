@@ -42,22 +42,20 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     maintainer="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
-RUN apk update && \
-    apk upgrade && \
+RUN apk upgrade --no-cache && \
+    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
     apk add --no-cache \
+    bash \
     ca-certificates \
     fontconfig \
-    ttf-dejavu \
     libpcap-dev \
-    unzip \
-    dpkg \
-    gnupg \
-    wget \
-    bash \
     shadow \
+    su-exec \
+    ttf-dejavu \
     openjdk8 \
-    zip \
-    su-exec
+    unzip \
+    wget \
+    zip
 
 # Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
@@ -75,7 +73,7 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 
 # Reduce image size by removing files that are used only for building the image
-RUN apk del dpkg gnupg && \
+RUN apk del build-dependencies && \
     rm -rf /var/cache/apk/*
 
 # Set working directory, expose and entrypoint

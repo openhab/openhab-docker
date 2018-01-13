@@ -48,9 +48,9 @@ RUN apt-get update && \
     dirmngr \
     fontconfig \
     gnupg \
+    libpcap-dev \
     locales \
     locales-all \
-    libpcap-dev \
     netbase \
     unzip \
     wget \
