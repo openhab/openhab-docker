@@ -290,12 +290,38 @@ print_volumes_old() {
 EOI
 }
 
-# Set working directory, expose and entrypoint
+print_expose_ports() {
+	case $version in
+	1.8.3)
+		expose_comment="Expose HTTP and HTTPS ports"
+		expose_ports="8080 8443"
+		;;
+	2.0.0|2.1.0)
+		expose_comment="Expose HTTP, HTTPS and Console ports"
+		expose_ports="8080 8443 8101"
+		;;
+	2.2.0|2.3.0-snapshot)
+		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
+		expose_ports="8080 8443 8101 5007"
+		;;
+	default)
+		expose_comment="Error"
+		expose_ports="error"
+		;;
+	esac
+
+	cat >> $1 <<-EOI
+	# $expose_comment
+	EXPOSE $expose_ports
+
+	EOI
+}
+
+# Set working directory and entrypoint
 print_entrypoint() {
 	cat >> $1 <<-'EOI'
-	# Set working directory, expose and entrypoint
+	# Set working directory and entrypoint
 	WORKDIR ${APPDIR}
-	EXPOSE 8080 8443 5555
 	COPY entrypoint.sh /
 	RUN chmod +x /entrypoint.sh
 	ENTRYPOINT ["/entrypoint.sh"]
@@ -361,6 +387,7 @@ do
 				else
 					print_cleanup $file;
 				fi
+				print_expose_ports $file
 				print_entrypoint $file
 				print_command $file
 

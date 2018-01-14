@@ -225,10 +225,13 @@ Before enabling this make sure this is allowed by local laws and you agree with 
 
 ## Parameters
 
-* `-p 8080` - the port of the webinterface
-* `-v /openhab/addons` - custom openhab addons
-* `-v /openhab/conf` - openhab configs
-* `-v /openhab/userdata` - openhab userdata directory
+* `-p 8080` - the HTTP port of the web interface
+* `-p 8443` - the HTTPS port of the web interface
+* `-p 8101` - the SSH port of the [Console](https://docs.openhab.org/administration/console.html) (since openHAB 2.0.0)
+* `-p 5007` - the LSP port for [validating rules](https://github.com/openhab/openhab-vscode#validating-the-rules) (since openHAB 2.2.0)
+* `-v /openhab/addons` - custom openHAB addons
+* `-v /openhab/conf` - openHAB configs
+* `-v /openhab/userdata` - openHAB userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
 
 ## Upgrading

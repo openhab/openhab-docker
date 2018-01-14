@@ -106,9 +106,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
     DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory, expose and entrypoint
+# Expose HTTP, HTTPS and Console ports
+EXPOSE 8080 8443 8101
+
+# Set working directory and entrypoint
 WORKDIR ${APPDIR}
-EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
