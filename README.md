@@ -52,7 +52,7 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 
 **Distributions:**
 
-* ``debian`` for debian jessie
+* ``debian`` for debian stretch
 * ``alpine`` for alpine 3.7
 
 The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://docs.openhab.org/installation/#prerequisites) for known disadvantages).
@@ -177,7 +177,7 @@ The default password for the login is ``habopen``.
 
 **Debug Mode**
 
-You can run a new container with the command ``docker run -it openhab/openhab:2.2.0-amd64 ./start_debug.sh`` to get into the debug shell.
+You can run a new container with the command ``docker run -it openhab/openhab:2.2.0-amd64-debian ./start_debug.sh`` to get into the debug shell.
 
 ## Environment variables
 
@@ -240,7 +240,7 @@ Upgrading OH requires changes to the user mapped in userdata folder. The contain
 * Copy over the relevant files from `userdata.dist/etc` to `userdata/etc`.
 * Delete the contents of `userdata/cache` and `userdata/tmp`.
 
-The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded, 
+The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
 
 ## Building the image
 
