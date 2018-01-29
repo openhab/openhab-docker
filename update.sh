@@ -124,7 +124,6 @@ print_basepackages() {
 	RUN apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 	    ca-certificates \
-	    fontconfig \
 	    locales \
 	    locales-all \
 	    libpcap-dev \
@@ -170,6 +169,7 @@ print_lib32_support_arm64() {
 	RUN dpkg --add-architecture armhf && \
 	    apt-get update && \
 	    apt-get install --no-install-recommends -y \
+		fontconfig:armhf \ 
 	    libc6:armhf && \
 	    rm -rf /var/lib/apt/lists/*
 
