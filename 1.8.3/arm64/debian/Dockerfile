@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/debian-debootstrap:arm64-jessie
+FROM multiarch/debian-debootstrap:arm64-stretch
 
 # Set download urls
 ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" 	    OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip" 	    OPENHAB_VERSION="1.8.3"
@@ -17,9 +17,10 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+    LC_ALL="en_US.UTF-8" \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    CRYPTO_POLICY="limited"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -44,29 +45,26 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     ca-certificates \
+    dirmngr \
     fontconfig \
+    gnupg \
+    libpcap-dev \
     locales \
     locales-all \
-    libpcap-dev \
     netbase \
     unzip \
     wget \
     zip && \
-    rm -rf /var/lib/apt/lists/* && \
-ln -s -f /bin/true /usr/bin/chfn
+    ln -s -f /bin/true /usr/bin/chfn
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
 RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
     mkdir ${JAVA_HOME} && \
-    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
     rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
     update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
-RUN cd /tmp \
-    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
-    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
-    && rm /tmp/ZuluJCEPolicies.zip
 
 # Install gosu
 ENV GOSU_VERSION 1.10
@@ -76,16 +74,18 @@ RUN set -x \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
     && export GNUPGHOME \
     && GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+    && GPG_KEY="B42F6819007F00F88E364FD4036A9C25BF357DD4" \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys $GPG_KEY \
+       || gpg --keyserver pgp.mit.edu --recv-keys $GPG_KEY \
+       || gpg --keyserver keyserver.pgp.com --recv-keys $GPG_KEY \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+    && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu
 
 RUN dpkg --add-architecture armhf && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
-    libc6:armhf && \
-    rm -rf /var/lib/apt/lists/*
+    libc6:armhf
 
 # Install openhab
 RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
@@ -97,9 +97,16 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 
-# Set working directory, expose and entrypoint
+# Reduce image size by removing files that are used only for building the image
+RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
+    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Expose HTTP and HTTPS ports
+EXPOSE 8080 8443
+
+# Set working directory and entrypoint
 WORKDIR ${APPDIR}
-EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

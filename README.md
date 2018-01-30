@@ -52,8 +52,8 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 
 **Distributions:**
 
-* ``debian`` for debian jessie
-* ``alpine`` for alpine 3.6
+* ``debian`` for debian stretch
+* ``alpine`` for alpine 3.7
 
 The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://docs.openhab.org/installation/#prerequisites) for known disadvantages).
 
@@ -177,7 +177,7 @@ The default password for the login is ``habopen``.
 
 **Debug Mode**
 
-You can run a new container with the command ``docker run -it openhab/openhab:2.2.0-amd64 ./start_debug.sh`` to get into the debug shell.
+You can run a new container with the command ``docker run -it openhab/openhab:2.2.0-amd64-debian ./start_debug.sh`` to get into the debug shell.
 
 ## Environment variables
 
@@ -189,6 +189,9 @@ You can run a new container with the command ``docker run -it openhab/openhab:2.
 *  `OPENHAB_HTTPS_PORT`=8443
 *  `USER_ID`=9001
 *  `GROUP_ID`=9001
+*  `CRYPTO_POLICY`=limited
+
+### User and group identifiers
 
 Group id will default to the same value as the user id. By default the openHAB user in the container is running with:
 
@@ -211,13 +214,36 @@ docker run \
 -e USER_ID=<myownuserid>
 ```
 
+### Java cryptographic strength policy
+
+Due to local laws and export restrictions the containers use Java with a limited cryptographic strength policy. Some openHAB functionality (e.g. KM200 binding) may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited 
+
+Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
+
+* debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
+* alpine: [OpenJDK (Cryptographic Cautions)](http://openjdk.java.net/groups/security)
+
 ## Parameters
 
-* `-p 8080` - the port of the webinterface
-* `-v /openhab/addons` - custom openhab addons
-* `-v /openhab/conf` - openhab configs
-* `-v /openhab/userdata` - openhab userdata directory
+* `-p 8080` - the HTTP port of the web interface
+* `-p 8443` - the HTTPS port of the web interface
+* `-p 8101` - the SSH port of the [Console](https://docs.openhab.org/administration/console.html) (since openHAB 2.0.0)
+* `-p 5007` - the LSP port for [validating rules](https://github.com/openhab/openhab-vscode#validating-the-rules) (since openHAB 2.2.0)
+* `-v /openhab/addons` - custom openHAB addons
+* `-v /openhab/conf` - openHAB configs
+* `-v /openhab/userdata` - openHAB userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
+
+## Upgrading
+
+Upgrading OH requires changes to the user mapped in userdata folder. The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `userdata.dist/etc/version.properties` in the Docker image. The steps performed are:
+
+* Create a `userdata/backup` folder if one does not exist.
+* Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
+* Copy over the relevant files from `userdata.dist/etc` to `userdata/etc`.
+* Delete the contents of `userdata/cache` and `userdata/tmp`.
+
+The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
 
 ## Building the image
 
