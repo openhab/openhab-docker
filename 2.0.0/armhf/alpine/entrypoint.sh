@@ -56,7 +56,7 @@ case ${OPENHAB_VERSION} in
         echo "Image and userdata versions differ! Starting an upgrade."
 
         # Make a backup of userdata
-        backupFile=userdata-$(date +"%FT%H:%M:%S").tar
+        backupFile=userdata-$(date +"%FT%H-%M-%S").tar
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir "${APPDIR}/userdata/backup"
         fi
