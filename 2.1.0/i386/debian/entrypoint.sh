@@ -102,6 +102,12 @@ case ${OPENHAB_VERSION} in
         cp "${APPDIR}/userdata.dist/etc/version.properties" "${APPDIR}/userdata/etc/"
         echo "Replaced files in userdata/etc with newer versions"
 
+        # Remove necessary files after installation
+        rm -rf "${APPDIR}/userdata/etc/org.openhab.addons.cfg"
+        if [ ! -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
+          rm -rf "${APPDIR}/userdata/etc/overrides.properties"
+        fi
+
         # Clear the cache and tmp
         rm -rf "${APPDIR}/userdata/cache"
         rm -rf "${APPDIR}/userdata/tmp"
