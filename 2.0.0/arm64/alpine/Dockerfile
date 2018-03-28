@@ -17,9 +17,10 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+    LC_ALL="en_US.UTF-8" \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    CRYPTO_POLICY="limited"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -41,23 +42,25 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     maintainer="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
-RUN apk update && \
-    apk upgrade && \
+RUN apk upgrade --no-cache && \
+    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
     apk add --no-cache \
+    bash \
     ca-certificates \
     fontconfig \
-    ttf-dejavu \
     libpcap-dev \
-    unzip \
-    dpkg \
-    gnupg \
-    wget \
-    bash \
     shadow \
+    su-exec \
+    ttf-dejavu \
     openjdk8 \
-    zip \
-    su-exec && \
-    rm -rf /var/cache/apk/*
+    unzip \
+    wget \
+    zip
+
+# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
+RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
@@ -73,9 +76,15 @@ RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 
-# Set working directory, expose and entrypoint
+# Reduce image size by removing files that are used only for building the image
+RUN apk del build-dependencies && \
+    rm -rf /var/cache/apk/*
+
+# Expose HTTP, HTTPS and Console ports
+EXPOSE 8080 8443 8101
+
+# Set working directory and entrypoint
 WORKDIR ${APPDIR}
-EXPOSE 8080 8443 5555
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

@@ -10,6 +10,14 @@ fi
 set -euo pipefail
 IFS=$'\n\t'
 
+# Install Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -f "${JAVA_HOME}/jre/lib/security/README.txt" ]; then
+  echo "Installing Zulu Cryptography Extension Kit (\"CEK\")..."
+  wget -q -O /tmp/ZuluJCEPolicies.zip https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip
+  unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip
+  rm /tmp/ZuluJCEPolicies.zip
+fi
+
 # Deleting instance.properties to avoid karaf PID conflict on restart
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f /openhab/runtime/instances/instance.properties
@@ -58,6 +66,54 @@ case ${OPENHAB_VERSION} in
         # Copy userdata dir for version 2.0.0
         echo "No userdata found... initializing."
         cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
+      fi
+
+      # Upgrade userdata if versions do not match
+      if [ ! -z $(cmp "${APPDIR}/userdata/etc/version.properties" "${APPDIR}/userdata.dist/etc/version.properties") ]; then
+        echo "Image and userdata versions differ! Starting an upgrade."
+
+        # Make a backup of userdata
+        backupFile=userdata-$(date +"%FT%H-%M-%S").tar
+        if [ ! -d "${APPDIR}/userdata/backup" ]; then
+          mkdir "${APPDIR}/userdata/backup"
+        fi
+        tar --exclude="${APPDIR}/userdata/backup" -c -f "${APPDIR}/userdata/backup/${backupFile}" "${APPDIR}/userdata"
+        echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
+
+        # Copy over the updated files
+        cp "${APPDIR}/userdata.dist/etc/all.policy" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/branding.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/branding-ssh.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/config.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/custom.properties" "${APPDIR}/userdata/etc/"
+        if [ -f "${APPDIR}/userdata.dist/etc/custom.system.properties" ]; then
+          cp "${APPDIR}/userdata.dist/etc/custom.system.properties" "${APPDIR}/userdata/etc/"
+        fi
+        cp "${APPDIR}/userdata.dist/etc/distribution.info" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/jre.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/org.apache.karaf"* "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg" "${APPDIR}/userdata/etc/"
+        if [ -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
+          cp "${APPDIR}/userdata.dist/etc/overrides.properties" "${APPDIR}/userdata/etc/"
+        fi
+        cp "${APPDIR}/userdata.dist/etc/profile.cfg" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/startup.properties" "${APPDIR}/userdata/etc"
+        cp "${APPDIR}/userdata.dist/etc/system.properties" "${APPDIR}/userdata/etc"
+        cp "${APPDIR}/userdata.dist/etc/version.properties" "${APPDIR}/userdata/etc/"
+        echo "Replaced files in userdata/etc with newer versions"
+
+        # Remove necessary files after installation
+        rm -rf "${APPDIR}/userdata/etc/org.openhab.addons.cfg"
+        if [ ! -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
+          rm -rf "${APPDIR}/userdata/etc/overrides.properties"
+        fi
+
+        # Clear the cache and tmp
+        rm -rf "${APPDIR}/userdata/cache"
+        rm -rf "${APPDIR}/userdata/tmp"
+        mkdir "${APPDIR}/userdata/cache"
+        mkdir "${APPDIR}/userdata/tmp"
+        echo "Cleared the cache and tmp"
       fi
 
       if [ -z "$(ls -A "${APPDIR}/conf")" ]; then

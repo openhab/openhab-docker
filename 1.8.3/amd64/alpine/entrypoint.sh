@@ -10,13 +10,19 @@ fi
 set -euo pipefail
 IFS=$'\n\t'
 
+# Install Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security/policy/unlimited" ]; then
+  echo "Installing OpenJDK unlimited strength cryptography policy..."
+  apk fix --no-cache openjdk8-jre-lib
+fi
+
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 10
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
 echo "Starting with openhab user id: $NEW_USER_ID"
 if ! id -u openhab >/dev/null 2>&1; then
-  echo "Create user openhab with id 9001"
+  echo "Create user openhab with id $NEW_USER_ID"
   adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} openhab
 fi
 
@@ -35,6 +41,54 @@ case ${OPENHAB_VERSION} in
         # Copy userdata dir for version 2.0.0
         echo "No userdata found... initializing."
         cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
+      fi
+
+      # Upgrade userdata if versions do not match
+      if [ ! -z $(cmp "${APPDIR}/userdata/etc/version.properties" "${APPDIR}/userdata.dist/etc/version.properties") ]; then
+        echo "Image and userdata versions differ! Starting an upgrade."
+
+        # Make a backup of userdata
+        backupFile=userdata-$(date +"%FT%H-%M-%S").tar
+        if [ ! -d "${APPDIR}/userdata/backup" ]; then
+          mkdir "${APPDIR}/userdata/backup"
+        fi
+        tar -c -f "${APPDIR}/userdata/backup/${backupFile}" --exclude "backup/*" "${APPDIR}/userdata"
+        echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
+
+        # Copy over the updated files
+        cp "${APPDIR}/userdata.dist/etc/all.policy" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/branding.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/branding-ssh.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/config.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/custom.properties" "${APPDIR}/userdata/etc/"
+        if [ -f "${APPDIR}/userdata.dist/etc/custom.system.properties" ]; then
+          cp "${APPDIR}/userdata.dist/etc/custom.system.properties" "${APPDIR}/userdata/etc/"
+        fi
+        cp "${APPDIR}/userdata.dist/etc/distribution.info" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/jre.properties" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/org.apache.karaf"* "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg" "${APPDIR}/userdata/etc/"
+        if [ -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
+          cp "${APPDIR}/userdata.dist/etc/overrides.properties" "${APPDIR}/userdata/etc/"
+        fi
+        cp "${APPDIR}/userdata.dist/etc/profile.cfg" "${APPDIR}/userdata/etc/"
+        cp "${APPDIR}/userdata.dist/etc/startup.properties" "${APPDIR}/userdata/etc"
+        cp "${APPDIR}/userdata.dist/etc/system.properties" "${APPDIR}/userdata/etc"
+        cp "${APPDIR}/userdata.dist/etc/version.properties" "${APPDIR}/userdata/etc/"
+        echo "Replaced files in userdata/etc with newer versions"
+
+        # Remove necessary files after installation
+        rm -rf "${APPDIR}/userdata/etc/org.openhab.addons.cfg"
+        if [ ! -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
+          rm -rf "${APPDIR}/userdata/etc/overrides.properties"
+        fi
+
+        # Clear the cache and tmp
+        rm -rf "${APPDIR}/userdata/cache"
+        rm -rf "${APPDIR}/userdata/tmp"
+        mkdir "${APPDIR}/userdata/cache"
+        mkdir "${APPDIR}/userdata/tmp"
+        echo "Cleared the cache and tmp"
       fi
 
       if [ -z "$(ls -A "${APPDIR}/conf")" ]; then

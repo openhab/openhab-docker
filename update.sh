@@ -60,7 +60,7 @@ print_baseimage() {
 	# Set docker base image based on distributions
 	case $base in
 	debian)
-		base_image="debian-debootstrap:$arch-jessie"
+		base_image="debian-debootstrap:$arch-stretch"
 		;;
 	alpine)
 		base_image="alpine:$arch-v3.7"
@@ -91,9 +91,10 @@ print_basemetadata() {
 	    EXTRA_JAVA_OPTS="" \
 	    OPENHAB_HTTP_PORT="8080" \
 	    OPENHAB_HTTPS_PORT="8443" \
-	    LC_ALL=en_US.UTF-8 \
-	    LANG=en_US.UTF-8 \
-	    LANGUAGE=en_US.UTF-8
+	    LC_ALL="en_US.UTF-8" \
+	    LANG="en_US.UTF-8" \
+	    LANGUAGE="en_US.UTF-8" \
+	    CRYPTO_POLICY="limited"
 
 	# Set arguments on build
 	ARG BUILD_DATE
@@ -124,16 +125,17 @@ print_basepackages() {
 	RUN apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 	    ca-certificates \
+	    dirmngr \
 	    fontconfig \
+	    gnupg \
+	    libpcap-dev \
 	    locales \
 	    locales-all \
-	    libpcap-dev \
 	    netbase \
 	    unzip \
 	    wget \
 	    zip && \
-	    rm -rf /var/lib/apt/lists/* && \
-		ln -s -f /bin/true /usr/bin/chfn
+	    ln -s -f /bin/true /usr/bin/chfn
 
 EOI
 }
@@ -142,22 +144,40 @@ EOI
 print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
-	RUN apk update && \
-	    apk upgrade && \
+	RUN apk upgrade --no-cache && \
+	    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
 	    apk add --no-cache \
+	    bash \
 	    ca-certificates \
 	    fontconfig \
-	    ttf-dejavu \
 	    libpcap-dev \
-	    unzip \
-	    dpkg \
-	    gnupg \
-	    wget \
-	    bash \
 	    shadow \
+	    su-exec \
+	    ttf-dejavu \
 	    openjdk8 \
-	    zip \
-	    su-exec && \
+	    unzip \
+	    wget \
+	    zip
+
+EOI
+}
+
+# Print cleanup for debian
+print_cleanup() {
+	cat >> $1 <<-'EOI'
+	# Reduce image size by removing files that are used only for building the image
+	RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
+	    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+	    rm -rf /var/lib/apt/lists/*
+
+EOI
+}
+
+# Print cleanup for alpine
+print_cleanup_alpine() {
+	cat >> $1 <<-'EOI'
+	# Reduce image size by removing files that are used only for building the image
+	RUN apk del build-dependencies && \
 	    rm -rf /var/cache/apk/*
 
 EOI
@@ -169,8 +189,7 @@ print_lib32_support_arm64() {
 	RUN dpkg --add-architecture armhf && \
 	    apt-get update && \
 	    apt-get install --no-install-recommends -y \
-	    libc6:armhf && \
-	    rm -rf /var/lib/apt/lists/*
+	    libc6:armhf
 
 EOI
 }
@@ -186,9 +205,12 @@ print_gosu() {
 	    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
 	    && export GNUPGHOME \
 	    && GNUPGHOME="$(mktemp -d)" \
-	    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+	    && GPG_KEY="B42F6819007F00F88E364FD4036A9C25BF357DD4" \
+	    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys $GPG_KEY \
+	       || gpg --keyserver pgp.mit.edu --recv-keys $GPG_KEY \
+	       || gpg --keyserver keyserver.pgp.com --recv-keys $GPG_KEY \
 	    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	    && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	    && chmod +x /usr/local/bin/gosu
 
 EOI
@@ -201,14 +223,21 @@ print_java() {
 	ENV JAVA_HOME='/usr/lib/java-8'
 	RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
 	    mkdir ${JAVA_HOME} && \
-	    tar -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
 	    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
-	RUN cd /tmp \
-	    && wget https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip \
-	    && unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip \
-	    && rm /tmp/ZuluJCEPolicies.zip
+
+EOI
+}
+
+# Configure java for alpine
+print_java_alpine() {
+	cat >> $1 <<-'EOI'
+	# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+	ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
+	RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
+	    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 EOI
 }
@@ -261,12 +290,38 @@ print_volumes_old() {
 EOI
 }
 
-# Set working directory, expose and entrypoint
+print_expose_ports() {
+	case $version in
+	1.8.3)
+		expose_comment="Expose HTTP and HTTPS ports"
+		expose_ports="8080 8443"
+		;;
+	2.0.0|2.1.0)
+		expose_comment="Expose HTTP, HTTPS and Console ports"
+		expose_ports="8080 8443 8101"
+		;;
+	2.2.0|2.3.0-snapshot)
+		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
+		expose_ports="8080 8443 8101 5007"
+		;;
+	default)
+		expose_comment="Error"
+		expose_ports="error"
+		;;
+	esac
+
+	cat >> $1 <<-EOI
+	# $expose_comment
+	EXPOSE $expose_ports
+
+	EOI
+}
+
+# Set working directory and entrypoint
 print_entrypoint() {
 	cat >> $1 <<-'EOI'
-	# Set working directory, expose and entrypoint
+	# Set working directory and entrypoint
 	WORKDIR ${APPDIR}
-	EXPOSE 8080 8443 5555
 	COPY entrypoint.sh /
 	RUN chmod +x /entrypoint.sh
 	ENTRYPOINT ["/entrypoint.sh"]
@@ -311,6 +366,7 @@ do
 				print_basemetadata $file;
 				if [ "$base" == "alpine" ]; then
 					print_basepackages_alpine $file;
+					print_java_alpine $file;
 				else
 					print_basepackages $file;
 					print_java $file;
@@ -326,6 +382,12 @@ do
 					print_openhab_install $file;
 					print_volumes $file
 				fi
+				if [ "$base" == "alpine" ]; then
+					print_cleanup_alpine $file;
+				else
+					print_cleanup $file;
+				fi
+				print_expose_ports $file
 				print_entrypoint $file
 				print_command $file
 
