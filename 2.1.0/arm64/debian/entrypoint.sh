@@ -60,7 +60,7 @@ case ${OPENHAB_VERSION} in
         cp -av "${APPDIR}/configurations.dist/." "${APPDIR}/configurations/"
       fi
     ;;
-  2.0.0|2.1.0|2.2.0|2.3.0-snapshot)
+  2.0.0|2.1.0|2.2.0|2.3.0|2.4.0-snapshot)
       # Initialize empty host volumes
       if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
         # Copy userdata dir for version 2.0.0
