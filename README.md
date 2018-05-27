@@ -55,7 +55,7 @@ Repository for building Docker containers for [openHAB](http://openhab.org) (Hom
 * ``debian`` for debian stretch
 * ``alpine`` for alpine 3.7
 
-The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://docs.openhab.org/installation/#prerequisites) for known disadvantages).
+The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
 If you are unsure about what your needs are, you probably want to use
  ``openhab/openhab:2.2.0-amd64-debian``.
@@ -227,7 +227,7 @@ Before enabling this make sure this is allowed by local laws and you agree with 
 
 * `-p 8080` - the HTTP port of the web interface
 * `-p 8443` - the HTTPS port of the web interface
-* `-p 8101` - the SSH port of the [Console](https://docs.openhab.org/administration/console.html) (since openHAB 2.0.0)
+* `-p 8101` - the SSH port of the [Console](https://www.openhab.org/docs/administration/console.html) (since openHAB 2.0.0)
 * `-p 5007` - the LSP port for [validating rules](https://github.com/openhab/openhab-vscode#validating-the-rules) (since openHAB 2.2.0)
 * `-v /openhab/addons` - custom openHAB addons
 * `-v /openhab/conf` - openHAB configs
