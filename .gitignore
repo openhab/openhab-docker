@@ -1,3 +1,5 @@
+*.iml
+.project
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -8,3 +10,4 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 /tmp-*
+
