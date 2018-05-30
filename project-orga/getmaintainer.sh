@@ -21,7 +21,7 @@ cd $DEST
 while true; do
 	if [ -e ./MAINTAINERS ]; then
 		{
-			while read line; do
+			while read -r line; do
 				re='^([^:]*): *(.*)$'
 				file=$(echo $line | sed -E -n "s/$re/\1/p")
 				if [ ! -z "$file" ]; then
