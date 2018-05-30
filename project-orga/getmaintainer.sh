@@ -47,7 +47,7 @@ while true; do
 done
 
 PRIMARY="${MAINTAINERS[0]}"
-PRIMARY_FIRSTNAME=$(echo $PRIMARY | cut -d' ' -f1)
+#PRIMARY_FIRSTNAME=$(echo $PRIMARY | cut -d' ' -f1)
 LGTM_COUNT=${#MAINTAINERS[@]}
 LGTM_COUNT=$((LGTM_COUNT%2 +1))
 
