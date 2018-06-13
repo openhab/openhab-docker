@@ -45,6 +45,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apk upgrade --no-cache && \
     apk add --no-cache --virtual build-dependencies dpkg gnupg && \
     apk add --no-cache \
+    arping \
     bash \
     ca-certificates \
     fontconfig \

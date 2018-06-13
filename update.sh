@@ -127,6 +127,7 @@ print_basepackages() {
 	# Install basepackages
 	RUN apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+	    arping \
 	    ca-certificates \
 	    dirmngr \
 	    fontconfig \
@@ -150,6 +151,7 @@ print_basepackages_alpine() {
 	RUN apk upgrade --no-cache && \
 	    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
 	    apk add --no-cache \
+	    arping \
 	    bash \
 	    ca-certificates \
 	    fontconfig \

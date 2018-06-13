@@ -44,6 +44,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 # Install basepackages
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+    arping \
     ca-certificates \
     dirmngr \
     fontconfig \
