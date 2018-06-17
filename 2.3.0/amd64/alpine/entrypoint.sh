@@ -25,13 +25,18 @@ rm -f /openhab/runtime/instances/instance.properties
 rm -f /openhab/userdata/tmp/instances/instance.properties
 
 # Add openhab user & handle possible device groups for different host systems
-# Container base image puts dialout on group id 20, uucp on id 10
+# Container base image puts dialout on group id 20, uucp on id 14
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
-echo "Starting with openhab user id: $NEW_USER_ID"
+NEW_GROUP_ID=${GROUP_ID:-$NEW_USER_ID}
+echo "Starting with openhab user id: $NEW_USER_ID and group id: $NEW_GROUP_ID"
 if ! id -u openhab >/dev/null 2>&1; then
-  echo "Create user openhab with id $NEW_USER_ID"
-  adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} openhab
+  echo "Create group openhab with id ${NEW_GROUP_ID}"
+  addgroup -g $NEW_GROUP_ID openhab
+  echo "Create user openhab with id ${NEW_USER_ID}"
+  adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} -G openhab openhab
+  adduser openhab dialout
+  adduser openhab uucp
 fi
 
 # Copy initial files to host volume
