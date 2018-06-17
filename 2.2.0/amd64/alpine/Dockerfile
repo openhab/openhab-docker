@@ -56,7 +56,8 @@ RUN apk upgrade --no-cache && \
     openjdk8 \
     unzip \
     wget \
-    zip
+    zip && \
+    chmod u+s /usr/sbin/arping
 
 # Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'

@@ -56,6 +56,7 @@ RUN apt-get update && \
     unzip \
     wget \
     zip && \
+    chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn
 
 # Install java

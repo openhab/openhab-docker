@@ -139,6 +139,7 @@ print_basepackages() {
 	    unzip \
 	    wget \
 	    zip && \
+	    chmod u+s /usr/sbin/arping && \
 	    ln -s -f /bin/true /usr/bin/chfn
 
 EOI
@@ -162,7 +163,8 @@ print_basepackages_alpine() {
 	    openjdk8 \
 	    unzip \
 	    wget \
-	    zip
+	    zip && \
+	    chmod u+s /usr/sbin/arping
 
 EOI
 }
