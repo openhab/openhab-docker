@@ -77,9 +77,8 @@ RUN set -x \
     && export GNUPGHOME \
     && GNUPGHOME="$(mktemp -d)" \
     && GPG_KEY="B42F6819007F00F88E364FD4036A9C25BF357DD4" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys $GPG_KEY \
-       || gpg --keyserver pgp.mit.edu --recv-keys $GPG_KEY \
-       || gpg --keyserver keyserver.pgp.com --recv-keys $GPG_KEY \
+    && KEYSERVERS=$(shuf -e $(echo "ha.pool.sks-keyservers.net\nhkp://p80.pool.sks-keyservers.net:80\nkeyserver.ubuntu.com\nhkp://keyserver.ubuntu.com:80\npgp.mit.edu\nhkp://pgp.mit.edu:80")) \
+    && for i in $(seq 1 3); do for keyserver in $KEYSERVERS; do gpg --verbose --keyserver $keyserver --recv-keys $GPG_KEY && break; done; if [ $? -eq 0 ]; then break; fi done \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu
