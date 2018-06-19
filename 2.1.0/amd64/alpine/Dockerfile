@@ -9,7 +9,10 @@
 FROM multiarch/alpine:amd64-v3.7
 
 # Set download urls
-ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" 	    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip" 	    OPENHAB_VERSION="2.1.0"
+ENV \
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
+    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip" \
+    OPENHAB_VERSION="2.1.0"
 
 # Set variables and locales
 ENV \
@@ -35,7 +38,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vendor="openHAB Foundation e.V." \
     org.label-schema.version=$VERSION \
     org.label-schema.description="An open source, technology agnostic home automation platform" \
-    org.label-schema.url="http://www.openhab.com/" \
+    org.label-schema.url="https://www.openhab.com/" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
@@ -66,13 +69,13 @@ RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
-    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \
-    mkdir -p ${APPDIR}/userdata/logs && \
-    touch ${APPDIR}/userdata/logs/openhab.log && \
-    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
-    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
+    mkdir -p "${APPDIR}/userdata/logs" && \
+    touch "${APPDIR}/userdata/logs/openhab.log" && \
+    cp -a "${APPDIR}/userdata" "${APPDIR}/userdata.dist" && \
+    cp -a "${APPDIR}/conf" "${APPDIR}/conf.dist" && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
