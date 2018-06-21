@@ -9,7 +9,10 @@
 FROM multiarch/debian-debootstrap:amd64-stretch
 
 # Set download urls
-ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" 	    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip" 	    OPENHAB_VERSION="2.1.0"
+ENV \
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
+    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip" \
+    OPENHAB_VERSION="2.1.0"
 
 # Set variables and locales
 ENV \
@@ -35,7 +38,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vendor="openHAB Foundation e.V." \
     org.label-schema.version=$VERSION \
     org.label-schema.description="An open source, technology agnostic home automation platform" \
-    org.label-schema.url="http://www.openhab.com/" \
+    org.label-schema.url="https://www.openhab.com/" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
@@ -49,6 +52,7 @@ RUN apt-get update && \
     dirmngr \
     fontconfig \
     gnupg \
+    gosu \
     libpcap-dev \
     locales \
     locales-all \
@@ -61,37 +65,22 @@ RUN apt-get update && \
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
-RUN wget -nv -O /tmp/java.tar.gz ${JAVA_URL} && \
-    mkdir ${JAVA_HOME} && \
-    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C ${JAVA_HOME} && \
+RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
+    mkdir "${JAVA_HOME}" && \
+    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
     rm /tmp/java.tar.gz && \
-    update-alternatives --install /usr/bin/java java ${JAVA_HOME}/bin/java 50 && \
-    update-alternatives --install /usr/bin/javac javac ${JAVA_HOME}/bin/javac 50
-
-# Install gosu
-ENV GOSU_VERSION 1.10
-RUN set -x \
-    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
-    && export GNUPGHOME \
-    && GNUPGHOME="$(mktemp -d)" \
-    && GPG_KEY="B42F6819007F00F88E364FD4036A9C25BF357DD4" \
-    && KEYSERVERS=$(shuf -e $(echo "ha.pool.sks-keyservers.net\nhkp://p80.pool.sks-keyservers.net:80\nkeyserver.ubuntu.com\nhkp://keyserver.ubuntu.com:80\npgp.mit.edu\nhkp://pgp.mit.edu:80")) \
-    && for i in $(seq 1 3); do for keyserver in $KEYSERVERS; do gpg --verbose --keyserver $keyserver --recv-keys $GPG_KEY && break; done; if [ $? -eq 0 ]; then break; fi done \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu
+    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
+    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
 
 # Install openhab
 # Set permissions for openhab. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
-    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \
-    mkdir -p ${APPDIR}/userdata/logs && \
-    touch ${APPDIR}/userdata/logs/openhab.log && \
-    cp -a ${APPDIR}/userdata ${APPDIR}/userdata.dist && \
-    cp -a ${APPDIR}/conf ${APPDIR}/conf.dist && \
+    mkdir -p "${APPDIR}/userdata/logs" && \
+    touch "${APPDIR}/userdata/logs/openhab.log" && \
+    cp -a "${APPDIR}/userdata" "${APPDIR}/userdata.dist" && \
+    cp -a "${APPDIR}/conf" "${APPDIR}/conf.dist" && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
