@@ -1,12 +1,6 @@
 #!/bin/bash -x
 
-# Karaf needs a pseudo-TTY so exit and instruct user to allocate one when necessary
-test -t 0
-if [ $? -eq 1 ]; then
-    echo "Please start the openHAB container with a pseudo-TTY using the -t option or 'tty: true' with docker compose"
-    exit 1
-fi
-
+interactive=$(if test -t 0; then echo true; else echo false; fi)
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -130,4 +124,10 @@ esac
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
 
-exec "$@"
+# Use server mode with the default command when there is no pseudo-TTY
+if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "gosu openhab ./start.sh" ]; then
+    command=($@ server)
+    exec "${command[@]}"
+else
+    exec "$@"
+fi
