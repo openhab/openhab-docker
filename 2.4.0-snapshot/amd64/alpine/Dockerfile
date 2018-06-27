@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:amd64-v3.7
+FROM multiarch/alpine:amd64-v3.8
 
 # Set download urls
 ENV \

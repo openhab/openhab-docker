@@ -60,7 +60,7 @@ Comments, suggestions and contributions are welcome!
 **Distributions:**
 
 * `debian` for debian stretch
-* `alpine` for alpine 3.7
+* `alpine` for alpine 3.8
 
 The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
