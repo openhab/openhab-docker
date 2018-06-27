@@ -1,4 +1,5 @@
 # openHAB Docker Containers
+
 ![](images/openhab.png)
 
 [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.3.0-amd64-debian.svg)](https://microbadger.com/images/openhab/openhab:2.3.0-amd64-debian "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.3.0-amd64-debian.svg)](https://microbadger.com/#/images/openhab/openhab:2.3.0-amd64-debian) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -10,7 +11,7 @@ Table of Contents
 
    * [openHAB Docker Containers](#openhab-docker-containers)
       * [Introduction](#introduction)
-      * [Image Variants](#image-variants)
+      * [Image variants](#image-variants)
       * [Usage](#usage)
          * [Starting with Docker named volumes (for beginners)](#starting-with-docker-named-volumes-for-beginners)
             * [Running from command line](#running-from-command-line)
@@ -18,74 +19,82 @@ Table of Contents
             * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
          * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
          * [Accessing the console](#accessing-the-console)
+         * [Startup modes](#startup-modes)
       * [Environment variables](#environment-variables)
+         * [User and group identifiers](#user-and-group-identifiers)
+         * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
       * [Parameters](#parameters)
-      * [Building the image](#building-the-image)
+      * [Upgrading](#upgrading)
+      * [Building the images](#building-the-images)
       * [Contributing](#contributing)
       * [License](#license)
 
 ## Introduction
 
-Repository for building Docker containers for [openHAB](http://openhab.org) (Home Automation Server). Comments, suggestions and contributions are welcome!
+Repository for building Docker containers for [openHAB](http://openhab.org) (Home Automation Server).
+Comments, suggestions and contributions are welcome!
 
 ## Docker Image
 
 [![dockeri.co](http://dockeri.co/image/openhab/openhab)](https://hub.docker.com/r/openhab/openhab/)
 
-## Image Variants
+## Image variants
 
-``openhab/openhab:<version>-<architecture>-<distributions>``
+`openhab/openhab:<version>-<architecture>-<distributions>`
 
 **Version**
 
-* [``1.8.3`` Stable openHAB 1.8 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/debian/Dockerfile)
-* [``2.0.0`` Stable openHAB 2.0 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/debian/Dockerfile)
-* [``2.1.0`` Stable openHAB 2.1 version](https://github.com/openhab/openhab-docker/blob/master/2.1.0/amd64/debian/Dockerfile)
-* [``2.2.0`` Stable openHAB 2.2 version](https://github.com/openhab/openhab-docker/blob/master/2.2.0/amd64/debian/Dockerfile)
-* [``2.3.0`` Stable openHAB 2.3 version](https://github.com/openhab/openhab-docker/blob/master/2.3.0/amd64/debian/Dockerfile)
-* [``2.4.0-snapshot`` Experimental openHAB 2.4 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.4.0-snapshot/amd64/debian/Dockerfile)
+* [`1.8.3` Stable openHAB 1.8 version](https://github.com/openhab/openhab-docker/blob/master/1.8.3/amd64/debian/Dockerfile)
+* [`2.0.0` Stable openHAB 2.0 version](https://github.com/openhab/openhab-docker/blob/master/2.0.0/amd64/debian/Dockerfile)
+* [`2.1.0` Stable openHAB 2.1 version](https://github.com/openhab/openhab-docker/blob/master/2.1.0/amd64/debian/Dockerfile)
+* [`2.2.0` Stable openHAB 2.2 version](https://github.com/openhab/openhab-docker/blob/master/2.2.0/amd64/debian/Dockerfile)
+* [`2.3.0` Stable openHAB 2.3 version](https://github.com/openhab/openhab-docker/blob/master/2.3.0/amd64/debian/Dockerfile)
+* [`2.4.0-snapshot` Experimental openHAB 2.4 SNAPSHOT version](https://github.com/openhab/openhab-docker/blob/master/2.4.0-snapshot/amd64/debian/Dockerfile)
 
 **Architecture:**
 
-* ``amd64`` for most desktop computer (e.g. x64, x86-64, x86_64)
-* ``armhf`` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
-* ``arm64`` for ARMv8 devices 64 Bit (not RaspberryPi 3)
+* `amd64` for most desktop computer (e.g. x64, x86-64, x86_64)
+* `armhf` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
+* `arm64` for ARMv8 devices 64 Bit (not RaspberryPi 3)
 
 **Distributions:**
 
-* ``debian`` for debian stretch
-* ``alpine`` for alpine 3.7
+* `debian` for debian stretch
+* `alpine` for alpine 3.7
 
 The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
-If you are unsure about what your needs are, you probably want to use
- ``openhab/openhab:2.3.0-amd64-debian``.
+If you are unsure about what your needs are, you probably want to use `openhab/openhab:2.3.0-amd64-debian`.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
 ## Usage
 
-**Important:** To be able to use UPnP for discovery the container needs to be started with ``--net=host``.
+**Important:** To be able to use UPnP for discovery the container needs to be started with `--net=host`.
 
 **Important:** In the container openHAB runs with user "openhab" (id 9001) by default. See user configuration section below!
 
 The following will run openHAB in demo mode on the host machine:
-```
-docker run -it --name openhab --net=host openhab/openhab:2.3.0-amd64-debian
-```
-_**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method. To properly run the container, please specify a **host volume** for the directories._
+
+`docker run --name openhab --net=host openhab/openhab:2.3.0-amd64-debian`
+
+_**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method.
+To properly run the container, please specify a **host volume** for the directories._
 
 ### Starting with Docker named volumes (for beginners)
 
-Following configuration uses Docker named data volumes. These volumes will survive, if you delete or upgrade your container. It is a good starting point for beginners. The volumes are created in the Docker volume directory. You can use ``docker inspect openhab`` to locate the directories (e.g. /var/lib/docker/volumes) on your host system. For more information visit  [Manage data in containers](https://docs.docker.com/engine/tutorials/dockervolumes/):
+Following configuration uses Docker named data volumes. These volumes will survive, if you delete or upgrade your container.
+It is a good starting point for beginners.
+The volumes are created in the Docker volume directory.
+You can use `docker inspect openhab` to locate the directories (e.g. /var/lib/docker/volumes) on your host system.
+For more information visit [Manage data in containers](https://docs.docker.com/engine/tutorials/dockervolumes/).
 
 #### Running from command line
 
-```SHELL
+```shell
 docker run \
         --name openhab \
         --net=host \
-        --tty \
         -v /etc/localtime:/etc/localtime:ro \
         -v /etc/timezone:/etc/timezone:ro \
         -v openhab_addons:/openhab/addons \
@@ -98,9 +107,9 @@ docker run \
 
 #### Running from compose-file.yml
 
-Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
+Create the following `docker-compose.yml` and start the container with `docker-compose up -d`
 
-```YAML
+```yaml
 version: '2.2'
 
 services:
@@ -108,7 +117,6 @@ services:
     image: "openhab/openhab:2.3.0-amd64-debian"
     restart: always
     network_mode: host
-    tty: true
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
@@ -122,9 +130,11 @@ services:
 
 #### Running openHAB with libpcap support
 
-You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container. For that feature to work correctly, you need to run the image as **root user**. Create the following ``docker-compose.yml`` and start the container with ``docker-compose up -d``
+You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
+For that feature to work correctly, you need to run the image as **root user**.
+Create the following `docker-compose.yml` and start the container with `docker-compose up -d`
 
-```YAML
+```yaml
 version: '2.2'
 
 services:
@@ -132,7 +142,6 @@ services:
     container_name: openhab
     image: "openhab/openhab:2.3.0-amd64-debian"
     restart: always
-    tty: true
     network_mode: host
     cap_add:
       - NET_ADMIN
@@ -145,19 +154,21 @@ services:
       - "openhab_addons:/openhab/addons"
     # The command node is very important. It overrides
     # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
-    command: "./start.sh"
+    command: "./start.sh server"
 ```
+
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
 
 ### Starting with Docker mounting a host directory (for advanced user)
 
-You can mount a local host directory to store your configuration files. If you followed the beginners guide, you do not need to read this section. The following ``run`` command will create the folders and copy the initial configuration files for you.
+You can mount a local host directory to store your configuration files.
+If you followed the beginners guide, you do not need to read this section.
+The following `run` command will create the folders and copy the initial configuration files for you.
 
-```SHELL
+```shell
 docker run \
   --name openhab \
   --net=host \
-  --tty \
   -v /etc/localtime:/etc/localtime:ro \
   -v /etc/timezone:/etc/timezone:ro \
   -v /opt/openhab/addons:/openhab/addons \
@@ -169,46 +180,76 @@ docker run \
 ### Accessing the console
 
 You can connect to a console of an already running openHAB container with following command:
-* ``docker ps``  - lists all your currently running container
-* ``docker exec -it openhab /openhab/runtime/bin/client`` - connect to openHAB container by name
-* ``docker exec -it c4ad98f24423 /openhab/runtime/bin/client`` - connect to openHAB container by id
-* ``docker attach openhab`` - attach to openHAB container by name, input only works when starting the container with `-i`  (or `stdin_open: true` with docker compose)
 
-The default password for the login is ``habopen``.
+* `docker ps` - lists all your currently running container
+* `docker exec -it openhab /openhab/runtime/bin/client` - connect to openHAB container by name
+* `docker exec -it openhab /openhab/runtime/bin/client -p habopen` - connect to openHAB container by name and use `habopen` as password (**not recommended** because this makes the password visible in the command history and process list)
+* `docker exec -it c4ad98f24423 /openhab/runtime/bin/client` - connect to openHAB container by id
+* `docker attach openhab` - attach to openHAB container by name, input only works when starting the container with `-it` (or `stdin_open: true` and `tty: true` with docker compose)
 
-**Debug Mode**
+The default password for the login is `habopen`.
 
-You can run a new container with the command ``docker run -it openhab/openhab:2.3.0-amd64-debian ./start_debug.sh`` to get into the debug shell.
+### Startup modes
+
+#### Server mode
+
+The container starts openHAB in server mode when no TTY is provided, example:
+
+`docker run --detach --name openhab openhab/openhab:2.3.0-amd64-debian`
+
+When the container runs in server mode you can also add a console logger so it prints logging to stdout so you can check the logging of a container named "openhab" with:
+
+`docker logs openhab`
+
+To add the console logger, edit `userdata/etc/org.ops4j.pax.logging.cfg` and then:
+
+* Update the appenderRefs line to: `log4j2.rootLogger.appenderRefs = out, osgi, console`
+* Add the following line: `log4j2.rootLogger.appenderRef.console.ref = STDOUT`
+
+#### Regular mode
+
+When a TTY is provided openHAB is started with an interactive console, e.g.: 
+
+`docker run -it openhab/openhab:2.3.0-amd64-debian`
+
+#### Debug mode
+
+The debug mode is started with the command:
+
+`docker run -it openhab/openhab:2.3.0-amd64-debian ./start_debug.sh`
 
 ## Environment variables
 
-*  `EXTRA_JAVA_OPTS`=""
-*  `LC_ALL`=en_US.UTF-8
-*  `LANG`=en_US.UTF-8
-*  `LANGUAGE`=en_US.UTF-8
-*  `OPENHAB_HTTP_PORT`=8080
-*  `OPENHAB_HTTPS_PORT`=8443
-*  `USER_ID`=9001
-*  `GROUP_ID`=9001
-*  `CRYPTO_POLICY`=limited
+* `EXTRA_JAVA_OPTS`=""
+* `LC_ALL`=en_US.UTF-8
+* `LANG`=en_US.UTF-8
+* `LANGUAGE`=en_US.UTF-8
+* `OPENHAB_HTTP_PORT`=8080
+* `OPENHAB_HTTPS_PORT`=8443
+* `USER_ID`=9001
+* `GROUP_ID`=9001
+* `CRYPTO_POLICY`=limited
 
 ### User and group identifiers
 
-Group id will default to the same value as the user id. By default the openHAB user in the container is running with:
+Group id will default to the same value as the user id. 
+By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
 
 Make sure that either
 
 * You create the same user with the same uid and gid on your docker host system
-```
+
+```shell
 groupadd -g 9001 openhab
 useradd -u 9001 -g openhab -r -s /sbin/nologin openhab
 usermod -a -G openhab myownuser
 ```
 
 * Or run the docker container with your own user AND passing the userid to openHAB through env
-```
+
+```shell
 docker run \
 (...)
 --user <myownuserid> \
@@ -217,7 +258,8 @@ docker run \
 
 ### Java cryptographic strength policy
 
-Due to local laws and export restrictions the containers use Java with a limited cryptographic strength policy. Some openHAB functionality (e.g. KM200 binding) may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited 
+Due to local laws and export restrictions the containers use Java with a limited cryptographic strength policy.
+Some openHAB functionality (e.g. KM200 binding) may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited 
 
 Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
 
@@ -226,6 +268,7 @@ Before enabling this make sure this is allowed by local laws and you agree with 
 
 ## Parameters
 
+* `-it` - starts openHAB with an interactive console (since openHAB 2.0.0)
 * `-p 8080` - the HTTP port of the web interface
 * `-p 8443` - the HTTPS port of the web interface
 * `-p 8101` - the SSH port of the [Console](https://www.openhab.org/docs/administration/console.html) (since openHAB 2.0.0)
@@ -237,7 +280,9 @@ Before enabling this make sure this is allowed by local laws and you agree with 
 
 ## Upgrading
 
-Upgrading OH requires changes to the user mapped in userdata folder. The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `userdata.dist/etc/version.properties` in the Docker image. The steps performed are:
+Upgrading OH requires changes to the user mapped in userdata folder.
+The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `userdata.dist/etc/version.properties` in the Docker image.
+The steps performed are:
 
 * Create a `userdata/backup` folder if one does not exist.
 * Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
@@ -246,12 +291,19 @@ Upgrading OH requires changes to the user mapped in userdata folder. The contain
 
 The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
 
-## Building the image
+## Building the images
 
-Checkout the github repository and then run these commands:
-```
+Checkout the GitHub repository, change to a directory with a Dockerfile and then run these commands:
+
+```shell
 $ docker build -t openhab/openhab .
-$ docker run -it openhab/openhab server
+$ docker run openhab/openhab
+```
+
+To be able to build images for other architectures (e.g. armhf/arm64 on amd64) QEMU User Emulation first needs to be registered with:
+
+```shell
+$ docker run --rm --privileged multiarch/qemu-user-static:register --reset
 ```
 
 ## Contributing
@@ -261,3 +313,4 @@ $ docker run -it openhab/openhab server
 ## License
 
 When not explicitly set, files are placed under [![Eclipse license](https://img.shields.io/badge/license-Eclipse-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
+
