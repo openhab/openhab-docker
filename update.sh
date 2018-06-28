@@ -66,7 +66,7 @@ print_baseimage() {
 		base_image="debian-debootstrap:$arch-stretch"
 		;;
 	alpine)
-		base_image="alpine:$arch-v3.7"
+		base_image="alpine:$arch-v3.8"
 		;;
 	default)
 		base_image="error"
