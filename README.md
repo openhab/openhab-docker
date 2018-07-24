@@ -100,7 +100,7 @@ docker run \
         -v openhab_addons:/openhab/addons \
         -v openhab_conf:/openhab/conf \
         -v openhab_userdata:/openhab/userdata \
-        -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/YourTZCity" \
+        -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
         -d \
         --restart=always \
         openhab/openhab:2.3.0-amd64-debian
@@ -127,7 +127,7 @@ services:
     environment:
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/YourTZCity"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
 ```
 
 #### Running openHAB with libpcap support
@@ -176,7 +176,7 @@ docker run \
   -v /opt/openhab/addons:/openhab/addons \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
-  -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/YourTZCity" \
+  -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
   openhab/openhab:2.3.0-amd64-debian
 ```
 
