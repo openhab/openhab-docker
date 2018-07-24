@@ -18,6 +18,7 @@ Table of Contents
             * [Running from compose-file.yml](#running-from-compose-fileyml)
             * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
          * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
+         * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
          * [Accessing the console](#accessing-the-console)
          * [Startup modes](#startup-modes)
       * [Environment variables](#environment-variables)
