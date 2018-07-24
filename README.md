@@ -212,7 +212,7 @@ Here is an example playbook in case you control your environment with Ansible. Y
       pull: true
       restart_policy: unless-stopped
       env:
-        EXTRA_JAVA_OPTS="-Duser.timezone=Europe/Helsinki"
+        EXTRA_JAVA_OPTS="-Duser.timezone=Europe/Berlin"
 ```
 
 ### Accessing the console
