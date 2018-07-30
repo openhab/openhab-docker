@@ -18,6 +18,7 @@ Table of Contents
             * [Running from compose-file.yml](#running-from-compose-fileyml)
             * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
          * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
+         * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
          * [Accessing the console](#accessing-the-console)
          * [Startup modes](#startup-modes)
       * [Environment variables](#environment-variables)
@@ -178,6 +179,43 @@ docker run \
   -v /opt/openhab/userdata:/openhab/userdata \
   -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
   openhab/openhab:2.3.0-amd64-debian
+```
+
+### Automating Docker setup using Ansible (for advanced user)
+
+Here is an example playbook in case you control your environment with Ansible. You can test it by running `ansible-playbook -i mycontainerhost, -t openhab run-containers.yml`. The `:Z` at the end of volume lines is for SELinux systems. If run elsewhere, replace it with ro.
+
+```yaml
+- name: ensure containers are running
+  hosts: all
+  tasks:
+
+  - name: ensure openhab is up
+    tags: openhab
+    docker_container:
+      name: openhab
+      image: openhab/openhab:2.3.0-amd64-alpine
+      state: started
+      detach: yes
+      interactive: yes
+      tty: yes
+      ports:
+        - 8080:8080
+        - 8101:8101
+        - 5007:5007
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+        - /etc/timezone:/etc/timezone:ro
+        - /opt/openhab/addons:/openhab/addons:Z
+        - /opt/openhab/conf:/openhab/conf:Z
+        - /opt/openhab/userdata:/openhab/userdata:Z
+      keep_volumes: yes
+      hostname: openhab.localnet
+      memory: 512m
+      pull: true
+      restart_policy: unless-stopped
+      env:
+        EXTRA_JAVA_OPTS="-Duser.timezone=Europe/Berlin"
 ```
 
 ### Accessing the console
