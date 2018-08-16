@@ -109,9 +109,31 @@ docker run \
 
 #### Running from compose-file.yml
 
-Create the following `docker-compose.yml` and start the container with `docker-compose up -d`
+Create the following `docker-compose.yml` for use of local directories and start the container with `docker-compose up -d`
 
 ```yaml
+version: '2.2'
+
+services:
+  openhab:
+    image: "openhab/openhab:2.3.0-amd64-debian"
+    restart: always
+    network_mode: host
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "./openhab_addons:/openhab/addons"
+      - "./openhab_conf:/openhab/conf"
+      - "./openhab_userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+```
+
+Create the following `docker-compose.yml` for use of docker volumes and start the container with `docker-compose up -d`
+
+```yml
 version: '2.2'
 
 services:
@@ -129,6 +151,14 @@ services:
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
       EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+
+volumes:
+  openhab_addons:
+    driver: local
+  openhab_conf:
+    driver: local
+  openhab_userdata:
+    driver: local
 ```
 
 #### Running openHAB with libpcap support
