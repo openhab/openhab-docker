@@ -25,7 +25,7 @@ print_baseimage() {
 	# Set download url for openhab version
 	case $version in
 	2.4.0.M3)
-		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.tar.gz"
+		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.zip"
 		;;
 	2.4.0-snapshot)
 		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip"

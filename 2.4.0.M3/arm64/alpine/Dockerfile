@@ -11,7 +11,7 @@ FROM multiarch/alpine:arm64-v3.8
 # Set download urls
 ENV \
     JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
-    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.tar.gz" \
+    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.zip" \
     OPENHAB_VERSION="2.4.0.M3"
 
 # Set variables and locales
