@@ -303,7 +303,7 @@ print_expose_ports() {
 	# $expose_comment
 	EXPOSE $expose_ports
 	
-	EOI
+EOI
 }
 
 # Set working directory and entrypoint
