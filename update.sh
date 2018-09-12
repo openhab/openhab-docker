@@ -2,13 +2,13 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.4.0.M3 2.4.0.M2 2.4.0.M1 2.4.0-snapshot 2.3.0 2.2.0 2.1.0 2.0.0 1.8.3"
+versions="2.4.0.M3 2.4.0-snapshot 2.3.0 2.2.0 2.1.0 2.0.0 1.8.3"
 arches="i386 amd64 armhf arm64"
 bases="debian alpine"
 
 # Generate header
 print_header() {
-	cat > $1 <<-EOI
+    cat >> $1 <<-'EOI'
 	# openhab image
 	#
 	# ------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ print_header() {
 	#                       PLEASE DO NOT EDIT IT DIRECTLY.
 	# ------------------------------------------------------------------------------
 	#
-	EOI
+EOI
 }
 
 # Print selected image
@@ -26,12 +26,6 @@ print_baseimage() {
 	case $version in
 	2.4.0.M3)
 		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.tar.gz"
-		;;
-	2.4.0.M2)
-		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M2/openhab-2.4.0.M2.tar.gz"
-		;;
-	2.4.0.M1)
-		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M1/openhab-2.4.0.M1.tar.gz"
 		;;
 	2.4.0-snapshot)
 		openhab_url="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip"
@@ -75,14 +69,14 @@ print_baseimage() {
 		base_image="debian-debootstrap:$arch-stretch"
 		;;
 	alpine)
-		base_image="alpine:$arch-v3.7"
+		base_image="alpine:$arch-v3.8"
 		;;
 	default)
 		base_image="error"
 		;;
 	esac
 
-	cat >> $1 <<-EOI
+	cat >> $1 <<-'EOI'
 	FROM multiarch/$base_image
 
 	# Set download urls
@@ -91,7 +85,7 @@ print_baseimage() {
 	    OPENHAB_URL="$openhab_url" \
 	    OPENHAB_VERSION="$version"
 
-	EOI
+EOI
 }
 
 # Print metadata
@@ -312,7 +306,7 @@ print_expose_ports() {
 		expose_comment="Expose HTTP, HTTPS and Console ports"
 		expose_ports="8080 8443 8101"
 		;;
-	2.2.0|2.3.0|2.4.0-snapshot|2.4.0.M1|2.4.0.M2|2.4.0.M3)
+	2.2.0|2.3.0|2.4.0-snapshot|2.4.0.M3)
 		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
 		expose_ports="8080 8443 8101 5007"
 		;;
