@@ -8,7 +8,7 @@ bases="debian alpine"
 
 # Generate header
 print_header() {
-    cat > $1 <<-EOI
+	cat > $1 <<-EOI
 	# openhab image
 	#
 	# ------------------------------------------------------------------------------
@@ -302,7 +302,7 @@ print_expose_ports() {
 	cat >> $1 <<-EOI
 	# $expose_comment
 	EXPOSE $expose_ports
-	
+
 EOI
 }
 
