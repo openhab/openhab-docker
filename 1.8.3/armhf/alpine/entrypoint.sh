@@ -1,12 +1,6 @@
-#!/bin/sh -x
+#!/bin/bash -x
 
-# Karaf needs a pseudo-TTY so exit and instruct user to allocate one when necessary
-test -t 0
-if [ $? -eq 1 ]; then
-    echo "Please start the openHAB container with a pseudo-TTY using the -t option or 'tty: true' with docker compose"
-    exit 1
-fi
-
+interactive=$(if test -t 0; then echo true; else echo false; fi)
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -17,13 +11,18 @@ if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security
 fi
 
 # Add openhab user & handle possible device groups for different host systems
-# Container base image puts dialout on group id 20, uucp on id 10
+# Container base image puts dialout on group id 20, uucp on id 14
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
-echo "Starting with openhab user id: $NEW_USER_ID"
+NEW_GROUP_ID=${GROUP_ID:-$NEW_USER_ID}
+echo "Starting with openhab user id: $NEW_USER_ID and group id: $NEW_GROUP_ID"
 if ! id -u openhab >/dev/null 2>&1; then
-  echo "Create user openhab with id $NEW_USER_ID"
-  adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} openhab
+  echo "Create group openhab with id ${NEW_GROUP_ID}"
+  addgroup -g $NEW_GROUP_ID openhab
+  echo "Create user openhab with id ${NEW_USER_ID}"
+  adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} -G openhab openhab
+  adduser openhab dialout
+  adduser openhab uucp
 fi
 
 # Copy initial files to host volume
@@ -105,4 +104,10 @@ esac
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
 
-exec "$@"
+# Use server mode with the default command when there is no pseudo-TTY
+if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "su-exec openhab ./start.sh" ]; then
+    command=($@ server)
+    exec "${command[@]}"
+else
+    exec "$@"
+fi

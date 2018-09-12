@@ -6,10 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:arm64-v3.7
+FROM multiarch/alpine:arm64-v3.8
 
 # Set download urls
-ENV 	    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" 	    OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip" 	    OPENHAB_VERSION="1.8.3"
+ENV \
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
+    OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip" \
+    OPENHAB_VERSION="1.8.3"
 
 # Set variables and locales
 ENV \
@@ -35,7 +38,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vendor="openHAB Foundation e.V." \
     org.label-schema.version=$VERSION \
     org.label-schema.description="An open source, technology agnostic home automation platform" \
-    org.label-schema.url="http://www.openhab.com/" \
+    org.label-schema.url="https://www.openhab.com/" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
     org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
@@ -45,6 +48,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 RUN apk upgrade --no-cache && \
     apk add --no-cache --virtual build-dependencies dpkg gnupg && \
     apk add --no-cache \
+    arping \
     bash \
     ca-certificates \
     fontconfig \
@@ -55,7 +59,8 @@ RUN apk upgrade --no-cache && \
     openjdk8 \
     unzip \
     wget \
-    zip
+    zip && \
+    chmod u+s /usr/sbin/arping
 
 # Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
@@ -63,10 +68,10 @@ RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 # Install openhab
-RUN wget -nv -O /tmp/openhab.zip ${OPENHAB_URL} && \
-    unzip -q /tmp/openhab.zip -d ${APPDIR} && \
+RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \
-    cp -a ${APPDIR}/configurations ${APPDIR}/configurations.dist && \
+    cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
     echo "export TERM=dumb" | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
