@@ -1,5 +1,4 @@
 sudo: required
-group: deprecated-2017Q2
 language: bash
 branches:
   only:
@@ -11,9 +10,9 @@ before_install:
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 install:
   - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
-  - docker run --rm --tty $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
+  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
 after_success:
-  - docker login -e=$DOCKER_EMAIL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
   - docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST
 env:
   #global:
