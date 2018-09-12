@@ -6,13 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/$base_image
+FROM multiarch/alpine:armhf-v3.8
 
 # Set download urls
-ENV \\
-    JAVA_URL="$java_url" \\
-    OPENHAB_URL="$openhab_url" \\
-    OPENHAB_VERSION="$version"
+ENV \
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
+    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.2.0%2Fopenhab-2.2.0.zip" \
+    OPENHAB_VERSION="2.2.0"
 
 # Set variables and locales
 ENV \

@@ -6,13 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/$base_image
+FROM multiarch/debian-debootstrap:arm64-stretch
 
 # Set download urls
-ENV \\
-    JAVA_URL="$java_url" \\
-    OPENHAB_URL="$openhab_url" \\
-    OPENHAB_VERSION="$version"
+ENV \
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
+    OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip" \
+    OPENHAB_VERSION="2.4.0-snapshot"
 
 # Set variables and locales
 ENV \

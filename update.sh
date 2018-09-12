@@ -76,7 +76,7 @@ print_baseimage() {
 		;;
 	esac
 
-	cat >> $1 <<-'EOI'
+	cat >> $1 <<-EOI
 	FROM multiarch/$base_image
 
 	# Set download urls
