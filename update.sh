@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # Dockerfiles to be generated
-versions="2.4.0.M3 2.4.0-snapshot 2.3.0 2.2.0 2.1.0 2.0.0 1.8.3"
+versions="2.4.0.M4 2.4.0.M3 2.4.0-snapshot 2.3.0 2.2.0 2.1.0 2.0.0 1.8.3"
 arches="i386 amd64 armhf arm64"
 bases="debian alpine"
 
@@ -24,6 +24,9 @@ EOI
 print_baseimage() {
 	# Set download url for openhab version
 	case $version in
+	2.4.0.M4)
+		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.zip"
+		;;
 	2.4.0.M3)
 		openhab_url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.zip"
 		;;
@@ -143,6 +146,8 @@ print_basepackages() {
 	    unzip \
 	    wget \
 	    zip && \
+	    apt-get clean && \
+	    rm -rf /var/lib/apt/lists/* && \
 	    chmod u+s /usr/sbin/arping && \
 	    ln -s -f /bin/true /usr/bin/chfn
 
@@ -179,6 +184,7 @@ print_cleanup() {
 	# Reduce image size by removing files that are used only for building the image
 	RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
 	    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+		apt-get clean && \
 	    rm -rf /var/lib/apt/lists/*
 
 EOI
