@@ -295,7 +295,7 @@ print_expose_ports() {
 		expose_comment="Expose HTTP, HTTPS and Console ports"
 		expose_ports="8080 8443 8101"
 		;;
-	2.2.0|2.3.0|2.4.0-snapshot|2.4.0.M3)
+	2.2.0|2.3.0|2.4.*)
 		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
 		expose_ports="8080 8443 8101 5007"
 		;;
