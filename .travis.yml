@@ -44,6 +44,9 @@ env:
     - DIST=debian TARGET=amd64 VERSION=2.4.0.M3
     - DIST=debian TARGET=armhf VERSION=2.4.0.M3
     - DIST=debian TARGET=arm64 VERSION=2.4.0.M3
+    - DIST=debian TARGET=amd64 VERSION=2.4.0.M4
+    - DIST=debian TARGET=armhf VERSION=2.4.0.M4
+    - DIST=debian TARGET=arm64 VERSION=2.4.0.M4
     - DIST=alpine TARGET=amd64 VERSION=1.8.3
     - DIST=alpine TARGET=armhf VERSION=1.8.3
     - DIST=alpine TARGET=arm64 VERSION=1.8.3
@@ -65,5 +68,8 @@ env:
     - DIST=alpine TARGET=amd64 VERSION=2.4.0.M3
     - DIST=alpine TARGET=armhf VERSION=2.4.0.M3
     - DIST=alpine TARGET=arm64 VERSION=2.4.0.M3
+    - DIST=alpine TARGET=amd64 VERSION=2.4.0.M4
+    - DIST=alpine TARGET=armhf VERSION=2.4.0.M4
+    - DIST=alpine TARGET=arm64 VERSION=2.4.0.M4
 matrix:
   fast_finish: true
