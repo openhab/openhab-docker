@@ -6,7 +6,7 @@ branches:
 services:
   - docker
 before_install:
-  - sh . update.sh
+  - ./update.sh
   - docker info
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 install:
