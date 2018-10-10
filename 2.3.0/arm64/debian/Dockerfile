@@ -60,6 +60,8 @@ RUN apt-get update && \
     unzip \
     wget \
     zip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn
 
@@ -94,6 +96,7 @@ VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 # Reduce image size by removing files that are used only for building the image
 RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
     DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Expose HTTP, HTTPS, Console and LSP ports
