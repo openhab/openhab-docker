@@ -54,7 +54,7 @@ case ${OPENHAB_VERSION} in
         cp -av "${APPDIR}/configurations.dist/." "${APPDIR}/configurations/"
       fi
     ;;
-  2.0.0|2.1.0|2.2.0|2.3.0|2.4.0-snapshot)
+  2.0.0|2.1.0|2.2.0|2.3.0|2.4.*)
       # Initialize empty host volumes
       if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
         # Copy userdata dir for version 2.0.0
@@ -123,6 +123,7 @@ esac
 
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
+sync
 
 # Use server mode with the default command when there is no pseudo-TTY
 if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "gosu openhab ./start.sh" ]; then
