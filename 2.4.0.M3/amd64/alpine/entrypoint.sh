@@ -109,6 +109,14 @@ case ${OPENHAB_VERSION} in
     ;;
 esac
 
+if [ -d /etc/cont-init.d ]
+then
+    for script in $(find /etc/cont-init.d -type f | grep -v \~)
+    do
+	. ${script}
+    done
+fi
+
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
 sync
