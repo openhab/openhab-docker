@@ -11,7 +11,7 @@ FROM multiarch/alpine:amd64-v3.8
 # Set download urls
 ENV \
     JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
-    OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip" \
+    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip" \
     OPENHAB_VERSION="2.4.0-snapshot"
 
 # Set variables and locales
@@ -67,8 +67,8 @@ ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
 RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
-# Install openhab
-# Set permissions for openhab. Export TERM variable. See issue #30 for details!
+# Install openHAB
+# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
     unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \

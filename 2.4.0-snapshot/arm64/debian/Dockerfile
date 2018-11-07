@@ -11,7 +11,7 @@ FROM multiarch/debian-debootstrap:arm64-stretch
 # Set download urls
 ENV \
     JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
-    OPENHAB_URL="https://openhab.ci.cloudbees.com/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip" \
+    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.4.0-SNAPSHOT.zip" \
     OPENHAB_VERSION="2.4.0-snapshot"
 
 # Set variables and locales
@@ -77,8 +77,8 @@ RUN dpkg --add-architecture armhf && \
     apt-get install --no-install-recommends -y \
     libc6:armhf
 
-# Install openhab
-# Set permissions for openhab. Export TERM variable. See issue #30 for details!
+# Install openHAB
+# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
     unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \
@@ -94,6 +94,7 @@ VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
 # Reduce image size by removing files that are used only for building the image
 RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
     DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Expose HTTP, HTTPS, Console and LSP ports

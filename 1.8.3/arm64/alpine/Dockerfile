@@ -67,7 +67,7 @@ ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
 RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
-# Install openhab
+# Install openHAB
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
     unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \

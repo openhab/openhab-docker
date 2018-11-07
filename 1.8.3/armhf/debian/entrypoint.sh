@@ -16,7 +16,7 @@ fi
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f /openhab/runtime/instances/instance.properties
 
-# The instance.properties file in OH2.x is installed in the tmp
+# The instance.properties file in openHAB 2.x is installed in the tmp
 # directory
 rm -f /openhab/userdata/tmp/instances/instance.properties
 
@@ -47,17 +47,17 @@ fi
 
 # Copy initial files to host volume
 case ${OPENHAB_VERSION} in
-  1.8.3)
+  1.*)
       if [ -z "$(ls -A "${APPDIR}/configurations")" ]; then
-        # Copy userdata dir for version 1.8.3
+        # Copy userdata dir for openHAB 1.x
         echo "No configuration found... initializing."
         cp -av "${APPDIR}/configurations.dist/." "${APPDIR}/configurations/"
       fi
     ;;
-  2.0.0|2.1.0|2.2.0|2.3.0|2.4.0-snapshot)
+  2.*)
       # Initialize empty host volumes
       if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
-        # Copy userdata dir for version 2.0.0
+        # Copy userdata dir for openHAB 2.x
         echo "No userdata found... initializing."
         cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
       fi
@@ -111,7 +111,7 @@ case ${OPENHAB_VERSION} in
       fi
 
       if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
-        # Copy userdata dir for version 2.0.0
+        # Copy userdata dir for openHAB 2.x
         echo "No configuration found... initializing."
         cp -av "${APPDIR}/conf.dist/." "${APPDIR}/conf/"
       fi
@@ -123,6 +123,7 @@ esac
 
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
+sync
 
 # Use server mode with the default command when there is no pseudo-TTY
 if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "gosu openhab ./start.sh" ]; then

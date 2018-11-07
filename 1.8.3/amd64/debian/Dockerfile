@@ -72,7 +72,7 @@ RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
     update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
     update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
 
-# Install openhab
+# Install openHAB
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
     unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \
@@ -85,6 +85,7 @@ VOLUME ${APPDIR}/configurations ${APPDIR}/addons
 # Reduce image size by removing files that are used only for building the image
 RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
     DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Expose HTTP and HTTPS ports

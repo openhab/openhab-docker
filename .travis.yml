@@ -1,3 +1,10 @@
+#
+# ------------------------------------------------------------------------------
+#          NOTE: THIS TRAVIS CONFIGURATION IS GENERATED VIA "update.sh"
+#
+#                       PLEASE DO NOT EDIT IT DIRECTLY.
+# ------------------------------------------------------------------------------
+#
 sudo: required
 language: bash
 branches:
@@ -6,7 +13,7 @@ branches:
 services:
   - docker
 before_install:
-  - ./update.sh
+  - ./update-docker-files.sh
   - docker info
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 install:
@@ -15,61 +22,66 @@ install:
 after_success:
   - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
   - docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST
+matrix:
+  fast_finish: true
 env:
   #global:
   # -  DOCKER_REPO=openhab/openhab
   # Encrypted:
-  # -  DOCKER_EMAIL
   # -  DOCKER_USERNAME
   # -  DOCKER_PASSWORD
   matrix:
-    - DIST=debian TARGET=amd64 VERSION=1.8.3
-    - DIST=debian TARGET=armhf VERSION=1.8.3
-    - DIST=debian TARGET=arm64 VERSION=1.8.3
-    - DIST=debian TARGET=amd64 VERSION=2.0.0
-    - DIST=debian TARGET=armhf VERSION=2.0.0
-    - DIST=debian TARGET=arm64 VERSION=2.0.0
-    - DIST=debian TARGET=amd64 VERSION=2.1.0
-    - DIST=debian TARGET=armhf VERSION=2.1.0
-    - DIST=debian TARGET=arm64 VERSION=2.1.0
-    - DIST=debian TARGET=amd64 VERSION=2.2.0
-    - DIST=debian TARGET=armhf VERSION=2.2.0
-    - DIST=debian TARGET=arm64 VERSION=2.2.0
-    - DIST=debian TARGET=amd64 VERSION=2.3.0
-    - DIST=debian TARGET=armhf VERSION=2.3.0
-    - DIST=debian TARGET=arm64 VERSION=2.3.0
-    - DIST=debian TARGET=amd64 VERSION=2.4.0-snapshot
-    - DIST=debian TARGET=armhf VERSION=2.4.0-snapshot
-    - DIST=debian TARGET=arm64 VERSION=2.4.0-snapshot
-    - DIST=debian TARGET=amd64 VERSION=2.4.0.M3
-    - DIST=debian TARGET=armhf VERSION=2.4.0.M3
-    - DIST=debian TARGET=arm64 VERSION=2.4.0.M3
-    - DIST=debian TARGET=amd64 VERSION=2.4.0.M4
-    - DIST=debian TARGET=armhf VERSION=2.4.0.M4
-    - DIST=debian TARGET=arm64 VERSION=2.4.0.M4
-    - DIST=alpine TARGET=amd64 VERSION=1.8.3
-    - DIST=alpine TARGET=armhf VERSION=1.8.3
-    - DIST=alpine TARGET=arm64 VERSION=1.8.3
-    - DIST=alpine TARGET=amd64 VERSION=2.0.0
-    - DIST=alpine TARGET=armhf VERSION=2.0.0
-    - DIST=alpine TARGET=arm64 VERSION=2.0.0
-    - DIST=alpine TARGET=amd64 VERSION=2.1.0
-    - DIST=alpine TARGET=armhf VERSION=2.1.0
-    - DIST=alpine TARGET=arm64 VERSION=2.1.0
-    - DIST=alpine TARGET=amd64 VERSION=2.2.0
-    - DIST=alpine TARGET=armhf VERSION=2.2.0
-    - DIST=alpine TARGET=arm64 VERSION=2.2.0
-    - DIST=alpine TARGET=amd64 VERSION=2.3.0
-    - DIST=alpine TARGET=armhf VERSION=2.3.0
-    - DIST=alpine TARGET=arm64 VERSION=2.3.0
-    - DIST=alpine TARGET=amd64 VERSION=2.4.0-snapshot
-    - DIST=alpine TARGET=armhf VERSION=2.4.0-snapshot
-    - DIST=alpine TARGET=arm64 VERSION=2.4.0-snapshot
-    - DIST=alpine TARGET=amd64 VERSION=2.4.0.M3
-    - DIST=alpine TARGET=armhf VERSION=2.4.0.M3
-    - DIST=alpine TARGET=arm64 VERSION=2.4.0.M3
-    - DIST=alpine TARGET=amd64 VERSION=2.4.0.M4
-    - DIST=alpine TARGET=armhf VERSION=2.4.0.M4
-    - DIST=alpine TARGET=arm64 VERSION=2.4.0.M4
-matrix:
-  fast_finish: true
+    - VERSION=1.8.3 DIST=alpine TARGET=amd64
+    - VERSION=1.8.3 DIST=alpine TARGET=arm64
+    - VERSION=1.8.3 DIST=alpine TARGET=armhf
+    - VERSION=1.8.3 DIST=debian TARGET=amd64
+    - VERSION=1.8.3 DIST=debian TARGET=arm64
+    - VERSION=1.8.3 DIST=debian TARGET=armhf
+    - VERSION=2.0.0 DIST=alpine TARGET=amd64
+    - VERSION=2.0.0 DIST=alpine TARGET=arm64
+    - VERSION=2.0.0 DIST=alpine TARGET=armhf
+    - VERSION=2.0.0 DIST=debian TARGET=amd64
+    - VERSION=2.0.0 DIST=debian TARGET=arm64
+    - VERSION=2.0.0 DIST=debian TARGET=armhf
+    - VERSION=2.1.0 DIST=alpine TARGET=amd64
+    - VERSION=2.1.0 DIST=alpine TARGET=arm64
+    - VERSION=2.1.0 DIST=alpine TARGET=armhf
+    - VERSION=2.1.0 DIST=debian TARGET=amd64
+    - VERSION=2.1.0 DIST=debian TARGET=arm64
+    - VERSION=2.1.0 DIST=debian TARGET=armhf
+    - VERSION=2.2.0 DIST=alpine TARGET=amd64
+    - VERSION=2.2.0 DIST=alpine TARGET=arm64
+    - VERSION=2.2.0 DIST=alpine TARGET=armhf
+    - VERSION=2.2.0 DIST=debian TARGET=amd64
+    - VERSION=2.2.0 DIST=debian TARGET=arm64
+    - VERSION=2.2.0 DIST=debian TARGET=armhf
+    - VERSION=2.3.0 DIST=alpine TARGET=amd64
+    - VERSION=2.3.0 DIST=alpine TARGET=arm64
+    - VERSION=2.3.0 DIST=alpine TARGET=armhf
+    - VERSION=2.3.0 DIST=debian TARGET=amd64
+    - VERSION=2.3.0 DIST=debian TARGET=arm64
+    - VERSION=2.3.0 DIST=debian TARGET=armhf
+    - VERSION=2.4.0.M3 DIST=alpine TARGET=amd64
+    - VERSION=2.4.0.M3 DIST=alpine TARGET=arm64
+    - VERSION=2.4.0.M3 DIST=alpine TARGET=armhf
+    - VERSION=2.4.0.M3 DIST=debian TARGET=amd64
+    - VERSION=2.4.0.M3 DIST=debian TARGET=arm64
+    - VERSION=2.4.0.M3 DIST=debian TARGET=armhf
+    - VERSION=2.4.0.M4 DIST=alpine TARGET=amd64
+    - VERSION=2.4.0.M4 DIST=alpine TARGET=arm64
+    - VERSION=2.4.0.M4 DIST=alpine TARGET=armhf
+    - VERSION=2.4.0.M4 DIST=debian TARGET=amd64
+    - VERSION=2.4.0.M4 DIST=debian TARGET=arm64
+    - VERSION=2.4.0.M4 DIST=debian TARGET=armhf
+    - VERSION=2.4.0.M5 DIST=alpine TARGET=amd64
+    - VERSION=2.4.0.M5 DIST=alpine TARGET=arm64
+    - VERSION=2.4.0.M5 DIST=alpine TARGET=armhf
+    - VERSION=2.4.0.M5 DIST=debian TARGET=amd64
+    - VERSION=2.4.0.M5 DIST=debian TARGET=arm64
+    - VERSION=2.4.0.M5 DIST=debian TARGET=armhf
+    - VERSION=2.4.0-snapshot DIST=alpine TARGET=amd64
+    - VERSION=2.4.0-snapshot DIST=alpine TARGET=arm64
+    - VERSION=2.4.0-snapshot DIST=alpine TARGET=armhf
+    - VERSION=2.4.0-snapshot DIST=debian TARGET=amd64
+    - VERSION=2.4.0-snapshot DIST=debian TARGET=arm64
+    - VERSION=2.4.0-snapshot DIST=debian TARGET=armhf
