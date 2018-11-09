@@ -101,6 +101,15 @@ case ${OPENHAB_VERSION} in
     ;;
 esac
 
+# Run s6-style init continuation scripts if existent
+if [ -d /etc/cont-init.d ]
+then
+    for script in $(find /etc/cont-init.d -type f | grep -v \~)
+    do
+        . ${script}
+    done
+fi
+
 # Set openhab folder permission
 chown -R openhab:openhab ${APPDIR}
 sync
