@@ -105,7 +105,7 @@ esac
 # Run s6-style init continuation scripts if existent
 if [ -d /etc/cont-init.d ]
 then
-    for script in $(find /etc/cont-init.d -type f | grep -v \~)
+    for script in $(find /etc/cont-init.d -type f | grep -v \~ | sort)
     do
         . ${script}
     done
