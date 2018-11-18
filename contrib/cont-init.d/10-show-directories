@@ -1,0 +1,5 @@
+#!/bin/bash -x
+
+ls -l /openhab
+
+ls -l /openhab/userdata
