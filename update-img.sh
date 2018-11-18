@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Export the sha256sum for verification.
 export IMG_SHA256="6b7b660fa0a4c4ab10aa2c2d7d586afdbc70cb33644995b0ee0e7f77ddcc2565"
 
