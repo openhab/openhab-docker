@@ -24,15 +24,15 @@ print_static_configuration() {
 	  - docker
 	before_install:
 	  - ./update-docker-files.sh
-		- ./update-img.sh
+	  - ./update-img.sh
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 	install:
 	  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
 	  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
 	after_success:
-	  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
-	  - docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST
+	  - if [[ "$TRAVIS_BRANCH" == "master" ]]; login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD; fi
+	  - if [[ "$TRAVIS_BRANCH" == "master" ]]; docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST; fi
 	matrix:
 	  fast_finish: true
 	env:
