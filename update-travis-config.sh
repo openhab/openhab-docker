@@ -28,7 +28,7 @@ print_static_configuration() {
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 	install:
-	  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
+	  - img build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
 	  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
 	after_success:
 	  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
