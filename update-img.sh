@@ -9,6 +9,3 @@ sudo curl -fSL "https://github.com/genuinetools/img/releases/download/v0.5.4/img
 	&& sudo chmod a+x "/usr/local/bin/img"
 
 echo "img installed!"
-
-# Run it!
-img -h
