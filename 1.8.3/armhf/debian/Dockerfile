@@ -77,7 +77,7 @@ RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
     unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
     rm /tmp/openhab.zip && \
     cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
-    echo "export TERM=dumb" | tee -a ~/.bashrc
+    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
