@@ -233,7 +233,7 @@ print_openhab_install_oh1() {
 	    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
 	    rm /tmp/openhab.zip && \
 	    cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
-	    echo "export TERM=dumb" | tee -a ~/.bashrc
+	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 EOI
 }
@@ -250,7 +250,7 @@ print_openhab_install_oh2() {
 	    touch "${APPDIR}/userdata/logs/openhab.log" && \
 	    cp -a "${APPDIR}/userdata" "${APPDIR}/userdata.dist" && \
 	    cp -a "${APPDIR}/conf" "${APPDIR}/conf.dist" && \
-	    echo "export TERM=dumb" | tee -a ~/.bashrc
+	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 EOI
 }
