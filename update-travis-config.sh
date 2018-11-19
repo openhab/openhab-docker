@@ -31,8 +31,8 @@ print_static_configuration() {
 	  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
 	  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
 	after_success:
-	  - if [[ "$TRAVIS_BRANCH" == "master" ]]; docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD; fi
-	  - if [[ "$TRAVIS_BRANCH" == "master" ]]; docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST; fi
+	  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+	  - docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST
 	matrix:
 	  fast_finish: true
 	env:
