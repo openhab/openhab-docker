@@ -1,0 +1,9 @@
+#!/bin/bash -x
+
+cat > /openhab/userdata/etc/host.key <<EOF
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCrOe8O7r9uOjKu
+... your key here ...
+c2woMmUlKznoVPczYMncRJ3oBg==
+-----END PRIVATE KEY-----
+EOF

@@ -382,6 +382,77 @@ To be able to build images for other architectures (e.g. armhf/arm64 on amd64) Q
 $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
 ```
 
+## Executing shell scripts before openHAB is started
+
+It is sometimes useful to run shell scripts after the "userdata" directory is created, but before karaf itself is launched.
+One such case is creating SSH host keys, and allowing access to the system from the outside via SSH.
+Exemplary scripts can be found in the ([contrib] (https://github.com/openhab/openhab-docker/tree/contrib) directory
+
+To use this, create a directory called
+
+```shell
+/etc/cont-init.d
+```
+
+and add a volume mount to your startup:
+
+```shell
+  ...
+  -v /etc/cont-init.d:/etc/cont-init.d \
+  ...
+```
+
+
+and put your scripts into that directory.
+This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the offical ones.
+
+### Show the contents of the runnig docker image
+
+([10-show-directories] https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/10-show-directories)
+
+```shell
+ls -l /openhab
+ls -l /openhab/userdata
+```
+
+### Set a defined host key for the image
+
+([20-set-host-key] https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-set-host-key)
+
+```shell
+cat > /openhab/userdata/etc/host.key <<EOF
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCrOe8O7r9uOjKu
+... your key here ...
+c2woMmUlKznoVPczYMncRJ3oBg==
+-----END PRIVATE KEY-----
+EOF
+```
+
+### Open access from external hosts
+
+([20-open-ssh-server] https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-open-ssh-server)
+
+```shell
+sed -i \
+    "s/\#org.apache.karaf.shell:sshHost\s*=.*/org.apache.karaf.shell:sshHost=0.0.0.0/g" \
+    /openhab/conf/services/runtime.cfg
+```
+
+### Set a defined host key for the image
+
+([20-add-allowed-ssh-keys] https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-add-allowed-ssh-keys)
+
+```shell
+cat > /openhab/userdata/etc/keys.properties <<EOF
+openhab=A...your-ssh-public-key-here...B,_g_:admingroup
+
+_g_\:admingroup = group,admin,manager,viewer
+
+EOF
+```
+
+
 ## Contributing
 
 [Contribution guidelines](https://github.com/openhab/openhab-docker/blob/master/CONTRIBUTING.md)
