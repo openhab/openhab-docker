@@ -23,6 +23,7 @@ print_static_configuration() {
 	services:
 	  - docker
 	before_install:
+	  - sudo apt-get install -y uidmap
 	  - ./update-docker-files.sh
 	  - ./update-img.sh
 	  - docker info
