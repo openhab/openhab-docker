@@ -6,13 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/debian-debootstrap:armhf-stretch
+FROM multiarch/debian-debootstrap:amd64-stretch
 
 # Set download urls
 ENV \
-    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
-    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M3/openhab-2.4.0.M3.zip" \
-    OPENHAB_VERSION="2.4.0.M3"
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
+    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M6/openhab-2.4.0.M6.zip" \
+    OPENHAB_VERSION="2.4.0.M6"
 
 # Set variables and locales
 ENV \
