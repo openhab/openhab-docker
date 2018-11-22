@@ -23,7 +23,9 @@ print_static_configuration() {
 	services:
 	  - docker
 	before_install:
+	  - sudo apt-get install -y uidmap
 	  - ./update-docker-files.sh
+	  - ./update-img.sh
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 	install:
@@ -35,11 +37,6 @@ print_static_configuration() {
 	matrix:
 	  fast_finish: true
 	env:
-	  #global:
-	  # -  DOCKER_REPO=openhab/openhab
-	  # Encrypted:
-	  # -  DOCKER_USERNAME
-	  # -  DOCKER_PASSWORD
 	  matrix:
 EOI
 }
