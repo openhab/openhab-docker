@@ -46,21 +46,21 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 # Install basepackages
 RUN apk upgrade --no-cache && \
-    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
     apk add --no-cache \
-    arping \
-    bash \
-    ca-certificates \
-    fontconfig \
-    libpcap-dev \
-    shadow \
-    su-exec \
-    ttf-dejavu \
-    openjdk8 \
-    unzip \
-    wget \
-    zip && \
-    chmod u+s /usr/sbin/arping
+        arping \
+        bash \
+        ca-certificates \
+        fontconfig \
+        libpcap-dev \
+        shadow \
+        su-exec \
+        ttf-dejavu \
+        openjdk8 \
+        unzip \
+        wget \
+        zip && \
+    chmod u+s /usr/sbin/arping && \
+    rm -rf /var/cache/apk/*
 
 # Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
@@ -69,17 +69,13 @@ RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
 
 # Install openHAB
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
     rm /tmp/openhab.zip && \
     cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
     echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
-
-# Reduce image size by removing files that are used only for building the image
-RUN apk del build-dependencies && \
-    rm -rf /var/cache/apk/*
 
 # Expose HTTP and HTTPS ports
 EXPOSE 8080 8443

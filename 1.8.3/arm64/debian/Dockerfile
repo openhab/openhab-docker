@@ -47,21 +47,21 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 # Install basepackages
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    arping \
-    ca-certificates \
-    dirmngr \
-    fontconfig \
-    gnupg \
-    gosu \
-    libpcap-dev \
-    locales \
-    locales-all \
-    netbase \
-    unzip \
-    wget \
-    zip && \
+        arping \
+        ca-certificates \
+        fontconfig \
+        gosu \
+        libpcap-dev \
+        locales \
+        locales-all \
+        netbase \
+        unzip \
+        wget \
+        zip && \
     chmod u+s /usr/sbin/arping && \
-    ln -s -f /bin/true /usr/bin/chfn
+    ln -s -f /bin/true /usr/bin/chfn && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
@@ -74,24 +74,20 @@ RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
 
 RUN dpkg --add-architecture armhf && \
     apt-get update && \
-    apt-get install --no-install-recommends -y \
-    libc6:armhf
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+        libc6:armhf && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install openHAB
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
     rm /tmp/openhab.zip && \
     cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
     echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/configurations ${APPDIR}/addons
-
-# Reduce image size by removing files that are used only for building the image
-RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Expose HTTP and HTTPS ports
 EXPOSE 8080 8443

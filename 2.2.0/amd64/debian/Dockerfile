@@ -47,21 +47,21 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 # Install basepackages
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    arping \
-    ca-certificates \
-    dirmngr \
-    fontconfig \
-    gnupg \
-    gosu \
-    libpcap-dev \
-    locales \
-    locales-all \
-    netbase \
-    unzip \
-    wget \
-    zip && \
+        arping \
+        ca-certificates \
+        fontconfig \
+        gosu \
+        libpcap-dev \
+        locales \
+        locales-all \
+        netbase \
+        unzip \
+        wget \
+        zip && \
     chmod u+s /usr/sbin/arping && \
-    ln -s -f /bin/true /usr/bin/chfn
+    ln -s -f /bin/true /usr/bin/chfn && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install java
 ENV JAVA_HOME='/usr/lib/java-8'
@@ -75,7 +75,7 @@ RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
     rm /tmp/openhab.zip && \
     mkdir -p "${APPDIR}/userdata/logs" && \
     touch "${APPDIR}/userdata/logs/openhab.log" && \
@@ -85,12 +85,6 @@ RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
-
-# Reduce image size by removing files that are used only for building the image
-RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Expose HTTP, HTTPS, Console and LSP ports
 EXPOSE 8080 8443 8101 5007
