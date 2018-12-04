@@ -17,13 +17,14 @@ ENV \
 # Set variables and locales
 ENV \
     APPDIR="/openhab" \
+    CRYPTO_POLICY="limited" \
     EXTRA_JAVA_OPTS="" \
-    OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443" \
+    KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
-    CRYPTO_POLICY="limited"
+    OPENHAB_HTTP_PORT="8080" \
+    OPENHAB_HTTPS_PORT="8443"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -60,6 +61,10 @@ RUN apt-get update && \
         zip && \
     chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn && \
+    sed -i 's#stretch#buster#g' /etc/apt/sources.list && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tini && \
+    sed -i 's#buster#stretch#g' /etc/apt/sources.list && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -99,4 +104,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Execute command
-CMD ["gosu", "openhab", "./start.sh"]
+CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]

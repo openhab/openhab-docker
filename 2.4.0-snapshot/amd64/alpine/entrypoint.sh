@@ -124,7 +124,7 @@ chown -R openhab:openhab ${APPDIR}
 sync
 
 # Use server mode with the default command when there is no pseudo-TTY
-if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "su-exec openhab ./start.sh" ]; then
+if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "su-exec openhab tini -s ./start.sh" ]; then
     command=($@ server)
     exec "${command[@]}"
 else
