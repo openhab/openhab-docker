@@ -88,13 +88,14 @@ print_basemetadata() {
 	# Set variables and locales
 	ENV \
 	    APPDIR="/openhab" \
+	    CRYPTO_POLICY="limited" \
 	    EXTRA_JAVA_OPTS="" \
-	    OPENHAB_HTTP_PORT="8080" \
-	    OPENHAB_HTTPS_PORT="8443" \
+	    KARAF_EXEC="exec" \
 	    LC_ALL="en_US.UTF-8" \
 	    LANG="en_US.UTF-8" \
 	    LANGUAGE="en_US.UTF-8" \
-	    CRYPTO_POLICY="limited"
+	    OPENHAB_HTTP_PORT="8080" \
+	    OPENHAB_HTTPS_PORT="8443"
 
 	# Set arguments on build
 	ARG BUILD_DATE
@@ -123,21 +124,22 @@ print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apk upgrade --no-cache && \
-	    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
 	    apk add --no-cache \
-	    arping \
-	    bash \
-	    ca-certificates \
-	    fontconfig \
-	    libpcap-dev \
-	    shadow \
-	    su-exec \
-	    ttf-dejavu \
-	    openjdk8 \
-	    unzip \
-	    wget \
-	    zip && \
-	    chmod u+s /usr/sbin/arping
+	        arping \
+	        bash \
+	        ca-certificates \
+	        fontconfig \
+	        libpcap-dev \
+	        shadow \
+	        su-exec \
+	        tini \
+	        ttf-dejavu \
+	        openjdk8 \
+	        unzip \
+	        wget \
+	        zip && \
+	    chmod u+s /usr/sbin/arping && \
+	    rm -rf /var/cache/apk/*
 
 EOI
 }
@@ -148,41 +150,23 @@ print_basepackages_debian() {
 	# Install basepackages
 	RUN apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-	    arping \
-	    ca-certificates \
-	    dirmngr \
-	    fontconfig \
-	    gnupg \
-	    gosu \
-	    libpcap-dev \
-	    locales \
-	    locales-all \
-	    netbase \
-	    unzip \
-	    wget \
-	    zip && \
+	        arping \
+	        ca-certificates \
+	        fontconfig \
+	        gosu \
+	        libpcap-dev \
+	        locales \
+	        locales-all \
+	        netbase \
+	        unzip \
+	        wget \
+	        zip && \
 	    chmod u+s /usr/sbin/arping && \
-	    ln -s -f /bin/true /usr/bin/chfn
-
-EOI
-}
-
-# Print cleanup for Alpine
-print_cleanup_alpine() {
-	cat >> $1 <<-'EOI'
-	# Reduce image size by removing files that are used only for building the image
-	RUN apk del build-dependencies && \
-	    rm -rf /var/cache/apk/*
-
-EOI
-}
-
-# Print cleanup for Debian
-print_cleanup_debian() {
-	cat >> $1 <<-'EOI'
-	# Reduce image size by removing files that are used only for building the image
-	RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
-	    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+	    ln -s -f /bin/true /usr/bin/chfn && \
+	    sed -i 's#stretch#buster#g' /etc/apt/sources.list && \
+	    apt-get update && \
+	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tini && \
+	    sed -i 's#buster#stretch#g' /etc/apt/sources.list && \
 	    apt-get clean && \
 	    rm -rf /var/lib/apt/lists/*
 
@@ -194,8 +178,10 @@ print_lib32_support_arm64() {
 	cat >> $1 <<-'EOI'
 	RUN dpkg --add-architecture armhf && \
 	    apt-get update && \
-	    apt-get install --no-install-recommends -y \
-	    libc6:armhf
+	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+	        libc6:armhf && \
+	    apt-get clean && \
+	    rm -rf /var/lib/apt/lists/*
 
 EOI
 }
@@ -230,7 +216,7 @@ print_openhab_install_oh1() {
 	cat >> $1 <<-'EOI'
 	# Install openHAB
 	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+	    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
 	    rm /tmp/openhab.zip && \
 	    cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
 	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
@@ -244,7 +230,7 @@ print_openhab_install_oh2() {
 	# Install openHAB
 	# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+	    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
 	    rm /tmp/openhab.zip && \
 	    mkdir -p "${APPDIR}/userdata/logs" && \
 	    touch "${APPDIR}/userdata/logs/openhab.log" && \
@@ -318,12 +304,12 @@ print_command() {
 	case $base in
 	alpine)
 		cat >> $1 <<-'EOI'
-		CMD ["su-exec", "openhab", "./start.sh"]
+		CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]
 		EOI
 		;;
 	debian)
 		cat >> $1 <<-'EOI'
-		CMD ["gosu", "openhab", "./start.sh"]
+		CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]
 		EOI
 		;;
 	default)
@@ -367,11 +353,6 @@ do
 			else
 				print_openhab_install_oh2 $file;
 				print_volumes_oh2 $file
-			fi
-			if [ "$base" == "alpine" ]; then
-				print_cleanup_alpine $file;
-			else
-				print_cleanup_debian $file;
 			fi
 			print_expose_ports $file
 			print_entrypoint $file

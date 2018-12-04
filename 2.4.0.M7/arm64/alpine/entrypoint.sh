@@ -5,11 +5,10 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # Install Java unlimited strength cryptography
-if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -f "${JAVA_HOME}/jre/lib/security/README.txt" ]; then
-  echo "Installing Zulu Cryptography Extension Kit (\"CEK\")..."
-  wget -q -O /tmp/ZuluJCEPolicies.zip https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip
-  unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip
-  rm /tmp/ZuluJCEPolicies.zip
+if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security/policy/unlimited" ]; then
+  echo "Installing OpenJDK unlimited strength cryptography policy..."
+  mkdir "${JAVA_HOME}/jre/lib/security/policy/unlimited"
+  apk fix --no-cache openjdk8-jre-lib
 fi
 
 # Deleting instance.properties to avoid karaf PID conflict on restart
@@ -21,28 +20,18 @@ rm -f /openhab/runtime/instances/instance.properties
 rm -f /openhab/userdata/tmp/instances/instance.properties
 
 # Add openhab user & handle possible device groups for different host systems
-# Container base image puts dialout on group id 20, uucp on id 10
+# Container base image puts dialout on group id 20, uucp on id 14
 # GPIO Group for RPI access
 NEW_USER_ID=${USER_ID:-9001}
 NEW_GROUP_ID=${GROUP_ID:-$NEW_USER_ID}
 echo "Starting with openhab user id: $NEW_USER_ID and group id: $NEW_GROUP_ID"
 if ! id -u openhab >/dev/null 2>&1; then
   echo "Create group openhab with id ${NEW_GROUP_ID}"
-  groupadd -g $NEW_GROUP_ID openhab
+  addgroup -g $NEW_GROUP_ID openhab
   echo "Create user openhab with id ${NEW_USER_ID}"
-  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} --gid $NEW_GROUP_ID openhab
-  groupadd -g 14 uucp2
-  groupadd -g 16 dialout2
-  groupadd -g 18 dialout3
-  groupadd -g 32 uucp3
-  groupadd -g 997 gpio
+  adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} -G openhab openhab
   adduser openhab dialout
   adduser openhab uucp
-  adduser openhab uucp2
-  adduser openhab dialout2
-  adduser openhab dialout3
-  adduser openhab uucp3
-  adduser openhab gpio
 fi
 
 # Copy initial files to host volume
@@ -71,7 +60,7 @@ case ${OPENHAB_VERSION} in
         if [ ! -d "${APPDIR}/userdata/backup" ]; then
           mkdir "${APPDIR}/userdata/backup"
         fi
-        tar --exclude="${APPDIR}/userdata/backup" -c -f "${APPDIR}/userdata/backup/${backupFile}" "${APPDIR}/userdata"
+        tar -c -f "${APPDIR}/userdata/backup/${backupFile}" --exclude "backup/*" "${APPDIR}/userdata"
         echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
 
         # Copy over the updated files
@@ -135,7 +124,7 @@ chown -R openhab:openhab ${APPDIR}
 sync
 
 # Use server mode with the default command when there is no pseudo-TTY
-if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "gosu openhab ./start.sh" ]; then
+if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "su-exec openhab tini -s ./start.sh" ]; then
     command=($@ server)
     exec "${command[@]}"
 else

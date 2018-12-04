@@ -58,12 +58,6 @@ env:
     - VERSION=2.3.0 DIST=debian TARGET=amd64
     - VERSION=2.3.0 DIST=debian TARGET=arm64
     - VERSION=2.3.0 DIST=debian TARGET=armhf
-    - VERSION=2.4.0.M4 DIST=alpine TARGET=amd64
-    - VERSION=2.4.0.M4 DIST=alpine TARGET=arm64
-    - VERSION=2.4.0.M4 DIST=alpine TARGET=armhf
-    - VERSION=2.4.0.M4 DIST=debian TARGET=amd64
-    - VERSION=2.4.0.M4 DIST=debian TARGET=arm64
-    - VERSION=2.4.0.M4 DIST=debian TARGET=armhf
     - VERSION=2.4.0.M5 DIST=alpine TARGET=amd64
     - VERSION=2.4.0.M5 DIST=alpine TARGET=arm64
     - VERSION=2.4.0.M5 DIST=alpine TARGET=armhf
@@ -76,6 +70,12 @@ env:
     - VERSION=2.4.0.M6 DIST=debian TARGET=amd64
     - VERSION=2.4.0.M6 DIST=debian TARGET=arm64
     - VERSION=2.4.0.M6 DIST=debian TARGET=armhf
+    - VERSION=2.4.0.M7 DIST=alpine TARGET=amd64
+    - VERSION=2.4.0.M7 DIST=alpine TARGET=arm64
+    - VERSION=2.4.0.M7 DIST=alpine TARGET=armhf
+    - VERSION=2.4.0.M7 DIST=debian TARGET=amd64
+    - VERSION=2.4.0.M7 DIST=debian TARGET=arm64
+    - VERSION=2.4.0.M7 DIST=debian TARGET=armhf
     - VERSION=2.4.0-snapshot DIST=alpine TARGET=amd64
     - VERSION=2.4.0-snapshot DIST=alpine TARGET=arm64
     - VERSION=2.4.0-snapshot DIST=alpine TARGET=armhf

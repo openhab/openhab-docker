@@ -6,24 +6,25 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/debian-debootstrap:amd64-stretch
+FROM multiarch/alpine:armhf-v3.8
 
 # Set download urls
 ENV \
-    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
-    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M4/openhab-2.4.0.M4.zip" \
-    OPENHAB_VERSION="2.4.0.M4"
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
+    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M7/openhab-2.4.0.M7.zip" \
+    OPENHAB_VERSION="2.4.0.M7"
 
 # Set variables and locales
 ENV \
     APPDIR="/openhab" \
+    CRYPTO_POLICY="limited" \
     EXTRA_JAVA_OPTS="" \
-    OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443" \
+    KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
-    CRYPTO_POLICY="limited"
+    OPENHAB_HTTP_PORT="8080" \
+    OPENHAB_HTTPS_PORT="8443"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -45,37 +46,33 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     maintainer="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    arping \
-    ca-certificates \
-    dirmngr \
-    fontconfig \
-    gnupg \
-    gosu \
-    libpcap-dev \
-    locales \
-    locales-all \
-    netbase \
-    unzip \
-    wget \
-    zip && \
+RUN apk upgrade --no-cache && \
+    apk add --no-cache \
+        arping \
+        bash \
+        ca-certificates \
+        fontconfig \
+        libpcap-dev \
+        shadow \
+        su-exec \
+        tini \
+        ttf-dejavu \
+        openjdk8 \
+        unzip \
+        wget \
+        zip && \
     chmod u+s /usr/sbin/arping && \
-    ln -s -f /bin/true /usr/bin/chfn
+    rm -rf /var/cache/apk/*
 
-# Install java
-ENV JAVA_HOME='/usr/lib/java-8'
-RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
-    mkdir "${JAVA_HOME}" && \
-    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
-    rm /tmp/java.tar.gz && \
-    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
-    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
+# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
+RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
     rm /tmp/openhab.zip && \
     mkdir -p "${APPDIR}/userdata/logs" && \
     touch "${APPDIR}/userdata/logs/openhab.log" && \
@@ -85,12 +82,6 @@ RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
 
 # Expose volume with configuration and userdata dir
 VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
-
-# Reduce image size by removing files that are used only for building the image
-RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Expose HTTP, HTTPS, Console and LSP ports
 EXPOSE 8080 8443 8101 5007
@@ -102,4 +93,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Execute command
-CMD ["gosu", "openhab", "./start.sh"]
+CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]
