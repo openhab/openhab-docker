@@ -6,13 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/debian-debootstrap:arm64-stretch
+FROM multiarch/debian-debootstrap:amd64-stretch
 
 # Set download urls
 ENV \
-    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
-    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M4/openhab-2.4.0.M4.zip" \
-    OPENHAB_VERSION="2.4.0.M4"
+    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
+    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.4.0.M7/openhab-2.4.0.M7.zip" \
+    OPENHAB_VERSION="2.4.0.M7"
 
 # Set variables and locales
 ENV \
@@ -76,13 +76,6 @@ RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
     rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
     update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
-
-RUN dpkg --add-architecture armhf && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-        libc6:armhf && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
