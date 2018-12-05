@@ -4,6 +4,7 @@ set -eo pipefail
 # Supported architectures and base images
 arches="amd64 arm64 armhf"
 bases="alpine debian"
+docker_repo=${DOCKER_REPO:=openhab/openhab}
 
 last_stable_version() {
 	echo "$(grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sort --unique --version-sort | tail -n 1)"
@@ -20,6 +21,10 @@ stable_versions() {
 
 milestone_versions() {
 	echo "$(grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 3)"
+}
+
+last_milestone_version() {
+	echo "$(grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 1)"
 }
 
 snapshot_version() {

@@ -1,0 +1,18 @@
+image: openhab/openhab:2.4.0-snapshot-alpine
+tags: ['snapshot-alpine']
+manifests:
+  -
+    image: openhab/openhab:2.4.0-snapshot-amd64-alpine
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: openhab/openhab:2.4.0-snapshot-armhf-alpine
+    platform:
+      architecture: arm
+      os: linux
+  -
+    image: openhab/openhab:2.4.0-snapshot-arm64-alpine
+    platform:
+      architecture: arm64
+      os: linux
