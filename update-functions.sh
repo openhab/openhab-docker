@@ -29,11 +29,11 @@ stable_versions() {
 }
 
 milestone_versions() {
-	grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 3
+	grep -E "$(next_stable_version)\.M[0-9]+$" versions | sort --unique --version-sort | tail -n 3
 }
 
 last_milestone_version() {
-	grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 1
+	grep -E "$(next_stable_version)\.M[0-9]+$" versions | sort --unique --version-sort | tail -n 1
 }
 
 snapshot_version() {
