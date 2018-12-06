@@ -203,7 +203,7 @@ print_java_debian() {
 	ENV JAVA_HOME='/usr/lib/java-8'
 	RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
 	    mkdir "${JAVA_HOME}" && \
-	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
+	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
 	    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
@@ -320,58 +320,119 @@ print_command() {
 	esac
 }
 
+generate_docker_files() {
+	for arch in $(arches)
+	do
+		# Generate Dockerfile
+		file="$version/$base/Dockerfile-$arch"
+		mkdir -p $(dirname $file) 2>/dev/null
+		echo -n "Writing $file... "
+		print_header $file;
+		print_baseimage $file;
+		print_basemetadata $file;
+		if [ "$base" == "alpine" ]; then
+			print_basepackages_alpine $file;
+			print_java_alpine $file;
+		else
+			print_basepackages_debian $file;
+			print_java_debian $file;
+		fi
+		if [ "$arch" == "arm64" ] && [ "$base" == "debian" ]; then
+			print_lib32_support_arm64 $file;
+		fi
+		if [ "$version" == "1."* ]; then
+			print_openhab_install_oh1 $file;
+			print_volumes_oh1 $file
+		else
+			print_openhab_install_oh2 $file;
+			print_volumes_oh2 $file
+		fi
+		print_expose_ports $file
+		print_entrypoint $file
+		print_command $file
+
+		echo "done"
+	done
+}
+
+generate_manifest() {
+	tags=()
+
+	if [ "$base" == "debian" ]; then
+		tags+=("'$version'")
+	fi
+
+	if [ "$version" == "$(last_stable_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("'latest'")
+		fi
+		tags+=("'latest-$base'")
+	fi
+
+	milestone_maturity_version="$(last_milestone_version)"
+	if [ "$milestone_maturity_version" == "" ] ; then
+		milestone_maturity_version="$(last_stable_version)"
+	fi
+
+	if [ "$version" == "$milestone_maturity_version" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("'milestone'")
+		fi
+		tags+=("'milestone-$base'")
+	fi
+
+	if [ "$version" == "$(snapshot_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("'snapshot'")
+		fi
+		tags+=("'snapshot-$base'")
+	fi
+
+	tags=$(IFS=,; echo "${tags[*]}")
+
+	cat >> $1 <<-EOI
+	image: $(docker_repo):$version-$base
+	tags: [$tags]
+	manifests:
+	  -
+	    image: $(docker_repo):$version-amd64-$base
+	    platform:
+	      architecture: amd64
+	      os: linux
+	  -
+	    image: $(docker_repo):$version-armhf-$base
+	    platform:
+	      architecture: arm
+	      os: linux
+	  -
+	    image: $(docker_repo):$version-arm64-$base
+	    platform:
+	      architecture: arm64
+	      os: linux
+EOI
+}
+
 # Remove previously generated container files
 rm -rf ./1.* ./2.*
 
 # Generate new container files
 for version in $(build_versions)
 do
-	for base in $bases
+	for base in $(bases)
 	do
-		for arch in $arches
-		do
-			# Generate Dockerfile
-			file=$version/$arch/$base/Dockerfile
-			mkdir -p $(dirname $file) 2>/dev/null
-			echo -n "Writing $file... "
-			print_header $file;
-			print_baseimage $file;
-			print_basemetadata $file;
-			if [ "$base" == "alpine" ]; then
-				print_basepackages_alpine $file;
-				print_java_alpine $file;
-			else
-				print_basepackages_debian $file;
-				print_java_debian $file;
-			fi
-			if [ "$arch" == "arm64" ] && [ "$base" == "debian" ]; then
-				print_lib32_support_arm64 $file;
-			fi
-			if [ "$version" == "1."* ]; then
-				print_openhab_install_oh1 $file;
-				print_volumes_oh1 $file
-			else
-				print_openhab_install_oh2 $file;
-				print_volumes_oh2 $file
-			fi
-			print_expose_ports $file
-			print_entrypoint $file
-			print_command $file
+		# Generate Dockerfile per architecture
+		generate_docker_files
 
-			# Generate entrypoint.sh
-			file=$version/$arch/$base/entrypoint.sh
-			if [ "$base" == "alpine" ]; then
-				cp entrypoint-alpine.sh $file
-				# Remove bugfix for version 2 from entrypoint-alpine.sh
-				if [ "$version" == "1."* ]; then
-					line=$(sed "/rm -f \/openhab\/userdata\/tmp\/instances\/instance.properties/=; d" entrypoint-alpine.sh)
-					sed -i "$((line-7)),${line}"d $file
-				fi
-			else
-				cp entrypoint-debian.sh $file
-			fi
+		# Generate multi-architecture manifest
+		file="$version/$base/manifest.yml"
+		generate_manifest $file
 
-			echo "done"
-		done
+		# Copy base specific entrypoint.sh
+		file="$version/$base/entrypoint.sh"
+		if [ "$base" == "alpine" ]; then
+			cp entrypoint-alpine.sh $file
+		else
+			cp entrypoint-debian.sh $file
+		fi
 	done
 done

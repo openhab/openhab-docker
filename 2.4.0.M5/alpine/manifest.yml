@@ -1,0 +1,18 @@
+image: openhab/openhab:2.4.0.M5-alpine
+tags: []
+manifests:
+  -
+    image: openhab/openhab:2.4.0.M5-amd64-alpine
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: openhab/openhab:2.4.0.M5-armhf-alpine
+    platform:
+      architecture: arm
+      os: linux
+  -
+    image: openhab/openhab:2.4.0.M5-arm64-alpine
+    platform:
+      architecture: arm64
+      os: linux
