@@ -321,7 +321,7 @@ print_command() {
 }
 
 generate_docker_files() {
-	for arch in $arches
+	for arch in $(arches)
 	do
 		# Generate Dockerfile
 		file="$version/$base/Dockerfile-$arch"
@@ -391,21 +391,21 @@ generate_manifest() {
 	tags=$(IFS=,; echo "${tags[*]}")
 
 	cat >> $1 <<-EOI
-	image: $docker_repo:$version-$base
+	image: $(docker_repo):$version-$base
 	tags: [$tags]
 	manifests:
 	  -
-	    image: $docker_repo:$version-amd64-$base
+	    image: $(docker_repo):$version-amd64-$base
 	    platform:
 	      architecture: amd64
 	      os: linux
 	  -
-	    image: $docker_repo:$version-armhf-$base
+	    image: $(docker_repo):$version-armhf-$base
 	    platform:
 	      architecture: arm
 	      os: linux
 	  -
-	    image: $docker_repo:$version-arm64-$base
+	    image: $(docker_repo):$version-arm64-$base
 	    platform:
 	      architecture: arm64
 	      os: linux
@@ -418,7 +418,7 @@ rm -rf ./1.* ./2.*
 # Generate new container files
 for version in $(build_versions)
 do
-	for base in $bases
+	for base in $(bases)
 	do
 		# Generate Dockerfile per architecture
 		generate_docker_files

@@ -63,7 +63,7 @@ print_static_configuration $file;
 # Generate the matrix for building Dockerfiles
 for version in $(build_versions)
 do
-	for base in $bases
+	for base in $(bases)
 	do
 		print_matrix $file;
 	done
