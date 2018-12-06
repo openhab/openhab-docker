@@ -21,13 +21,13 @@ before_install:
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
   - ARCHES="amd64 armhf arm64"
 install:
-  - for ARCH in $ARCHES; do 
+  - for ARCH in $ARCHES; do
         docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -f $VERSION/$DIST/Dockerfile-$ARCH -t $DOCKER_REPO:$VERSION-$ARCH-$DIST $VERSION/$DIST;
         docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
     done
 after_success:
   - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
-  - for ARCH in $ARCHES; do 
+  - for ARCH in $ARCHES; do
         docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
     done
   - manifest-tool push from-spec $VERSION/$DIST/manifest.yml

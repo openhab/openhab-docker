@@ -16,7 +16,7 @@ docker_repo() {
 }
 
 last_stable_version() {
-	echo "$(grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sort --unique --version-sort | tail -n 1)"
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sort --unique --version-sort | tail -n 1
 }
 
 next_stable_version() {
@@ -25,15 +25,15 @@ next_stable_version() {
 }
 
 stable_versions() {
-	echo "$(grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sort --unique --version-sort)"
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sort --unique --version-sort
 }
 
 milestone_versions() {
-	echo "$(grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 3)"
+	grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 3
 }
 
 last_milestone_version() {
-	echo "$(grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 1)"
+	grep -E $(next_stable_version)\.M[0-9]+$ versions | sort --unique --version-sort | tail -n 1
 }
 
 snapshot_version() {
