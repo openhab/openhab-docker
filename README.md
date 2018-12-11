@@ -27,6 +27,7 @@ Table of Contents
       * [Parameters](#parameters)
       * [Upgrading](#upgrading)
       * [Building the images](#building-the-images)
+      * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
       * [Contributing](#contributing)
       * [License](#license)
 
@@ -468,6 +469,24 @@ openhab=A...your-ssh-public-key-here...B,_g_:admingroup
 _g_\:admingroup = group,admin,manager,viewer
 
 EOF
+```
+
+### Configure credentials for openHAB cloud
+
+[40-openhabcloud](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/40-openhabcloud)
+
+```shell
+if [ ! -z ${OHC_UUID} ]
+then
+    mkdir -p /openhab/userdata
+    echo ${OHC_UUID} > /openhab/userdata/uuid
+fi
+
+if [ ! -z ${OHC_SECRET} ]
+then
+    mkdir -p /openhab/userdata/openhabcloud
+    echo ${OHC_SECRET} > /openhab/userdata/openhabcloud/secret
+fi
 ```
 
 
