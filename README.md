@@ -210,8 +210,8 @@ services:
       - "openhab_userdata:/openhab/userdata"
       - "openhab_addons:/openhab/addons"
     # The command node is very important. It overrides
-    # the "gosu openhab ./start.sh" command from Dockerfile and runs as root!
-    command: "./start.sh server"
+    # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
+    command: "tini -s ./start.sh server"
 ```
 
 *If you could provide a method to run libpcap support in user mode please open a pull request.*

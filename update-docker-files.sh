@@ -47,10 +47,13 @@ print_baseimage() {
 	# Set Java download based on architecture
 	case $arch in
 	amd64)
-		java_url="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+		java_url="https://cdn.azul.com/zulu/bin/zulu8.33.0.1-jdk8.0.192-linux_x64.tar.gz"
 		;;
-	armhf|arm64)
-		java_url="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
+	armhf)
+		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.134-jdk1.8.0_192-linux_aarch32hf.tar.gz"
+		;;
+	arm64)
+		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.135-jdk1.8.0_192-linux_aarch64.tar.gz"
 		;;
 	default)
 		java_url="error"
@@ -167,19 +170,6 @@ print_basepackages_debian() {
 	    apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tini && \
 	    sed -i 's#buster#stretch#g' /etc/apt/sources.list && \
-	    apt-get clean && \
-	    rm -rf /var/lib/apt/lists/*
-
-EOI
-}
-
-# Print 32-bit for arm64 arch
-print_lib32_support_arm64() {
-	cat >> $1 <<-'EOI'
-	RUN dpkg --add-architecture armhf && \
-	    apt-get update && \
-	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-	        libc6:armhf && \
 	    apt-get clean && \
 	    rm -rf /var/lib/apt/lists/*
 
@@ -336,9 +326,6 @@ generate_docker_files() {
 		else
 			print_basepackages_debian $file;
 			print_java_debian $file;
-		fi
-		if [ "$arch" == "arm64" ] && [ "$base" == "debian" ]; then
-			print_lib32_support_arm64 $file;
 		fi
 		if [ "$version" == "1."* ]; then
 			print_openhab_install_oh1 $file;

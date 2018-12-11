@@ -10,7 +10,7 @@ FROM multiarch/debian-debootstrap:arm64-stretch
 
 # Set download urls
 ENV \
-    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.135-jdk1.8.0_192-linux_aarch64.tar.gz" \
     OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip" \
     OPENHAB_VERSION="2.0.0"
 
@@ -76,13 +76,6 @@ RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
     rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
     update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
-
-RUN dpkg --add-architecture armhf && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-        libc6:armhf && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
