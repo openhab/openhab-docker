@@ -1,0 +1,5 @@
+#!/bin/bash -x
+
+sed -i \
+    "s/\#org.apache.karaf.shell:sshHost\s*=.*/org.apache.karaf.shell:sshHost=0.0.0.0/g" \
+    /openhab/conf/services/runtime.cfg
