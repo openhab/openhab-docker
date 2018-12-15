@@ -30,7 +30,7 @@ print_baseimage() {
 	1.*)
 		openhab_url=$(eval "echo $openhab1_release_url")
 		;;
-	2.*.M*)
+	2.*.M*|2.*.RC*)
 		openhab_url=$(eval "echo $openhab2_milestone_url")
 		;;
 	2.*-snapshot)
@@ -357,7 +357,7 @@ generate_manifest() {
 	fi
 
 	milestone_maturity_version="$(last_milestone_version)"
-	if [ "$milestone_maturity_version" == "" ] ; then
+	if [ "$milestone_maturity_version" == "" ]; then
 		milestone_maturity_version="$(last_stable_version)"
 	fi
 
