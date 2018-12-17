@@ -10,7 +10,7 @@ FROM multiarch/alpine:amd64-v3.8
 
 # Set download urls
 ENV \
-    JAVA_URL="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.33.0.1-jdk8.0.192-linux_x64.tar.gz" \
     OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.2.0%2Fopenhab-2.2.0.zip" \
     OPENHAB_VERSION="2.2.0"
 
