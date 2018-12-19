@@ -1,5 +1,5 @@
 image: openhab/openhab:2.5.0-snapshot-debian
-tags: ['2.5.0-snapshot','snapshot','snapshot-debian']
+tags: ['2.5.0-snapshot', 'snapshot', 'snapshot-debian']
 manifests:
   -
     image: openhab/openhab:2.5.0-snapshot-amd64-debian

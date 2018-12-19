@@ -59,9 +59,9 @@ this (see below "Who decides what?")
   - If the pull request appears to be ready to merge, give it a `LGTM`, which
     stands for "Looks Good To Me".
   - If the pull request has some small problems that need to be changed, make
-    a comment adressing the issues.
+    a comment addressing the issues.
   - If the changes needed to a PR are small, you can add a "LGTM once the
-    following comments are adressed..." this will reduce needless back and
+    following comments are addressed..." this will reduce needless back and
     forth.
   - If the PR only needs a few changes before being merged, any MAINTAINER can
     make a replacement PR that incorporates the existing commits and fixes the
