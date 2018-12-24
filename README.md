@@ -419,7 +419,7 @@ and add a volume mount to your startup:
 
 
 and put your scripts into that directory.
-This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the offical ones.
+This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the official ones.
 
 ### Show the contents of the runnig docker image
 

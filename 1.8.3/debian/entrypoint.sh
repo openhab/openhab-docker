@@ -8,7 +8,7 @@ IFS=$'\n\t'
 if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -f "${JAVA_HOME}/jre/lib/security/README.txt" ]; then
   echo "Installing Zulu Cryptography Extension Kit (\"CEK\")..."
   wget -q -O /tmp/ZuluJCEPolicies.zip https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip
-  unzip -jo -d ${JAVA_HOME}/jre/lib/security /tmp/ZuluJCEPolicies.zip
+  unzip -jo -d "${JAVA_HOME}/jre/lib/security" /tmp/ZuluJCEPolicies.zip
   rm /tmp/ZuluJCEPolicies.zip
 fi
 
@@ -30,7 +30,7 @@ if ! id -u openhab >/dev/null 2>&1; then
   echo "Create group openhab with id ${NEW_GROUP_ID}"
   groupadd -g $NEW_GROUP_ID openhab
   echo "Create user openhab with id ${NEW_USER_ID}"
-  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home ${APPDIR} --gid $NEW_GROUP_ID openhab
+  adduser -u $NEW_USER_ID --disabled-password --gecos '' --home "${APPDIR}" --gid $NEW_GROUP_ID openhab
   groupadd -g 14 uucp2
   groupadd -g 16 dialout2
   groupadd -g 18 dialout3
@@ -117,7 +117,7 @@ case ${OPENHAB_VERSION} in
       fi
     ;;
   *)
-      echo openHAB version ${OPENHAB_VERSION} not supported!
+      echo "openHAB version ${OPENHAB_VERSION} not supported!"
     ;;
 esac
 
@@ -126,12 +126,12 @@ if [ -d /etc/cont-init.d ]
 then
     for script in $(find /etc/cont-init.d -type f | grep -v \~ | sort)
     do
-        . ${script}
+        . "${script}"
     done
 fi
 
 # Set openhab folder permission
-chown -R openhab:openhab ${APPDIR}
+chown -R openhab:openhab "${APPDIR}"
 sync
 
 # Use server mode with the default command when there is no pseudo-TTY

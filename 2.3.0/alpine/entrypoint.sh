@@ -106,7 +106,7 @@ case ${OPENHAB_VERSION} in
       fi
     ;;
   *)
-      echo openHAB version ${OPENHAB_VERSION} not supported!
+      echo "openHAB version ${OPENHAB_VERSION} not supported!"
     ;;
 esac
 
@@ -115,12 +115,12 @@ if [ -d /etc/cont-init.d ]
 then
     for script in $(find /etc/cont-init.d -type f | grep -v \~ | sort)
     do
-        . ${script}
+        . "${script}"
     done
 fi
 
 # Set openhab folder permission
-chown -R openhab:openhab ${APPDIR}
+chown -R openhab:openhab "${APPDIR}"
 sync
 
 # Use server mode with the default command when there is no pseudo-TTY

@@ -376,6 +376,7 @@ generate_manifest() {
 	fi
 
 	tags=$(IFS=,; echo "${tags[*]}")
+	tags="${tags//,/, }"
 
 	cat >> $1 <<-EOI
 	image: $(docker_repo):$version-$base
