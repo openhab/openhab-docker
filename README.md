@@ -343,19 +343,28 @@ usermod -a -G openhab myownuser
 ```shell
 docker run \
 (...)
---user <myownuserid> \
--e USER_ID=<myownuserid>
+-e USER_ID=<myownuserid> \
+-e GROUP_ID=<myowngroupid> \
+(...)
 ```
+
+You can obtain your user and group ID by executing the `id --user` and `id --group` commands.
 
 ### Java cryptographic strength policy
 
 Due to local laws and export restrictions the containers use Java with a limited cryptographic strength policy.
-Some openHAB functionality (e.g. KM200 binding) may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited 
+Some openHAB functionality may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited
 
 Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
 
 * debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
 * alpine: [OpenJDK (Cryptographic Cautions)](http://openjdk.java.net/groups/security)
+
+The following addons are known to depend on the unlimited cryptographic strength policy:
+
+* Eclipse IoT Market
+* KM200 binding
+* MQTT binding
 
 ## Parameters
 
