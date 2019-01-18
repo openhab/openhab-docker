@@ -501,5 +501,5 @@ fi
 
 ## License
 
-When not explicitly set, files are placed under [![Eclipse license](https://img.shields.io/badge/license-Eclipse-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
+When not explicitly set, files are placed under [![EPL-2.0 license](https://img.shields.io/badge/license-EPL--2.0-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
 

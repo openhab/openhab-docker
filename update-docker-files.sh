@@ -108,7 +108,7 @@ print_basemetadata() {
 	# Basic build-time metadata as defined at http://label-schema.org
 	LABEL org.label-schema.build-date=$BUILD_DATE \
 	    org.label-schema.docker.dockerfile="/Dockerfile" \
-	    org.label-schema.license="EPL" \
+	    org.label-schema.license="EPL-2.0" \
 	    org.label-schema.name="openHAB" \
 	    org.label-schema.vendor="openHAB Foundation e.V." \
 	    org.label-schema.version=$VERSION \
