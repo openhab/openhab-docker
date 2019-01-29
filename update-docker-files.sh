@@ -131,6 +131,7 @@ print_basepackages_alpine() {
 	        arping \
 	        bash \
 	        ca-certificates \
+	        curl \
 	        fontconfig \
 	        libpcap-dev \
 	        shadow \
@@ -155,6 +156,7 @@ print_basepackages_debian() {
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
 	        arping \
 	        ca-certificates \
+	        curl \
 	        fontconfig \
 	        gosu \
 	        libpcap-dev \
