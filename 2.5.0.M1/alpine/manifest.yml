@@ -1,0 +1,18 @@
+image: openhab/openhab:2.5.0.M1-alpine
+tags: ['milestone-alpine']
+manifests:
+  -
+    image: openhab/openhab:2.5.0.M1-amd64-alpine
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: openhab/openhab:2.5.0.M1-armhf-alpine
+    platform:
+      architecture: arm
+      os: linux
+  -
+    image: openhab/openhab:2.5.0.M1-arm64-alpine
+    platform:
+      architecture: arm64
+      os: linux
