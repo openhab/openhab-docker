@@ -127,6 +127,10 @@ case ${OPENHAB_VERSION} in
     ;;
 esac
 
+# Set openhab folder permission
+chown -R openhab:openhab "${APPDIR}"
+sync
+
 # Run s6-style init continuation scripts if existent
 if [ -d /etc/cont-init.d ]
 then
@@ -136,8 +140,7 @@ then
     done
 fi
 
-# Set openhab folder permission
-chown -R openhab:openhab "${APPDIR}"
+# sync again after continuation scripts have been run
 sync
 
 # Use server mode with the default command when there is no pseudo-TTY
