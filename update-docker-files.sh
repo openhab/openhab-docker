@@ -134,6 +134,7 @@ print_basepackages_alpine() {
 	        curl \
 	        fontconfig \
 	        libpcap-dev \
+	        nss \
 	        shadow \
 	        su-exec \
 	        tini \

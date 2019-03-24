@@ -54,6 +54,7 @@ RUN apk upgrade --no-cache && \
         curl \
         fontconfig \
         libpcap-dev \
+        nss \
         shadow \
         su-exec \
         tini \
