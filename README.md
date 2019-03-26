@@ -496,6 +496,14 @@ fi
 ```
 
 
+### Give pcap permissions to the java process
+
+[50-setpcap-on-java](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/50-setpcap-on-java)
+
+```shell
+setcap 'cap_net_bind_service=+ep' /usr/lib/java-8/bin/java
+```
+
 ## Contributing
 
 [Contribution guidelines](https://github.com/openhab/openhab-docker/blob/master/CONTRIBUTING.md)
