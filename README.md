@@ -73,7 +73,7 @@ Comments, suggestions and contributions are welcome!
 
 **Architectures:**
 
-* `amd64` for most desktop computer (e.g. x64, x86-64, x86_64)
+* `amd64` for most desktop computers (e.g. x64, x86-64, x86_64)
 * `armhf` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
 * `arm64` for ARMv8 devices 64 Bit (not RaspberryPi 3)
 
@@ -81,10 +81,10 @@ Newer Docker versions (1.10.0+) have multi-architecture support which allows for
 
 **Distributions:**
 
-* `debian` for debian stretch (default when not specified in tag)
-* `alpine` for alpine 3.8
+* `debian` for Debian stretch (default when not specified in tag)
+* `alpine` for Alpine 3.9
 
-The alpine images are substantially smaller than the debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
+The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
 If you are unsure about what your needs are, you probably want to use `openhab/openhab:2.4.0`.
 
@@ -152,7 +152,7 @@ services:
       EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
 ```
 
-Create the following `docker-compose.yml` for use of docker volumes and start the container with `docker-compose up -d`
+Create the following `docker-compose.yml` for use of Docker volumes and start the container with `docker-compose up -d`
 
 ```yml
 version: '2.2'
@@ -277,7 +277,7 @@ You can connect to a console of an already running openHAB container with follow
 * `docker exec -it openhab /openhab/runtime/bin/client` - connect to openHAB container by name
 * `docker exec -it openhab /openhab/runtime/bin/client -p habopen` - connect to openHAB container by name and use `habopen` as password (**not recommended** because this makes the password visible in the command history and process list)
 * `docker exec -it c4ad98f24423 /openhab/runtime/bin/client` - connect to openHAB container by id
-* `docker attach openhab` - attach to openHAB container by name, input only works when starting the container with `-it` (or `stdin_open: true` and `tty: true` with docker compose)
+* `docker attach openhab` - attach to openHAB container by name, input only works when starting the container with `-it` (or `stdin_open: true` and `tty: true` with Docker Compose)
 
 The default password for the login is `habopen`.
 
@@ -331,7 +331,7 @@ By default the openHAB user in the container is running with:
 
 Make sure that either
 
-* You create the same user with the same uid and gid on your docker host system
+* You create the same user with the same uid and gid on your Docker host system
 
 ```shell
 groupadd -g 9001 openhab
@@ -339,7 +339,7 @@ useradd -u 9001 -g openhab -r -s /sbin/nologin openhab
 usermod -a -G openhab myownuser
 ```
 
-* Or run the docker container with your own user AND passing the userid to openHAB through env
+* Or run the Docker container with your own user AND passing the userid to openHAB through env
 
 ```shell
 docker run \
@@ -358,8 +358,8 @@ Some openHAB functionality may depend on unlimited strength which can be enabled
 
 Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
 
-* debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
-* alpine: [OpenJDK (Cryptographic Cautions)](http://openjdk.java.net/groups/security)
+* Debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
+* Alpine: [OpenJDK (Cryptographic Cautions)](http://openjdk.java.net/groups/security)
 
 The following addons are known to depend on the unlimited cryptographic strength policy:
 
@@ -431,7 +431,7 @@ and add a volume mount to your startup:
 and put your scripts into that directory.
 This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the official ones.
 
-### Show the contents of the runnig docker image
+### Show the contents of the running Docker image
 
 [10-show-directories](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/10-show-directories)
 
@@ -496,7 +496,7 @@ fi
 ```
 
 
-### Give pcap permissions to the java process
+### Give pcap permissions to the Java process
 
 [50-setpcap-on-java](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/50-setpcap-on-java)
 
