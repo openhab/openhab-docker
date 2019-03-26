@@ -63,7 +63,7 @@ print_baseimage() {
 	# Set Docker base image based on distributions
 	case $base in
 	alpine)
-		base_image="alpine:$arch-v3.8"
+		base_image="alpine:$arch-v3.9"
 		;;
 	debian)
 		base_image="debian-debootstrap:$arch-stretch"
