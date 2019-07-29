@@ -10,7 +10,7 @@ language: bash
 addons:
   apt:
     packages:
-      - oracle-java8-set-default
+      - openjdk-8-jre-headless
 branches:
   only:
     - master
