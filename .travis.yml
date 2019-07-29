@@ -14,7 +14,7 @@ services:
   - docker
 before_install:
   - sudo apt-get install -y uidmap
-  - sudo apt-get install -y openjdk-8-jdk
+  - sudo apt-get install -y oracle-java8-set-default
   - ./update-docker-files.sh
   - ./install-img.sh
   - ./install-manifest-tool.sh
