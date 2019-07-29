@@ -31,6 +31,7 @@ after_success:
         docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
     done
   - manifest-tool push from-spec $VERSION/$DIST/manifest.yml
+  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
 matrix:
   fast_finish: true
 env:
