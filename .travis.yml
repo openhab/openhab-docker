@@ -7,10 +7,6 @@
 #
 sudo: required
 language: bash
-addons:
-  apt:
-    packages:
-      - openjdk-8-jre-headless
 branches:
   only:
     - master
@@ -18,6 +14,7 @@ services:
   - docker
 before_install:
   - sudo apt-get install -y uidmap
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -F 11
   - ./update-docker-files.sh
   - ./install-img.sh
   - ./install-manifest-tool.sh
