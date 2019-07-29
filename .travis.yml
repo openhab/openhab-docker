@@ -13,75 +13,41 @@ branches:
 services:
   - docker
 before_install:
+  - sudo apt-get install -y uidmap
   - ./update-docker-files.sh
+  - ./install-img.sh
+  - ./install-manifest-tool.sh
   - docker info
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  - ARCHES="amd64 armhf arm64"
 install:
-  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
-  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
+  - for ARCH in $ARCHES; do
+        docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -f $VERSION/$DIST/Dockerfile-$ARCH -t $DOCKER_REPO:$VERSION-$ARCH-$DIST $VERSION/$DIST;
+        docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
+    done
 after_success:
   - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
-  - docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST
+  - for ARCH in $ARCHES; do
+        docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
+    done
+  - manifest-tool push from-spec $VERSION/$DIST/manifest.yml
 matrix:
   fast_finish: true
 env:
-  #global:
-  # -  DOCKER_REPO=openhab/openhab
-  # Encrypted:
-  # -  DOCKER_USERNAME
-  # -  DOCKER_PASSWORD
   matrix:
-    - VERSION=1.8.3 DIST=alpine TARGET=amd64
-    - VERSION=1.8.3 DIST=alpine TARGET=arm64
-    - VERSION=1.8.3 DIST=alpine TARGET=armhf
-    - VERSION=1.8.3 DIST=debian TARGET=amd64
-    - VERSION=1.8.3 DIST=debian TARGET=arm64
-    - VERSION=1.8.3 DIST=debian TARGET=armhf
-    - VERSION=2.0.0 DIST=alpine TARGET=amd64
-    - VERSION=2.0.0 DIST=alpine TARGET=arm64
-    - VERSION=2.0.0 DIST=alpine TARGET=armhf
-    - VERSION=2.0.0 DIST=debian TARGET=amd64
-    - VERSION=2.0.0 DIST=debian TARGET=arm64
-    - VERSION=2.0.0 DIST=debian TARGET=armhf
-    - VERSION=2.1.0 DIST=alpine TARGET=amd64
-    - VERSION=2.1.0 DIST=alpine TARGET=arm64
-    - VERSION=2.1.0 DIST=alpine TARGET=armhf
-    - VERSION=2.1.0 DIST=debian TARGET=amd64
-    - VERSION=2.1.0 DIST=debian TARGET=arm64
-    - VERSION=2.1.0 DIST=debian TARGET=armhf
-    - VERSION=2.2.0 DIST=alpine TARGET=amd64
-    - VERSION=2.2.0 DIST=alpine TARGET=arm64
-    - VERSION=2.2.0 DIST=alpine TARGET=armhf
-    - VERSION=2.2.0 DIST=debian TARGET=amd64
-    - VERSION=2.2.0 DIST=debian TARGET=arm64
-    - VERSION=2.2.0 DIST=debian TARGET=armhf
-    - VERSION=2.3.0 DIST=alpine TARGET=amd64
-    - VERSION=2.3.0 DIST=alpine TARGET=arm64
-    - VERSION=2.3.0 DIST=alpine TARGET=armhf
-    - VERSION=2.3.0 DIST=debian TARGET=amd64
-    - VERSION=2.3.0 DIST=debian TARGET=arm64
-    - VERSION=2.3.0 DIST=debian TARGET=armhf
-    - VERSION=2.4.0.M3 DIST=alpine TARGET=amd64
-    - VERSION=2.4.0.M3 DIST=alpine TARGET=arm64
-    - VERSION=2.4.0.M3 DIST=alpine TARGET=armhf
-    - VERSION=2.4.0.M3 DIST=debian TARGET=amd64
-    - VERSION=2.4.0.M3 DIST=debian TARGET=arm64
-    - VERSION=2.4.0.M3 DIST=debian TARGET=armhf
-    - VERSION=2.4.0.M4 DIST=alpine TARGET=amd64
-    - VERSION=2.4.0.M4 DIST=alpine TARGET=arm64
-    - VERSION=2.4.0.M4 DIST=alpine TARGET=armhf
-    - VERSION=2.4.0.M4 DIST=debian TARGET=amd64
-    - VERSION=2.4.0.M4 DIST=debian TARGET=arm64
-    - VERSION=2.4.0.M4 DIST=debian TARGET=armhf
-    - VERSION=2.4.0.M5 DIST=alpine TARGET=amd64
-    - VERSION=2.4.0.M5 DIST=alpine TARGET=arm64
-    - VERSION=2.4.0.M5 DIST=alpine TARGET=armhf
-    - VERSION=2.4.0.M5 DIST=debian TARGET=amd64
-    - VERSION=2.4.0.M5 DIST=debian TARGET=arm64
-    - VERSION=2.4.0.M5 DIST=debian TARGET=armhf
-    - VERSION=2.4.0-snapshot DIST=alpine TARGET=amd64
-    - VERSION=2.4.0-snapshot DIST=alpine TARGET=arm64
-    - VERSION=2.4.0-snapshot DIST=alpine TARGET=armhf
-    - VERSION=2.4.0-snapshot DIST=debian TARGET=amd64
-    - VERSION=2.4.0-snapshot DIST=debian TARGET=arm64
-    - VERSION=2.4.0-snapshot DIST=debian TARGET=armhf
+    - VERSION=1.8.3 DIST=alpine
+    - VERSION=1.8.3 DIST=debian
+    - VERSION=2.0.0 DIST=alpine
+    - VERSION=2.0.0 DIST=debian
+    - VERSION=2.1.0 DIST=alpine
+    - VERSION=2.1.0 DIST=debian
+    - VERSION=2.2.0 DIST=alpine
+    - VERSION=2.2.0 DIST=debian
+    - VERSION=2.3.0 DIST=alpine
+    - VERSION=2.3.0 DIST=debian
+    - VERSION=2.4.0 DIST=alpine
+    - VERSION=2.4.0 DIST=debian
+    - VERSION=2.5.0.M1 DIST=alpine
+    - VERSION=2.5.0.M1 DIST=debian
+    - VERSION=2.5.0-snapshot DIST=alpine
+    - VERSION=2.5.0-snapshot DIST=debian

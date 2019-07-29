@@ -23,16 +23,24 @@ print_static_configuration() {
 	services:
 	  - docker
 	before_install:
+	  - sudo apt-get install -y uidmap
 	  - ./update-docker-files.sh
-		- ./update-img.sh
+	  - ./install-img.sh
+	  - ./install-manifest-tool.sh
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+	  - ARCHES="amd64 armhf arm64"
 	install:
-	  - docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -t $DOCKER_REPO:$VERSION-$TARGET-$DIST $VERSION/$TARGET/$DIST
-	  - docker run --rm $DOCKER_REPO:$VERSION-$TARGET-$DIST uname -a
+	  - for ARCH in $ARCHES; do
+	        docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -f $VERSION/$DIST/Dockerfile-$ARCH -t $DOCKER_REPO:$VERSION-$ARCH-$DIST $VERSION/$DIST;
+	        docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
+	    done
 	after_success:
 	  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
-	  - docker push $DOCKER_REPO:$VERSION-$TARGET-$DIST
+	  - for ARCH in $ARCHES; do
+	        docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
+	    done
+	  - manifest-tool push from-spec $VERSION/$DIST/manifest.yml
 	matrix:
 	  fast_finish: true
 	env:
@@ -43,7 +51,7 @@ EOI
 # Print Travis matrix environment variables
 print_matrix() {
 	cat >> $1 <<-EOI
-	    - VERSION=$version DIST=$base TARGET=$arch
+	    - VERSION=$version DIST=$base
 EOI
 }
 
@@ -55,12 +63,9 @@ print_static_configuration $file;
 # Generate the matrix for building Dockerfiles
 for version in $(build_versions)
 do
-	for base in $bases
+	for base in $(bases)
 	do
-		for arch in $arches
-		do
-			print_matrix $file;
-		done
+		print_matrix $file;
 	done
 done
 

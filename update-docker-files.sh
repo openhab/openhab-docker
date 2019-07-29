@@ -30,7 +30,7 @@ print_baseimage() {
 	1.*)
 		openhab_url=$(eval "echo $openhab1_release_url")
 		;;
-	2.*.M*)
+	2.*.M*|2.*.RC*)
 		openhab_url=$(eval "echo $openhab2_milestone_url")
 		;;
 	2.*-snapshot)
@@ -47,10 +47,13 @@ print_baseimage() {
 	# Set Java download based on architecture
 	case $arch in
 	amd64)
-		java_url="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_x64.tar.gz"
+		java_url="https://cdn.azul.com/zulu/bin/zulu8.33.0.1-jdk8.0.192-linux_x64.tar.gz"
 		;;
-	armhf|arm64)
-		java_url="https://www.azul.com/downloads/zulu/zdk-8-ga-linux_aarch32hf.tar.gz"
+	armhf)
+		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.134-jdk1.8.0_192-linux_aarch32hf.tar.gz"
+		;;
+	arm64)
+		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.135-jdk1.8.0_192-linux_aarch64.tar.gz"
 		;;
 	default)
 		java_url="error"
@@ -60,7 +63,7 @@ print_baseimage() {
 	# Set Docker base image based on distributions
 	case $base in
 	alpine)
-		base_image="alpine:$arch-v3.8"
+		base_image="alpine:$arch-v3.9"
 		;;
 	debian)
 		base_image="debian-debootstrap:$arch-stretch"
@@ -88,13 +91,14 @@ print_basemetadata() {
 	# Set variables and locales
 	ENV \
 	    APPDIR="/openhab" \
+	    CRYPTO_POLICY="limited" \
 	    EXTRA_JAVA_OPTS="" \
-	    OPENHAB_HTTP_PORT="8080" \
-	    OPENHAB_HTTPS_PORT="8443" \
+	    KARAF_EXEC="exec" \
 	    LC_ALL="en_US.UTF-8" \
 	    LANG="en_US.UTF-8" \
 	    LANGUAGE="en_US.UTF-8" \
-	    CRYPTO_POLICY="limited"
+	    OPENHAB_HTTP_PORT="8080" \
+	    OPENHAB_HTTPS_PORT="8443"
 
 	# Set arguments on build
 	ARG BUILD_DATE
@@ -104,7 +108,7 @@ print_basemetadata() {
 	# Basic build-time metadata as defined at http://label-schema.org
 	LABEL org.label-schema.build-date=$BUILD_DATE \
 	    org.label-schema.docker.dockerfile="/Dockerfile" \
-	    org.label-schema.license="EPL" \
+	    org.label-schema.license="EPL-2.0" \
 	    org.label-schema.name="openHAB" \
 	    org.label-schema.vendor="openHAB Foundation e.V." \
 	    org.label-schema.version=$VERSION \
@@ -123,21 +127,24 @@ print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
 	RUN apk upgrade --no-cache && \
-	    apk add --no-cache --virtual build-dependencies dpkg gnupg && \
 	    apk add --no-cache \
-	    arping \
-	    bash \
-	    ca-certificates \
-	    fontconfig \
-	    libpcap-dev \
-	    shadow \
-	    su-exec \
-	    ttf-dejavu \
-	    openjdk8 \
-	    unzip \
-	    wget \
-	    zip && \
-	    chmod u+s /usr/sbin/arping
+	        arping \
+	        bash \
+	        ca-certificates \
+	        curl \
+	        fontconfig \
+	        libpcap-dev \
+	        nss \
+	        shadow \
+	        su-exec \
+	        tini \
+	        ttf-dejavu \
+	        openjdk8 \
+	        unzip \
+	        wget \
+	        zip && \
+	    chmod u+s /usr/sbin/arping && \
+	    rm -rf /var/cache/apk/*
 
 EOI
 }
@@ -148,54 +155,26 @@ print_basepackages_debian() {
 	# Install basepackages
 	RUN apt-get update && \
 	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-	    arping \
-	    ca-certificates \
-	    dirmngr \
-	    fontconfig \
-	    gnupg \
-	    gosu \
-	    libpcap-dev \
-	    locales \
-	    locales-all \
-	    netbase \
-	    unzip \
-	    wget \
-	    zip && \
+	        arping \
+	        ca-certificates \
+	        curl \
+	        fontconfig \
+	        gosu \
+	        libpcap-dev \
+	        locales \
+	        locales-all \
+	        netbase \
+	        unzip \
+	        wget \
+	        zip && \
 	    chmod u+s /usr/sbin/arping && \
-	    ln -s -f /bin/true /usr/bin/chfn
-
-EOI
-}
-
-# Print cleanup for Alpine
-print_cleanup_alpine() {
-	cat >> $1 <<-'EOI'
-	# Reduce image size by removing files that are used only for building the image
-	RUN apk del build-dependencies && \
-	    rm -rf /var/cache/apk/*
-
-EOI
-}
-
-# Print cleanup for Debian
-print_cleanup_debian() {
-	cat >> $1 <<-'EOI'
-	# Reduce image size by removing files that are used only for building the image
-	RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y dirmngr gnupg && \
-	    DEBIAN_FRONTEND=noninteractive apt-get autoremove -y && \
+	    ln -s -f /bin/true /usr/bin/chfn && \
+	    sed -i 's#stretch#buster#g' /etc/apt/sources.list && \
+	    apt-get update && \
+	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tini && \
+	    sed -i 's#buster#stretch#g' /etc/apt/sources.list && \
 	    apt-get clean && \
 	    rm -rf /var/lib/apt/lists/*
-
-EOI
-}
-
-# Print 32-bit for arm64 arch
-print_lib32_support_arm64() {
-	cat >> $1 <<-'EOI'
-	RUN dpkg --add-architecture armhf && \
-	    apt-get update && \
-	    apt-get install --no-install-recommends -y \
-	    libc6:armhf
 
 EOI
 }
@@ -217,7 +196,7 @@ print_java_debian() {
 	ENV JAVA_HOME='/usr/lib/java-8'
 	RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
 	    mkdir "${JAVA_HOME}" && \
-	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xvf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
+	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
 	    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
@@ -230,10 +209,10 @@ print_openhab_install_oh1() {
 	cat >> $1 <<-'EOI'
 	# Install openHAB
 	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+	    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
 	    rm /tmp/openhab.zip && \
 	    cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
-	    echo "export TERM=dumb" | tee -a ~/.bashrc
+	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 EOI
 }
@@ -244,13 +223,13 @@ print_openhab_install_oh2() {
 	# Install openHAB
 	# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${APPDIR}" && \
+	    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
 	    rm /tmp/openhab.zip && \
 	    mkdir -p "${APPDIR}/userdata/logs" && \
 	    touch "${APPDIR}/userdata/logs/openhab.log" && \
 	    cp -a "${APPDIR}/userdata" "${APPDIR}/userdata.dist" && \
 	    cp -a "${APPDIR}/conf" "${APPDIR}/conf.dist" && \
-	    echo "export TERM=dumb" | tee -a ~/.bashrc
+	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 EOI
 }
@@ -318,12 +297,12 @@ print_command() {
 	case $base in
 	alpine)
 		cat >> $1 <<-'EOI'
-		CMD ["su-exec", "openhab", "./start.sh"]
+		CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]
 		EOI
 		;;
 	debian)
 		cat >> $1 <<-'EOI'
-		CMD ["gosu", "openhab", "./start.sh"]
+		CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]
 		EOI
 		;;
 	default)
@@ -334,63 +313,117 @@ print_command() {
 	esac
 }
 
+generate_docker_files() {
+	for arch in $(arches)
+	do
+		# Generate Dockerfile
+		file="$version/$base/Dockerfile-$arch"
+		mkdir -p $(dirname $file) 2>/dev/null
+		echo -n "Writing $file... "
+		print_header $file;
+		print_baseimage $file;
+		print_basemetadata $file;
+		if [ "$base" == "alpine" ]; then
+			print_basepackages_alpine $file;
+			print_java_alpine $file;
+		else
+			print_basepackages_debian $file;
+			print_java_debian $file;
+		fi
+		if [ "$version" == "1."* ]; then
+			print_openhab_install_oh1 $file;
+			print_volumes_oh1 $file
+		else
+			print_openhab_install_oh2 $file;
+			print_volumes_oh2 $file
+		fi
+		print_expose_ports $file
+		print_entrypoint $file
+		print_command $file
+
+		echo "done"
+	done
+}
+
+generate_manifest() {
+	tags=()
+
+	if [ "$base" == "debian" ]; then
+		tags+=("'$version'")
+	fi
+
+	if [ "$version" == "$(last_stable_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("'latest'")
+		fi
+		tags+=("'latest-$base'")
+	fi
+
+	milestone_maturity_version="$(last_milestone_version)"
+	if [ "$milestone_maturity_version" == "" ]; then
+		milestone_maturity_version="$(last_stable_version)"
+	fi
+
+	if [ "$version" == "$milestone_maturity_version" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("'milestone'")
+		fi
+		tags+=("'milestone-$base'")
+	fi
+
+	if [ "$version" == "$(snapshot_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("'snapshot'")
+		fi
+		tags+=("'snapshot-$base'")
+	fi
+
+	tags=$(IFS=,; echo "${tags[*]}")
+	tags="${tags//,/, }"
+
+	cat >> $1 <<-EOI
+	image: $(docker_repo):$version-$base
+	tags: [$tags]
+	manifests:
+	  -
+	    image: $(docker_repo):$version-amd64-$base
+	    platform:
+	      architecture: amd64
+	      os: linux
+	  -
+	    image: $(docker_repo):$version-armhf-$base
+	    platform:
+	      architecture: arm
+	      os: linux
+	  -
+	    image: $(docker_repo):$version-arm64-$base
+	    platform:
+	      architecture: arm64
+	      os: linux
+EOI
+}
+
 # Remove previously generated container files
 rm -rf ./1.* ./2.*
 
 # Generate new container files
 for version in $(build_versions)
 do
-	for base in $bases
+	for base in $(bases)
 	do
-		for arch in $arches
-		do
-			# Generate Dockerfile
-			file=$version/$arch/$base/Dockerfile
-			mkdir -p $(dirname $file) 2>/dev/null
-			echo -n "Writing $file... "
-			print_header $file;
-			print_baseimage $file;
-			print_basemetadata $file;
-			if [ "$base" == "alpine" ]; then
-				print_basepackages_alpine $file;
-				print_java_alpine $file;
-			else
-				print_basepackages_debian $file;
-				print_java_debian $file;
-			fi
-			if [ "$arch" == "arm64" ] && [ "$base" == "debian" ]; then
-				print_lib32_support_arm64 $file;
-			fi
-			if [ "$version" == "1."* ]; then
-				print_openhab_install_oh1 $file;
-				print_volumes_oh1 $file
-			else
-				print_openhab_install_oh2 $file;
-				print_volumes_oh2 $file
-			fi
-			if [ "$base" == "alpine" ]; then
-				print_cleanup_alpine $file;
-			else
-				print_cleanup_debian $file;
-			fi
-			print_expose_ports $file
-			print_entrypoint $file
-			print_command $file
+		# Generate Dockerfile per architecture
+		generate_docker_files
 
-			# Generate entrypoint.sh
-			file=$version/$arch/$base/entrypoint.sh
-			if [ "$base" == "alpine" ]; then
-				cp entrypoint-alpine.sh $file
-				# Remove bugfix for version 2 from entrypoint-alpine.sh
-				if [ "$version" == "1."* ]; then
-					line=$(sed "/rm -f \/openhab\/userdata\/tmp\/instances\/instance.properties/=; d" entrypoint-alpine.sh)
-					sed -i "$((line-7)),${line}"d $file
-				fi
-			else
-				cp entrypoint-debian.sh $file
-			fi
+		# Generate multi-architecture manifest
+		file="$version/$base/manifest.yml"
+		generate_manifest $file
 
-			echo "done"
-		done
+		# Copy base specific entrypoint.sh
+		file="$version/$base/entrypoint.sh"
+		if [ "$base" == "alpine" ]; then
+			cp entrypoint-alpine.sh $file
+		else
+			cp entrypoint-debian.sh $file
+		fi
 	done
 done
