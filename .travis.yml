@@ -27,7 +27,7 @@ install:
         docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
     done
 after_success:
-  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
   - for ARCH in $ARCHES; do
         docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
     done
