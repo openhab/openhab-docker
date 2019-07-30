@@ -10,7 +10,7 @@ FROM multiarch/alpine:amd64-v3.9
 
 # Set download urls
 ENV \
-    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.33.0.1-jdk8.0.192-linux_x64.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.40.0.25-ca-jdk8.0.222-linux_x64.tar.gz" \
     OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.5.0.M1/openhab-2.5.0.M1.zip" \
     OPENHAB_VERSION="2.5.0.M1"
 
