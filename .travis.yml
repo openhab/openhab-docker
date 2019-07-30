@@ -19,6 +19,8 @@ before_install:
   - ./install-img.sh
   - ./install-manifest-tool.sh
   - docker info
+  - docker logout
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
   - ARCHES="amd64 armhf arm64"
 install:
@@ -27,7 +29,6 @@ install:
         docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
     done
 after_success:
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - for ARCH in $ARCHES; do
         docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
     done
