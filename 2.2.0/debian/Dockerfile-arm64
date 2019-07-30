@@ -6,11 +6,11 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/debian-debootstrap:arm64-stretch
+FROM multiarch/debian-debootstrap:arm64-buster
 
 # Set download urls
 ENV \
-    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.135-jdk1.8.0_192-linux_aarch64.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.40.0.178-ca-jdk1.8.0_222-linux_aarch64.tar.gz" \
     OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.2.0%2Fopenhab-2.2.0.zip" \
     OPENHAB_VERSION="2.2.0"
 
@@ -57,15 +57,12 @@ RUN apt-get update && \
         locales \
         locales-all \
         netbase \
+        tini \
         unzip \
         wget \
         zip && \
     chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn && \
-    sed -i 's#stretch#buster#g' /etc/apt/sources.list && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tini && \
-    sed -i 's#buster#stretch#g' /etc/apt/sources.list && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

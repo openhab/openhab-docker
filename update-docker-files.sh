@@ -47,13 +47,13 @@ print_baseimage() {
 	# Set Java download based on architecture
 	case $arch in
 	amd64)
-		java_url="https://cdn.azul.com/zulu/bin/zulu8.33.0.1-jdk8.0.192-linux_x64.tar.gz"
+		java_url="https://cdn.azul.com/zulu/bin/zulu8.40.0.25-ca-jdk8.0.222-linux_x64.tar.gz"
 		;;
 	armhf)
-		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.134-jdk1.8.0_192-linux_aarch32hf.tar.gz"
+		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.40.0.178-ca-jdk1.8.0_222-linux_aarch32hf.tar.gz"
 		;;
 	arm64)
-		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.33.0.135-jdk1.8.0_192-linux_aarch64.tar.gz"
+		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.40.0.178-ca-jdk1.8.0_222-linux_aarch64.tar.gz"
 		;;
 	default)
 		java_url="error"
@@ -66,7 +66,7 @@ print_baseimage() {
 		base_image="alpine:$arch-v3.9"
 		;;
 	debian)
-		base_image="debian-debootstrap:$arch-stretch"
+		base_image="debian-debootstrap:$arch-buster"
 		;;
 	default)
 		base_image="error"
@@ -164,15 +164,12 @@ print_basepackages_debian() {
 	        locales \
 	        locales-all \
 	        netbase \
+	        tini \
 	        unzip \
 	        wget \
 	        zip && \
 	    chmod u+s /usr/sbin/arping && \
 	    ln -s -f /bin/true /usr/bin/chfn && \
-	    sed -i 's#stretch#buster#g' /etc/apt/sources.list && \
-	    apt-get update && \
-	    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tini && \
-	    sed -i 's#buster#stretch#g' /etc/apt/sources.list && \
 	    apt-get clean && \
 	    rm -rf /var/lib/apt/lists/*
 
