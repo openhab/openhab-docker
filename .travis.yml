@@ -20,7 +20,7 @@ before_install:
   - ./install-manifest-tool.sh
   - docker info
   - docker logout
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
   - ARCHES="amd64 armhf arm64"
 install:
