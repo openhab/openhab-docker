@@ -74,14 +74,14 @@ Comments, suggestions and contributions are welcome!
 **Architectures:**
 
 * `amd64` for most desktop computers (e.g. x64, x86-64, x86_64)
-* `armhf` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
-* `arm64` for ARMv8 devices 64 Bit (not RaspberryPi 3)
+* `armhf` for ARMv7 devices 32 Bit (e.g. most Raspberry Pi 1/2/3/4)
+* `arm64` for ARMv8 devices 64 Bit (not Raspberry Pi 3/4)
 
 Newer Docker versions (1.10.0+) have multi-architecture support which allows for omitting the architecture from the tag.
 
 **Distributions:**
 
-* `debian` for Debian buster (default when not specified in tag)
+* `debian` for Debian 10 "buster" (default when not specified in tag)
 * `alpine` for Alpine 3.9
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
