@@ -82,7 +82,7 @@ Newer Docker versions (1.10.0+) have multi-architecture support which allows for
 **Distributions:**
 
 * `debian` for Debian 10 "buster" (default when not specified in tag)
-* `alpine` for Alpine 3.9
+* `alpine` for Alpine 3.10
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
