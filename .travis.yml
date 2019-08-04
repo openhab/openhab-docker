@@ -5,6 +5,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
+dist: bionic
 sudo: required
 language: bash
 branches:
@@ -28,7 +29,7 @@ install:
     done
 after_success:
   - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
-  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin 
   - for ARCH in $ARCHES; do
         docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
     done

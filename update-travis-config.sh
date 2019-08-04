@@ -15,6 +15,7 @@ print_static_configuration() {
 	#                       PLEASE DO NOT EDIT IT DIRECTLY.
 	# ------------------------------------------------------------------------------
 	#
+	dist: bionic
 	sudo: required
 	language: bash
 	branches:
@@ -37,8 +38,8 @@ print_static_configuration() {
 	        docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
 	    done
 	after_success:
-	  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)s
-	  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+	  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
+	  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 	  - for ARCH in $ARCHES; do
 	        docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
 	    done
