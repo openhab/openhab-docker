@@ -382,22 +382,26 @@ The following addons are known to depend on the unlimited cryptographic strength
 ## Upgrading
 
 Upgrading OH requires changes to the user mapped in userdata folder.
-The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `userdata.dist/etc/version.properties` in the Docker image.
-The steps performed are:
+The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `dist/userdata/etc/version.properties` in the Docker image.
 
+The steps performed are:
 * Create a `userdata/backup` folder if one does not exist.
 * Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
-* Copy over the relevant files from `userdata.dist/etc` to `userdata/etc`.
+* Show update notes and warnings.
+* Execute update pre/post commands.
+* Copy userdata system files from `dist/userdata/etc` to `userdata/etc`.
+* Update KAR files in `addons`.
 * Delete the contents of `userdata/cache` and `userdata/tmp`.
 
 The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
+All messages shown during the update are also logged to `userdata/logs/update.log`.
 
 ## Building the images
 
-Checkout the GitHub repository, change to a directory with a Dockerfile and then run these commands:
+Checkout the GitHub repository, change to a directory containing Dockerfiles (e.g. `2.4.0/debian`) and then run these commands to build and run a amd64 image:
 
 ```shell
-$ docker build -t openhab/openhab .
+$ docker build -f Dockerfile-amd64 -t openhab/openhab .
 $ docker run openhab/openhab
 ```
 
@@ -510,5 +514,4 @@ setcap 'cap_net_bind_service=+ep' /usr/lib/java-8/bin/java
 
 ## License
 
-When not explicitly set, files are placed under [![EPL-2.0 license](https://img.shields.io/badge/license-EPL--2.0-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
-
+When not explicitly set, files are placed under [![EPL-2.0 license](https://img.shields.io/badge/license-EPL--2.0-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE)

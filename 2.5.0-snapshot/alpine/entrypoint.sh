@@ -13,11 +13,11 @@ fi
 
 # Deleting instance.properties to avoid karaf PID conflict on restart
 # See: https://github.com/openhab/openhab-docker/issues/99
-rm -f /openhab/runtime/instances/instance.properties
+rm -f "${OPENHAB_HOME}/runtime/instances/instance.properties"
 
 # The instance.properties file in openHAB 2.x is installed in the tmp
 # directory
-rm -f /openhab/userdata/tmp/instances/instance.properties
+rm -f "${OPENHAB_USERDATA}/tmp/instances/instance.properties"
 
 # Add openhab user & handle possible device groups for different host systems
 # Container base image puts dialout on group id 20, uucp on id 14
@@ -35,80 +35,44 @@ if ! id -u openhab >/dev/null 2>&1; then
     groupmod --new-name openhab $group_name
   fi
   echo "Create user openhab with id ${NEW_USER_ID}"
-  adduser -u $NEW_USER_ID -D -g '' -h ${APPDIR} -G openhab openhab
+  adduser -u $NEW_USER_ID -D -g '' -h ${OPENHAB_HOME} -G openhab openhab
   adduser openhab dialout
   adduser openhab uucp
 fi
 
-# Copy initial files to host volume
+
+initialize_volume() {
+  volume="$1"
+  source="$2"
+
+  if [ -z "$(ls -A "$volume")" ]; then
+    echo "Initializing empty volume ${volume} ..."
+    cp -av "${source}/." "${volume}/"
+  fi
+}
+
+# Initialize empty volumes and update userdata
 case ${OPENHAB_VERSION} in
   1.*)
-      if [ -z "$(ls -A "${APPDIR}/configurations")" ]; then
-        # Copy userdata dir for openHAB 1.x
-        echo "No configuration found... initializing."
-        cp -av "${APPDIR}/configurations.dist/." "${APPDIR}/configurations/"
-      fi
+      initialize_volume "${OPENHAB_HOME}/configurations" "${OPENHAB_HOME}/dist/configurations"
     ;;
   2.*)
-      # Initialize empty host volumes
-      if [ -z "$(ls -A "${APPDIR}/userdata")" ]; then
-        # Copy userdata dir for openHAB 2.x
-        echo "No userdata found... initializing."
-        cp -av "${APPDIR}/userdata.dist/." "${APPDIR}/userdata/"
-      fi
+      initialize_volume "${OPENHAB_CONF}" "${OPENHAB_HOME}/dist/conf"
+      initialize_volume "${OPENHAB_USERDATA}" "${OPENHAB_HOME}/dist/userdata"
 
-      # Upgrade userdata if versions do not match
-      if [ ! -z $(cmp "${APPDIR}/userdata/etc/version.properties" "${APPDIR}/userdata.dist/etc/version.properties") ]; then
-        echo "Image and userdata versions differ! Starting an upgrade."
+      # Update userdata if versions do not match
+      if [ ! -z $(cmp "${OPENHAB_USERDATA}/etc/version.properties" "${OPENHAB_HOME}/dist/userdata/etc/version.properties") ]; then
+        echo "Image and userdata versions differ! Starting an upgrade." | tee "${OPENHAB_LOGDIR}/update.log"
 
         # Make a backup of userdata
-        backupFile=userdata-$(date +"%FT%H-%M-%S").tar
-        if [ ! -d "${APPDIR}/userdata/backup" ]; then
-          mkdir "${APPDIR}/userdata/backup"
+        backup_file=userdata-$(date +"%FT%H-%M-%S").tar
+        if [ ! -d "${OPENHAB_BACKUPS}" ]; then
+          mkdir "${OPENHAB_BACKUPS}"
         fi
-        tar -c -f "${APPDIR}/userdata/backup/${backupFile}" --exclude "backup/*" "${APPDIR}/userdata"
-        echo "You can find backup of userdata in ${APPDIR}/userdata/backup/${backupFile}"
+        tar -c -f "${OPENHAB_BACKUPS}/${backup_file}" --exclude "backup/*" "${OPENHAB_USERDATA}"
+        echo "You can find backup of userdata in ${OPENHAB_BACKUPS}/${backup_file}" | tee -a "${OPENHAB_LOGDIR}/update.log"
 
-        # Copy over the updated files
-        cp "${APPDIR}/userdata.dist/etc/all.policy" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/branding.properties" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/branding-ssh.properties" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/config.properties" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/custom.properties" "${APPDIR}/userdata/etc/"
-        if [ -f "${APPDIR}/userdata.dist/etc/custom.system.properties" ]; then
-          cp "${APPDIR}/userdata.dist/etc/custom.system.properties" "${APPDIR}/userdata/etc/"
-        fi
-        cp "${APPDIR}/userdata.dist/etc/distribution.info" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/jre.properties" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/org.apache.karaf"* "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/org.ops4j.pax.url.mvn.cfg" "${APPDIR}/userdata/etc/"
-        if [ -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
-          cp "${APPDIR}/userdata.dist/etc/overrides.properties" "${APPDIR}/userdata/etc/"
-        fi
-        cp "${APPDIR}/userdata.dist/etc/profile.cfg" "${APPDIR}/userdata/etc/"
-        cp "${APPDIR}/userdata.dist/etc/startup.properties" "${APPDIR}/userdata/etc"
-        cp "${APPDIR}/userdata.dist/etc/system.properties" "${APPDIR}/userdata/etc"
-        cp "${APPDIR}/userdata.dist/etc/version.properties" "${APPDIR}/userdata/etc/"
-        echo "Replaced files in userdata/etc with newer versions"
-
-        # Remove necessary files after installation
-        rm -rf "${APPDIR}/userdata/etc/org.openhab.addons.cfg"
-        if [ ! -f "${APPDIR}/userdata.dist/etc/overrides.properties" ]; then
-          rm -rf "${APPDIR}/userdata/etc/overrides.properties"
-        fi
-
-        # Clear the cache and tmp
-        rm -rf "${APPDIR}/userdata/cache"
-        rm -rf "${APPDIR}/userdata/tmp"
-        mkdir "${APPDIR}/userdata/cache"
-        mkdir "${APPDIR}/userdata/tmp"
-        echo "Cleared the cache and tmp"
-      fi
-
-      if [ -z "$(ls -A "${APPDIR}/conf")" ]; then
-        # Copy userdata dir for openHAB 2.x
-        echo "No configuration found... initializing."
-        cp -av "${APPDIR}/conf.dist/." "${APPDIR}/conf/"
+        exec "${OPENHAB_HOME}/runtime/bin/update" 2>&1 | tee -a "${OPENHAB_LOGDIR}/update.log"
       fi
     ;;
   *)
@@ -117,7 +81,7 @@ case ${OPENHAB_VERSION} in
 esac
 
 # Set openhab folder permission
-chown -R openhab:openhab "${APPDIR}"
+chown -R openhab:openhab "${OPENHAB_HOME}"
 sync
 
 # Run s6-style init continuation scripts if existent
