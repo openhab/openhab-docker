@@ -15,17 +15,16 @@ print_static_configuration() {
 	#                       PLEASE DO NOT EDIT IT DIRECTLY.
 	# ------------------------------------------------------------------------------
 	#
-	sudo: required
+	dist: xenial
 	language: bash
+	sudo: required
 	branches:
 	  only:
 	    - master
 	services:
 	  - docker
 	before_install:
-	  - sudo apt-get install -y uidmap
 	  - ./update-docker-files.sh
-	  - ./install-img.sh
 	  - ./install-manifest-tool.sh
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
@@ -36,11 +35,13 @@ print_static_configuration() {
 	        docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
 	    done
 	after_success:
-	  - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
-	  - for ARCH in $ARCHES; do
-	        docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
-	    done
-	  - manifest-tool push from-spec $VERSION/$DIST/manifest.yml
+	  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+	        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+	        for ARCH in $ARCHES; do
+	            docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
+	        done;
+	        manifest-tool push from-spec $VERSION/$DIST/manifest.yml;
+	    fi
 	matrix:
 	  fast_finish: true
 	env:
