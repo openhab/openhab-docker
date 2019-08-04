@@ -29,7 +29,7 @@ install:
     done
 after_success:
   - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
   - for ARCH in $ARCHES; do
         docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
     done
