@@ -92,6 +92,7 @@ print_basemetadata() {
 	ENV \
 	    CRYPTO_POLICY="limited" \
 	    EXTRA_JAVA_OPTS="" \
+	    GROUP_ID="9001" \
 	    KARAF_EXEC="exec" \
 	    LC_ALL="en_US.UTF-8" \
 	    LANG="en_US.UTF-8" \
@@ -102,7 +103,8 @@ print_basemetadata() {
 	    OPENHAB_HTTP_PORT="8080" \
 	    OPENHAB_HTTPS_PORT="8443" \
 	    OPENHAB_LOGDIR="/openhab/userdata/logs" \
-	    OPENHAB_USERDATA="/openhab/userdata"
+	    OPENHAB_USERDATA="/openhab/userdata" \
+	    USER_ID="9001"
 
 	# Set arguments on build
 	ARG BUILD_DATE
@@ -329,20 +331,29 @@ generate_docker_files() {
 		print_header $file;
 		print_baseimage $file;
 		print_basemetadata $file;
-		if [ "$base" == "alpine" ]; then
+
+		case $base in
+		alpine)
 			print_basepackages_alpine $file;
 			print_java_alpine $file;
-		else
+			;;
+		debian)
 			print_basepackages_debian $file;
 			print_java_debian $file;
-		fi
-		if [ "$version" == "1."* ]; then
+			;;
+		esac
+
+		case $version in
+		1.*)
 			print_openhab_install_oh1 $file;
 			print_volumes_oh1 $file
-		else
+			;;
+		2.*)
 			print_openhab_install_oh2 $file;
 			print_volumes_oh2 $file
-		fi
+			;;
+		esac
+
 		print_expose_ports $file
 		print_entrypoint $file
 		print_command $file

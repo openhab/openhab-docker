@@ -20,7 +20,7 @@ last_stable_version() {
 }
 
 next_stable_version() {
-	a=($(echo "$(last_stable_version)" | tr '.' '\n'))
+	a=($(last_stable_version | tr '.' '\n'))
 	echo "${a[0]}.$((a[1]+1)).${a[2]}"
 }
 

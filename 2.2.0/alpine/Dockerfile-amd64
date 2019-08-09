@@ -18,6 +18,7 @@ ENV \
 ENV \
     CRYPTO_POLICY="limited" \
     EXTRA_JAVA_OPTS="" \
+    GROUP_ID="9001" \
     KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
@@ -28,7 +29,8 @@ ENV \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
-    OPENHAB_USERDATA="/openhab/userdata"
+    OPENHAB_USERDATA="/openhab/userdata" \
+    USER_ID="9001"
 
 # Set arguments on build
 ARG BUILD_DATE
