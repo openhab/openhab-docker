@@ -16,7 +16,8 @@ Table of Contents
          * [Starting with Docker named volumes (for beginners)](#starting-with-docker-named-volumes-for-beginners)
             * [Running from command line](#running-from-command-line)
             * [Running from compose-file.yml](#running-from-compose-fileyml)
-            * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
+         * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
+         * [Running on Windows and macOS](#running-on-windows-and-macos)
          * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
          * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
          * [Accessing the console](#accessing-the-console)
@@ -69,20 +70,21 @@ Comments, suggestions and contributions are welcome!
 * `2.3.0` Stable openHAB 2.3.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.3.0/debian/Dockerfile-amd64))
 * `2.4.0` Stable openHAB 2.4.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.4.0/debian/Dockerfile-amd64))
 * `2.5.0.M1` Experimental openHAB 2.5.0.M1 Milestone version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.0.M1/debian/Dockerfile-amd64))
+* `2.5.0.M2` Experimental openHAB 2.5.0.M2 Milestone version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.0.M2/debian/Dockerfile-amd64))
 * `2.5.0-snapshot` Experimental openHAB 2.5.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.0-snapshot/debian/Dockerfile-amd64))
 
 **Architectures:**
 
 * `amd64` for most desktop computers (e.g. x64, x86-64, x86_64)
-* `armhf` for ARMv7 devices 32 Bit (e.g. most RaspberryPi 1/2/3)
-* `arm64` for ARMv8 devices 64 Bit (not RaspberryPi 3)
+* `armhf` for ARMv7 devices 32 Bit (e.g. most Raspberry Pi 1/2/3/4)
+* `arm64` for ARMv8 devices 64 Bit (not Raspberry Pi 3/4)
 
 Newer Docker versions (1.10.0+) have multi-architecture support which allows for omitting the architecture from the tag.
 
 **Distributions:**
 
-* `debian` for Debian buster (default when not specified in tag)
-* `alpine` for Alpine 3.9
+* `debian` for Debian 10 "buster" (default when not specified in tag)
+* `alpine` for Alpine 3.10
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
@@ -182,9 +184,10 @@ volumes:
     driver: local
 ```
 
-#### Running openHAB with libpcap support
+### Running openHAB with libpcap support
 
-You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
+You can run all openHAB images with libpcap support.
+This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
 For that feature to work correctly, you need to run the image as **root user**.
 Create the following `docker-compose.yml` and start the container with `docker-compose up -d`
 
@@ -203,15 +206,40 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
-      - "openhab_conf:/openhab/conf"
-      - "openhab_userdata:/openhab/userdata"
-      - "openhab_addons:/openhab/addons"
+      - "./openhab_addons:/openhab/addons"
+      - "./openhab_conf:/openhab/conf"
+      - "./openhab_userdata:/openhab/userdata"
     # The command node is very important. It overrides
     # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
     command: "tini -s ./start.sh server"
 ```
 
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
+
+### Running on Windows and macOS
+
+The `host` networking driver only works on Linux hosts, and is not supported by Docker on Windows and macOS.
+On Windows and macOS ports should be exposed by adding port options to commands (`-p 8080`) or by adding a ports section to `docker-compose.yml`.
+
+```yaml
+version: '2.2'
+
+services:
+  openhab:
+    image: "openhab/openhab:2.4.0"
+    restart: always
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - "./openhab_addons:/openhab/addons"
+      - "./openhab_conf:/openhab/conf"
+      - "./openhab_userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+```
 
 ### Starting with Docker mounting a host directory (for advanced user)
 
@@ -382,22 +410,26 @@ The following addons are known to depend on the unlimited cryptographic strength
 ## Upgrading
 
 Upgrading OH requires changes to the user mapped in userdata folder.
-The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `userdata.dist/etc/version.properties` in the Docker image.
-The steps performed are:
+The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `dist/userdata/etc/version.properties` in the Docker image.
 
+The steps performed are:
 * Create a `userdata/backup` folder if one does not exist.
 * Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
-* Copy over the relevant files from `userdata.dist/etc` to `userdata/etc`.
+* Show update notes and warnings.
+* Execute update pre/post commands.
+* Copy userdata system files from `dist/userdata/etc` to `userdata/etc`.
+* Update KAR files in `addons`.
 * Delete the contents of `userdata/cache` and `userdata/tmp`.
 
 The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
+All messages shown during the update are also logged to `userdata/logs/update.log`.
 
 ## Building the images
 
-Checkout the GitHub repository, change to a directory with a Dockerfile and then run these commands:
+Checkout the GitHub repository, change to a directory containing Dockerfiles (e.g. `2.4.0/debian`) and then run these commands to build and run a amd64 image:
 
 ```shell
-$ docker build -t openhab/openhab .
+$ docker build -f Dockerfile-amd64 -t openhab/openhab .
 $ docker run openhab/openhab
 ```
 
@@ -510,5 +542,4 @@ setcap 'cap_net_bind_service=+ep' /usr/lib/java-8/bin/java
 
 ## License
 
-When not explicitly set, files are placed under [![EPL-2.0 license](https://img.shields.io/badge/license-EPL--2.0-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE).
-
+When not explicitly set, files are placed under [![EPL-2.0 license](https://img.shields.io/badge/license-EPL--2.0-blue.svg)](https://raw.githubusercontent.com/openhab/openhab-docker/master/LICENSE)

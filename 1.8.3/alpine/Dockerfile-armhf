@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:armhf-v3.9
+FROM multiarch/alpine:armhf-v3.10
 
 # Set download urls
 ENV \
@@ -16,15 +16,21 @@ ENV \
 
 # Set variables and locales
 ENV \
-    APPDIR="/openhab" \
     CRYPTO_POLICY="limited" \
     EXTRA_JAVA_OPTS="" \
+    GROUP_ID="9001" \
     KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
+    OPENHAB_BACKUPS="/openhab/userdata/backup" \
+    OPENHAB_CONF="/openhab/conf" \
+    OPENHAB_HOME="/openhab" \
     OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443"
+    OPENHAB_HTTPS_PORT="8443" \
+    OPENHAB_LOGDIR="/openhab/userdata/logs" \
+    OPENHAB_USERDATA="/openhab/userdata" \
+    USER_ID="9001"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -73,19 +79,20 @@ RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
 
 # Install openHAB
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
+    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" && \
     rm /tmp/openhab.zip && \
-    cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
+    mkdir -p "${OPENHAB_HOME}/dist" && \
+    cp -a "${OPENHAB_HOME}/configurations" "${OPENHAB_HOME}/dist" && \
     echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 # Expose volume with configuration and userdata dir
-VOLUME ${APPDIR}/configurations ${APPDIR}/addons
+VOLUME ${OPENHAB_HOME}/configurations ${OPENHAB_HOME}/addons
 
 # Expose HTTP and HTTPS ports
 EXPOSE 8080 8443
 
 # Set working directory and entrypoint
-WORKDIR ${APPDIR}
+WORKDIR ${OPENHAB_HOME}
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

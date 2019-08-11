@@ -63,7 +63,7 @@ print_baseimage() {
 	# Set Docker base image based on distributions
 	case $base in
 	alpine)
-		base_image="alpine:$arch-v3.9"
+		base_image="alpine:$arch-v3.10"
 		;;
 	debian)
 		base_image="debian-debootstrap:$arch-buster"
@@ -90,15 +90,21 @@ print_basemetadata() {
 	cat >> $1 <<-'EOI'
 	# Set variables and locales
 	ENV \
-	    APPDIR="/openhab" \
 	    CRYPTO_POLICY="limited" \
 	    EXTRA_JAVA_OPTS="" \
+	    GROUP_ID="9001" \
 	    KARAF_EXEC="exec" \
 	    LC_ALL="en_US.UTF-8" \
 	    LANG="en_US.UTF-8" \
 	    LANGUAGE="en_US.UTF-8" \
+	    OPENHAB_BACKUPS="/openhab/userdata/backup" \
+	    OPENHAB_CONF="/openhab/conf" \
+	    OPENHAB_HOME="/openhab" \
 	    OPENHAB_HTTP_PORT="8080" \
-	    OPENHAB_HTTPS_PORT="8443"
+	    OPENHAB_HTTPS_PORT="8443" \
+	    OPENHAB_LOGDIR="/openhab/userdata/logs" \
+	    OPENHAB_USERDATA="/openhab/userdata" \
+	    USER_ID="9001"
 
 	# Set arguments on build
 	ARG BUILD_DATE
@@ -206,9 +212,10 @@ print_openhab_install_oh1() {
 	cat >> $1 <<-'EOI'
 	# Install openHAB
 	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
+	    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" && \
 	    rm /tmp/openhab.zip && \
-	    cp -a "${APPDIR}/configurations" "${APPDIR}/configurations.dist" && \
+	    mkdir -p "${OPENHAB_HOME}/dist" && \
+	    cp -a "${OPENHAB_HOME}/configurations" "${OPENHAB_HOME}/dist" && \
 	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 
 EOI
@@ -220,13 +227,17 @@ print_openhab_install_oh2() {
 	# Install openHAB
 	# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
+	    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
 	    rm /tmp/openhab.zip && \
-	    mkdir -p "${APPDIR}/userdata/logs" && \
-	    touch "${APPDIR}/userdata/logs/openhab.log" && \
-	    cp -a "${APPDIR}/userdata" "${APPDIR}/userdata.dist" && \
-	    cp -a "${APPDIR}/conf" "${APPDIR}/conf.dist" && \
+	    if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \
+	    if [ ! -f "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst" ]; then wget -nv -O "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst" "https://raw.githubusercontent.com/openhab/openhab-distro/2.4.0/distributions/openhab/src/main/resources/bin/userdata_sysfiles.lst"; fi && \
+	    mkdir -p "${OPENHAB_LOGDIR}" && \
+	    touch "${OPENHAB_LOGDIR}/openhab.log" && \
+	    mkdir -p "${OPENHAB_HOME}/dist" && \
+	    cp -a "${OPENHAB_CONF}" "${OPENHAB_USERDATA}" "${OPENHAB_HOME}/dist" && \
 	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
+	COPY update.sh ${OPENHAB_HOME}/runtime/bin/update
+	RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
 
 EOI
 }
@@ -235,7 +246,7 @@ EOI
 print_volumes_oh1() {
 	cat >> $1 <<-'EOI'
 	# Expose volume with configuration and userdata dir
-	VOLUME ${APPDIR}/configurations ${APPDIR}/addons
+	VOLUME ${OPENHAB_HOME}/configurations ${OPENHAB_HOME}/addons
 
 EOI
 }
@@ -244,7 +255,7 @@ EOI
 print_volumes_oh2() {
 	cat >> $1 <<-'EOI'
 	# Expose volume with configuration and userdata dir
-	VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+	VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 
 EOI
 }
@@ -280,7 +291,7 @@ EOI
 print_entrypoint() {
 	cat >> $1 <<-'EOI'
 	# Set working directory and entrypoint
-	WORKDIR ${APPDIR}
+	WORKDIR ${OPENHAB_HOME}
 	COPY entrypoint.sh /
 	RUN chmod +x /entrypoint.sh
 	ENTRYPOINT ["/entrypoint.sh"]
@@ -320,20 +331,29 @@ generate_docker_files() {
 		print_header $file;
 		print_baseimage $file;
 		print_basemetadata $file;
-		if [ "$base" == "alpine" ]; then
+
+		case $base in
+		alpine)
 			print_basepackages_alpine $file;
 			print_java_alpine $file;
-		else
+			;;
+		debian)
 			print_basepackages_debian $file;
 			print_java_debian $file;
-		fi
-		if [ "$version" == "1."* ]; then
+			;;
+		esac
+
+		case $version in
+		1.*)
 			print_openhab_install_oh1 $file;
 			print_volumes_oh1 $file
-		else
+			;;
+		2.*)
 			print_openhab_install_oh2 $file;
 			print_volumes_oh2 $file
-		fi
+			;;
+		esac
+
 		print_expose_ports $file
 		print_entrypoint $file
 		print_command $file
@@ -412,15 +432,17 @@ do
 		generate_docker_files
 
 		# Generate multi-architecture manifest
-		file="$version/$base/manifest.yml"
-		generate_manifest $file
+		generate_manifest "$version/$base/manifest.yml"
 
 		# Copy base specific entrypoint.sh
-		file="$version/$base/entrypoint.sh"
-		if [ "$base" == "alpine" ]; then
-			cp entrypoint-alpine.sh $file
-		else
-			cp entrypoint-debian.sh $file
-		fi
+		case $base in
+			alpine) cp "entrypoint-alpine.sh" "$version/$base/entrypoint.sh";;
+			debian) cp "entrypoint-debian.sh" "$version/$base/entrypoint.sh";;
+		esac
+
+		# Copy version specific update script
+		case $version in
+			2.*) cp "openhab2-update.sh" "$version/$base/update.sh";;
+		esac
 	done
 done

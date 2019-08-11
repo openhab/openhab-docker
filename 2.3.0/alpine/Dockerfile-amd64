@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:amd64-v3.9
+FROM multiarch/alpine:amd64-v3.10
 
 # Set download urls
 ENV \
@@ -16,15 +16,21 @@ ENV \
 
 # Set variables and locales
 ENV \
-    APPDIR="/openhab" \
     CRYPTO_POLICY="limited" \
     EXTRA_JAVA_OPTS="" \
+    GROUP_ID="9001" \
     KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
+    OPENHAB_BACKUPS="/openhab/userdata/backup" \
+    OPENHAB_CONF="/openhab/conf" \
+    OPENHAB_HOME="/openhab" \
     OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443"
+    OPENHAB_HTTPS_PORT="8443" \
+    OPENHAB_LOGDIR="/openhab/userdata/logs" \
+    OPENHAB_USERDATA="/openhab/userdata" \
+    USER_ID="9001"
 
 # Set arguments on build
 ARG BUILD_DATE
@@ -74,22 +80,26 @@ RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-    unzip -q /tmp/openhab.zip -d "${APPDIR}" -x "*.bat" && \
+    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
     rm /tmp/openhab.zip && \
-    mkdir -p "${APPDIR}/userdata/logs" && \
-    touch "${APPDIR}/userdata/logs/openhab.log" && \
-    cp -a "${APPDIR}/userdata" "${APPDIR}/userdata.dist" && \
-    cp -a "${APPDIR}/conf" "${APPDIR}/conf.dist" && \
+    if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \
+    if [ ! -f "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst" ]; then wget -nv -O "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst" "https://raw.githubusercontent.com/openhab/openhab-distro/2.4.0/distributions/openhab/src/main/resources/bin/userdata_sysfiles.lst"; fi && \
+    mkdir -p "${OPENHAB_LOGDIR}" && \
+    touch "${OPENHAB_LOGDIR}/openhab.log" && \
+    mkdir -p "${OPENHAB_HOME}/dist" && \
+    cp -a "${OPENHAB_CONF}" "${OPENHAB_USERDATA}" "${OPENHAB_HOME}/dist" && \
     echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
+COPY update.sh ${OPENHAB_HOME}/runtime/bin/update
+RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
 
 # Expose volume with configuration and userdata dir
-VOLUME ${APPDIR}/conf ${APPDIR}/userdata ${APPDIR}/addons
+VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 
 # Expose HTTP, HTTPS, Console and LSP ports
 EXPOSE 8080 8443 8101 5007
 
 # Set working directory and entrypoint
-WORKDIR ${APPDIR}
+WORKDIR ${OPENHAB_HOME}
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

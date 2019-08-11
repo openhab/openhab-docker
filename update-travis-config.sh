@@ -15,18 +15,16 @@ print_static_configuration() {
 	#                       PLEASE DO NOT EDIT IT DIRECTLY.
 	# ------------------------------------------------------------------------------
 	#
-	dist: bionic
-	sudo: required
+	dist: xenial
 	language: bash
+	sudo: required
 	branches:
 	  only:
 	    - master
 	services:
 	  - docker
 	before_install:
-	  - sudo apt-get install -y uidmap
 	  - ./update-docker-files.sh
-	  - ./install-img.sh
 	  - ./install-manifest-tool.sh
 	  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -F 11
 	  - docker info
@@ -39,11 +37,13 @@ print_static_configuration() {
 	    done
 	after_success:
 	  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
-	  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-	  - for ARCH in $ARCHES; do
-	        docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
-	    done
-	  - manifest-tool push from-spec $VERSION/$DIST/manifest.yml
+	  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+	        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+	        for ARCH in $ARCHES; do
+	            docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
+	        done;
+	        manifest-tool push from-spec $VERSION/$DIST/manifest.yml;
+	    fi
 	matrix:
 	  fast_finish: true
 	env:
