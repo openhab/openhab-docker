@@ -26,7 +26,6 @@ print_static_configuration() {
 	before_install:
 	  - ./update-docker-files.sh
 	  - ./install-manifest-tool.sh
-	  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh && . ./install-jdk.sh -F 11
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 	  - ARCHES="amd64 armhf arm64"
@@ -36,7 +35,6 @@ print_static_configuration() {
 	        docker run --rm $DOCKER_REPO:$VERSION-$ARCH-$DIST uname -a;
 	    done
 	after_success:
-	  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
 	  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 	        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
 	        for ARCH in $ARCHES; do
