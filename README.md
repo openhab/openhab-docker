@@ -17,6 +17,7 @@ Table of Contents
             * [Running from command line](#running-from-command-line)
             * [Running from compose-file.yml](#running-from-compose-fileyml)
             * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
+            * [Running on Windows and macOS](#running-on-windows-and-macos)
          * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
          * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
          * [Accessing the console](#accessing-the-console)
@@ -204,15 +205,40 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
-      - "openhab_conf:/openhab/conf"
-      - "openhab_userdata:/openhab/userdata"
-      - "openhab_addons:/openhab/addons"
+      - "./openhab_addons:/openhab/addons"
+      - "./openhab_conf:/openhab/conf"
+      - "./openhab_userdata:/openhab/userdata"
     # The command node is very important. It overrides
     # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
     command: "tini -s ./start.sh server"
 ```
 
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
+
+#### Running on Windows and macOS
+
+The `host` networking driver only works on Linux hosts, and is not supported by Docker on Windows and macOS.
+On Windows and macOS ports should be exposed by adding port options to commands (`-p 8080`) or by adding a ports section to `docker-compose.yml`.
+
+```yaml
+version: '2.2'
+
+services:
+  openhab:
+    image: "openhab/openhab:2.4.0"
+    restart: always
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - "./openhab_addons:/openhab/addons"
+      - "./openhab_conf:/openhab/conf"
+      - "./openhab_userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+```
 
 ### Starting with Docker mounting a host directory (for advanced user)
 
