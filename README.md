@@ -16,8 +16,8 @@ Table of Contents
          * [Starting with Docker named volumes (for beginners)](#starting-with-docker-named-volumes-for-beginners)
             * [Running from command line](#running-from-command-line)
             * [Running from compose-file.yml](#running-from-compose-fileyml)
-            * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
-            * [Running on Windows and macOS](#running-on-windows-and-macos)
+         * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
+         * [Running on Windows and macOS](#running-on-windows-and-macos)
          * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
          * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
          * [Accessing the console](#accessing-the-console)
@@ -184,9 +184,10 @@ volumes:
     driver: local
 ```
 
-#### Running openHAB with libpcap support
+### Running openHAB with libpcap support
 
-You can run all openHAB images with libpcap support. This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
+You can run all openHAB images with libpcap support.
+This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
 For that feature to work correctly, you need to run the image as **root user**.
 Create the following `docker-compose.yml` and start the container with `docker-compose up -d`
 
@@ -215,7 +216,7 @@ services:
 
 *If you could provide a method to run libpcap support in user mode please open a pull request.*
 
-#### Running on Windows and macOS
+### Running on Windows and macOS
 
 The `host` networking driver only works on Linux hosts, and is not supported by Docker on Windows and macOS.
 On Windows and macOS ports should be exposed by adding port options to commands (`-p 8080`) or by adding a ports section to `docker-compose.yml`.
