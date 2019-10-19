@@ -1,5 +1,5 @@
 image: openhab/openhab:2.5.0.M3-alpine
-tags: ['milestone-alpine']
+tags: []
 manifests:
   -
     image: openhab/openhab:2.5.0.M3-amd64-alpine
