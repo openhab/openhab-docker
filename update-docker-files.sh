@@ -139,7 +139,7 @@ print_basepackages_alpine() {
 	        ca-certificates \
 	        curl \
 	        fontconfig \
-	        libpcap-dev \
+	        libcap \
 	        nss \
 	        shadow \
 	        su-exec \
@@ -166,10 +166,11 @@ print_basepackages_debian() {
 	        curl \
 	        fontconfig \
 	        gosu \
-	        libpcap-dev \
+	        libcap2-bin \
 	        locales \
 	        locales-all \
 	        netbase \
+	        procps \
 	        tini \
 	        unzip \
 	        wget \

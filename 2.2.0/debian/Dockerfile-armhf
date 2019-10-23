@@ -59,10 +59,11 @@ RUN apt-get update && \
         curl \
         fontconfig \
         gosu \
-        libpcap-dev \
+        libcap2-bin \
         locales \
         locales-all \
         netbase \
+        procps \
         tini \
         unzip \
         wget \
