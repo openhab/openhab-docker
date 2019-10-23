@@ -59,7 +59,7 @@ RUN apk upgrade --no-cache && \
         ca-certificates \
         curl \
         fontconfig \
-        libpcap-dev \
+        libcap \
         nss \
         shadow \
         su-exec \
