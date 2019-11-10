@@ -26,8 +26,8 @@ ENV \
     OPENHAB_BACKUPS="/openhab/userdata/backup" \
     OPENHAB_CONF="/openhab/conf" \
     OPENHAB_HOME="/openhab" \
-    OPENHAB_HTTP_PORT="8080" \
-    OPENHAB_HTTPS_PORT="8443" \
+    OPENHAB_HTTP_PORT="8081" \
+    OPENHAB_HTTPS_PORT="8444" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
     OPENHAB_USERDATA="/openhab/userdata" \
     USER_ID="9001"
@@ -101,7 +101,7 @@ RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
 VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 
 # Expose HTTP, HTTPS, Console and LSP ports
-EXPOSE 8080 8443 8101 5007
+EXPOSE 8081 8444 8101 5007
 
 # Set working directory and entrypoint
 WORKDIR ${OPENHAB_HOME}
