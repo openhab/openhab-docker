@@ -1,5 +1,5 @@
 image: openhab/openhab:2.5.0.M4-debian
-tags: ['2.5.0.M4', 'milestone', 'milestone-debian']
+tags: ['2.5.0.M4']
 manifests:
   -
     image: openhab/openhab:2.5.0.M4-amd64-debian
