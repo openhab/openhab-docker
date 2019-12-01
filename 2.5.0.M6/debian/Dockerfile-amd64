@@ -11,8 +11,8 @@ FROM multiarch/debian-debootstrap:amd64-buster
 # Set download urls
 ENV \
     JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.40.0.25-ca-jdk8.0.222-linux_x64.tar.gz" \
-    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.5.0.M3/openhab-2.5.0.M3.zip" \
-    OPENHAB_VERSION="2.5.0.M3"
+    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.5.0.M6/openhab-2.5.0.M6.zip" \
+    OPENHAB_VERSION="2.5.0.M6"
 
 # Set variables and locales
 ENV \
