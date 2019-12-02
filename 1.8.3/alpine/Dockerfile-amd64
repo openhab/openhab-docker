@@ -10,7 +10,7 @@ FROM multiarch/alpine:amd64-v3.10
 
 # Set download urls
 ENV \
-    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.40.0.25-ca-jdk8.0.222-linux_x64.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz" \
     OPENHAB_URL="https://bintray.com/artifact/download/openhab/bin/distribution-1.8.3-runtime.zip" \
     OPENHAB_VERSION="1.8.3"
 
