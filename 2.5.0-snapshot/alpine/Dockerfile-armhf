@@ -10,7 +10,7 @@ FROM multiarch/alpine:armhf-v3.10
 
 # Set download urls
 ENV \
-    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.40.0.178-ca-jdk1.8.0_222-linux_aarch32hf.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz" \
     OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.5.0-SNAPSHOT.zip" \
     OPENHAB_VERSION="2.5.0-snapshot"
 
