@@ -6,13 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/debian-debootstrap:arm64-buster
+FROM multiarch/alpine:amd64-v3.10
 
 # Set download urls
 ENV \
-    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz" \
-    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.5.0.M4/openhab-2.5.0.M4.zip" \
-    OPENHAB_VERSION="2.5.0.M4"
+    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz" \
+    OPENHAB_URL="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/2.5.0.RC1/openhab-2.5.0.RC1.zip" \
+    OPENHAB_VERSION="2.5.0.RC1"
 
 # Set variables and locales
 ENV \
@@ -52,35 +52,30 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     maintainer="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+RUN apk upgrade --no-cache && \
+    apk add --no-cache \
         arping \
+        bash \
         ca-certificates \
         curl \
         fontconfig \
-        gosu \
-        libcap2-bin \
-        locales \
-        locales-all \
-        netbase \
-        procps \
+        libcap \
+        nss \
+        shadow \
+        su-exec \
         tini \
+        ttf-dejavu \
+        openjdk8 \
         unzip \
         wget \
         zip && \
     chmod u+s /usr/sbin/arping && \
-    ln -s -f /bin/true /usr/bin/chfn && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/cache/apk/*
 
-# Install java
-ENV JAVA_HOME='/usr/lib/java-8'
-RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
-    mkdir "${JAVA_HOME}" && \
-    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
-    rm /tmp/java.tar.gz && \
-    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
-    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
+# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
+RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
@@ -110,4 +105,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Execute command
-CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]
+CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]
