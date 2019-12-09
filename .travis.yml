@@ -48,11 +48,11 @@ env:
     - VERSION=2.3.0 DIST=debian
     - VERSION=2.4.0 DIST=alpine
     - VERSION=2.4.0 DIST=debian
-    - VERSION=2.5.0.M4 DIST=alpine
-    - VERSION=2.5.0.M4 DIST=debian
     - VERSION=2.5.0.M5 DIST=alpine
     - VERSION=2.5.0.M5 DIST=debian
     - VERSION=2.5.0.M6 DIST=alpine
     - VERSION=2.5.0.M6 DIST=debian
+    - VERSION=2.5.0.RC1 DIST=alpine
+    - VERSION=2.5.0.RC1 DIST=debian
     - VERSION=2.5.0-snapshot DIST=alpine
     - VERSION=2.5.0-snapshot DIST=debian
