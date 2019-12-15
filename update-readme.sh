@@ -11,10 +11,10 @@ generate_version_list() {
 	do
 		url=$(eval "echo $dockerfile_url")
 		case $version in
-		2.*.M*|2.*.RC*)
+		2.*.M*|2.*.RC*|3.*.M*|3.*.RC*)
 			echo "* \`$version\` Experimental openHAB $version Milestone version ([Dockerfile]($url))"
 			;;
-		2.*-snapshot)
+		2.*-snapshot|3.*-snapshot)
 			echo "* \`$version\` Experimental openHAB $(echo $version | sed 's/-snapshot/ SNAPSHOT/g') version ([Dockerfile]($url))"
 			;;
 		*)
