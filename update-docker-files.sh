@@ -30,13 +30,13 @@ print_baseimage() {
 	1.*)
 		openhab_url=$(eval "echo $openhab1_release_url")
 		;;
-	2.*.M*|2.*.RC*)
+	2.*.M*|2.*.RC*|3.*.M*|3.*.RC*)
 		openhab_url=$(eval "echo $openhab2_milestone_url")
 		;;
-	2.*-snapshot)
+	2.*-snapshot|3.*-snapshot)
 		openhab_url=$(eval "echo $openhab2_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
 		;;
-	2.*)
+	2.*|3.*)
 		openhab_url=$(eval "echo $openhab2_release_url")
 		;;
 	default)
@@ -271,7 +271,7 @@ print_expose_ports() {
 		expose_comment="Expose HTTP, HTTPS and Console ports"
 		expose_ports="8080 8443 8101"
 		;;
-	2.*)
+	2.*|3.*)
 		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
 		expose_ports="8080 8443 8101 5007"
 		;;
@@ -349,7 +349,7 @@ generate_docker_files() {
 			print_openhab_install_oh1 $file;
 			print_volumes_oh1 $file
 			;;
-		2.*)
+		2.*|3.*)
 			print_openhab_install_oh2 $file;
 			print_volumes_oh2 $file
 			;;
@@ -422,7 +422,7 @@ EOI
 }
 
 # Remove previously generated container files
-rm -rf ./1.* ./2.*
+rm -rf ./1.* ./2.* ./3.*
 
 # Generate new container files
 for version in $(build_versions)
@@ -443,7 +443,7 @@ do
 
 		# Copy version specific update script
 		case $version in
-			2.*) cp "openhab2-update.sh" "$version/$base/update.sh";;
+			2.*|3.*) cp "openhab2-update.sh" "$version/$base/update.sh";;
 		esac
 	done
 done

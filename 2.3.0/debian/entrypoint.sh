@@ -16,7 +16,7 @@ fi
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f "${OPENHAB_HOME}/runtime/instances/instance.properties"
 
-# The instance.properties file in openHAB 2.x is installed in the tmp
+# The instance.properties file in openHAB 2.x/3.x is installed in the tmp
 # directory
 rm -f "${OPENHAB_USERDATA}/tmp/instances/instance.properties"
 
@@ -66,7 +66,7 @@ case ${OPENHAB_VERSION} in
   1.*)
       initialize_volume "${OPENHAB_HOME}/configurations" "${OPENHAB_HOME}/dist/configurations"
     ;;
-  2.*)
+  2.*|3.*)
       initialize_volume "${OPENHAB_CONF}" "${OPENHAB_HOME}/dist/conf"
       initialize_volume "${OPENHAB_USERDATA}" "${OPENHAB_HOME}/dist/userdata"
 

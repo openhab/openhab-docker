@@ -130,7 +130,7 @@ scan_versioning_list() {
 
 echo ""
 echo "################################################"
-echo "       openHAB 2.x.x Docker update script       "
+echo "          openHAB Docker update script          "
 echo "################################################"
 echo ""
 
