@@ -6,11 +6,12 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:arm64-v3.10
+FROM multiarch/alpine:arm64-v3.11
 
 # Set download urls
 ENV \
     JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz" \
+    JAVA_VERSION="8" \
     OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.4.0%2Fopenhab-2.4.0.zip" \
     OPENHAB_VERSION="2.4.0"
 
@@ -65,17 +66,20 @@ RUN apk upgrade --no-cache && \
         su-exec \
         tini \
         ttf-dejavu \
-        openjdk8 \
+        openjdk${JAVA_VERSION} \
         unzip \
         wget \
         zip && \
     chmod u+s /usr/sbin/arping && \
     rm -rf /var/cache/apk/*
 
-# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
-RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
-    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
+# Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
+RUN if [ "${JAVA_VERSION}" = "8" ]; then \
+        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
+    elif [ "${JAVA_VERSION}" = "11" ]; then \
+        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"; \
+    fi
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
