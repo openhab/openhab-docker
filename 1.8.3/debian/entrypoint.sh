@@ -4,12 +4,15 @@ interactive=$(if test -t 0; then echo true; else echo false; fi)
 set -euo pipefail
 IFS=$'\n\t'
 
-# Install Java unlimited strength cryptography
-if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -f "${JAVA_HOME}/jre/lib/security/README.txt" ]; then
-  echo "Installing Zulu Cryptography Extension Kit (\"CEK\")..."
-  wget -q -O /tmp/ZuluJCEPolicies.zip https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip
-  unzip -jo -d "${JAVA_HOME}/jre/lib/security" /tmp/ZuluJCEPolicies.zip
-  rm /tmp/ZuluJCEPolicies.zip
+# Configure Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ]; then
+  echo "Configuring Zulu JDK ${JAVA_VERSION} unlimited strength cryptography policy..."
+  if [ "${JAVA_VERSION}" = "8" ]; then
+    java_security_file="${JAVA_HOME}/jre/lib/security/java.security"
+  elif [ "$JAVA_VERSION" = "11" ]; then
+    java_security_file="${JAVA_HOME}/conf/security/java.security"
+  fi
+  sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${java_security_file}"
 fi
 
 # Deleting instance.properties to avoid karaf PID conflict on restart

@@ -8,6 +8,7 @@ openhab1_release_url='https://bintray.com/artifact/download/openhab/bin/distribu
 openhab2_release_url='https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F${version}%2Fopenhab-${version}.zip'
 openhab2_milestone_url='https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/${version}/openhab-${version}.zip'
 openhab2_snapshot_url='https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
+openhab3_snapshot_url='https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 
 # Generate header
 print_header() {
@@ -33,8 +34,11 @@ print_baseimage() {
 	2.*.M*|2.*.RC*|3.*.M*|3.*.RC*)
 		openhab_url=$(eval "echo $openhab2_milestone_url")
 		;;
-	2.*-snapshot|3.*-snapshot)
+	2.*-snapshot)
 		openhab_url=$(eval "echo $openhab2_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
+		;;
+	3.*-snapshot)
+		openhab_url=$(eval "echo $openhab3_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
 		;;
 	2.*|3.*)
 		openhab_url=$(eval "echo $openhab2_release_url")
@@ -44,18 +48,44 @@ print_baseimage() {
 		;;
 	esac
 
-	# Set Java download based on architecture
-	case $arch in
-	amd64)
-		java_url="https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz"
+	# Set download URL for openHAB version
+	case $version in
+	1.*|2.*)
+		java_version="8"
+		case $arch in
+		amd64)
+			java_url="https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz"
+			;;
+		armhf)
+			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz"
+			;;
+		arm64)
+			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz"
+			;;
+		default)
+			java_url="error"
+			;;
+		esac
 		;;
-	armhf)
-		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz"
-		;;
-	arm64)
-		java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz"
+	3.*)
+		java_version="11"
+		case $arch in
+		amd64)
+			java_url="https://cdn.azul.com/zulu/bin/zulu11.37.17-ca-jdk11.0.6-linux_x64.tar.gz"
+			;;
+		armhf)
+			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch32hf.tar.gz"
+			;;
+		arm64)
+			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz"
+			;;
+		default)
+			java_url="error"
+			;;
+		esac
 		;;
 	default)
+	        java_version="error"
 		java_url="error"
 		;;
 	esac
@@ -63,7 +93,7 @@ print_baseimage() {
 	# Set Docker base image based on distributions
 	case $base in
 	alpine)
-		base_image="alpine:$arch-v3.10"
+		base_image="alpine:$arch-v3.11"
 		;;
 	debian)
 		base_image="debian-debootstrap:$arch-buster"
@@ -79,6 +109,7 @@ print_baseimage() {
 	# Set download urls
 	ENV \\
 	    JAVA_URL="$java_url" \\
+	    JAVA_VERSION="$java_version" \\
 	    OPENHAB_URL="$openhab_url" \\
 	    OPENHAB_VERSION="$version"
 
@@ -145,7 +176,7 @@ print_basepackages_alpine() {
 	        su-exec \
 	        tini \
 	        ttf-dejavu \
-	        openjdk8 \
+	        openjdk${JAVA_VERSION} \
 	        unzip \
 	        wget \
 	        zip && \
@@ -186,10 +217,13 @@ EOI
 # Configure Java for Alpine
 print_java_alpine() {
 	cat >> $1 <<-'EOI'
-	# Limit OpenJDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-	ENV JAVA_HOME='/usr/lib/jvm/java-1.8-openjdk'
-	RUN rm -r "$JAVA_HOME/jre/lib/security/policy/unlimited" && \
-	    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "$JAVA_HOME/jre/lib/security/java.security"
+	# Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+	ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
+	RUN if [ "${JAVA_VERSION}" = "8" ]; then \
+	        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
+	    elif [ "${JAVA_VERSION}" = "11" ]; then \
+	        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"; \
+	    fi
 
 EOI
 }
@@ -197,10 +231,16 @@ EOI
 print_java_debian() {
 	cat >> $1 <<-'EOI'
 	# Install java
-	ENV JAVA_HOME='/usr/lib/java-8'
+	ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
+	# Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 	RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
-	    mkdir "${JAVA_HOME}" && \
+	    mkdir -p "${JAVA_HOME}" && \
 	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
+	    if [ "${JAVA_VERSION}" = "8" ]; then \
+	        sed -i 's/^#crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
+	    elif [ "${JAVA_VERSION}" = "11" ]; then \
+	        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"; \
+	    fi && \
 	    rm /tmp/java.tar.gz && \
 	    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
 	    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50

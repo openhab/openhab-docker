@@ -4,11 +4,15 @@ interactive=$(if test -t 0; then echo true; else echo false; fi)
 set -euo pipefail
 IFS=$'\n\t'
 
-# Install Java unlimited strength cryptography
-if [ "${CRYPTO_POLICY}" = "unlimited" ] && [ ! -d "${JAVA_HOME}/jre/lib/security/policy/unlimited" ]; then
-  echo "Installing OpenJDK unlimited strength cryptography policy..."
-  mkdir "${JAVA_HOME}/jre/lib/security/policy/unlimited"
-  apk fix --no-cache openjdk8-jre-lib
+# Configure Java unlimited strength cryptography
+if [ "${CRYPTO_POLICY}" = "unlimited" ]; then
+  echo "Configuring OpenJDK ${JAVA_VERSION} unlimited strength cryptography policy..."
+  if [ "${JAVA_VERSION}" = "8" ]; then
+    java_security_file="${JAVA_HOME}/jre/lib/security/java.security"
+  elif [ "${JAVA_VERSION}" = "11" ]; then
+    java_security_file="${JAVA_HOME}/conf/security/java.security"
+  fi
+  sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${java_security_file}"
 fi
 
 # Deleting instance.properties to avoid karaf PID conflict on restart
