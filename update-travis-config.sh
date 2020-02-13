@@ -15,9 +15,9 @@ print_static_configuration() {
 	#                       PLEASE DO NOT EDIT IT DIRECTLY.
 	# ------------------------------------------------------------------------------
 	#
-	dist: xenial
-	language: bash
-	sudo: required
+	os: linux
+	dist: bionic
+	language: shell
 	branches:
 	  only:
 	    - master
@@ -42,10 +42,10 @@ print_static_configuration() {
 	        done;
 	        manifest-tool push from-spec $VERSION/$DIST/manifest.yml;
 	    fi
-	matrix:
+	jobs:
 	  fast_finish: true
 	env:
-	  matrix:
+	  jobs:
 EOI
 }
 

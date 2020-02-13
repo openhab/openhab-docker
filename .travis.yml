@@ -5,9 +5,9 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-dist: xenial
-language: bash
-sudo: required
+os: linux
+dist: bionic
+language: shell
 branches:
   only:
     - master
@@ -32,10 +32,10 @@ after_success:
         done;
         manifest-tool push from-spec $VERSION/$DIST/manifest.yml;
     fi
-matrix:
+jobs:
   fast_finish: true
 env:
-  matrix:
+  jobs:
     - VERSION=1.8.3 DIST=alpine
     - VERSION=1.8.3 DIST=debian
     - VERSION=2.0.0 DIST=alpine
