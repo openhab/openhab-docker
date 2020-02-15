@@ -52,5 +52,7 @@ env:
     - VERSION=2.5.0 DIST=debian
     - VERSION=2.5.1 DIST=alpine
     - VERSION=2.5.1 DIST=debian
+    - VERSION=2.5.2-snapshot DIST=alpine
+    - VERSION=2.5.2-snapshot DIST=debian
     - VERSION=3.0.0-snapshot DIST=alpine
     - VERSION=3.0.0-snapshot DIST=debian

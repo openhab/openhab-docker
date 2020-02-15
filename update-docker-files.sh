@@ -429,7 +429,7 @@ generate_manifest() {
 		tags+=("'milestone-$base'")
 	fi
 
-	if [ "$version" == "$(snapshot_version)" ]; then
+	if [ "$version" == "$(last_snapshot_version)" ]; then
 		if [ "$base" == "debian" ]; then
 			tags+=("'snapshot'")
 		fi
