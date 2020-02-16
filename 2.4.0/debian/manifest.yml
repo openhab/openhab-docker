@@ -1,5 +1,5 @@
 image: openhab/openhab:2.4.0-debian
-tags: ['2.4.0']
+tags: ['2.4.0', '2.4.0-debian']
 manifests:
   -
     image: openhab/openhab:2.4.0-amd64-debian

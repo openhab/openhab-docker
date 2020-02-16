@@ -1,5 +1,5 @@
 image: openhab/openhab:2.5.2-snapshot-alpine
-tags: []
+tags: ['2.5.2-snapshot-alpine']
 manifests:
   -
     image: openhab/openhab:2.5.2-snapshot-amd64-alpine
