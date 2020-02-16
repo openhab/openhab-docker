@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:armhf-v3.11
+FROM multiarch/alpine:armhf-v3.10
 
 # Set download urls
 ENV \

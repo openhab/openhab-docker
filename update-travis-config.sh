@@ -24,6 +24,7 @@ print_static_configuration() {
 	services:
 	  - docker
 	before_install:
+	  - set -e
 	  - ./update-docker-files.sh
 	  - ./install-manifest-tool.sh
 	  - docker info
