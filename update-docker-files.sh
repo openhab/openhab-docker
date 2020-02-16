@@ -410,6 +410,8 @@ generate_manifest() {
 		tags+=("'$version'")
 	fi
 
+	tags+=("'$version-$base'")
+
 	if [ "$version" == "$(last_stable_version)" ]; then
 		if [ "$base" == "debian" ]; then
 			tags+=("'latest'")

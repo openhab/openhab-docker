@@ -1,5 +1,5 @@
 image: openhab/openhab:1.8.3-debian
-tags: ['1.8.3']
+tags: ['1.8.3', '1.8.3-debian']
 manifests:
   -
     image: openhab/openhab:1.8.3-amd64-debian
