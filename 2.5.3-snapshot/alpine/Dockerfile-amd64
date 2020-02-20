@@ -6,14 +6,14 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM multiarch/alpine:arm64-v3.10
+FROM multiarch/alpine:amd64-v3.10
 
 # Set download urls
 ENV \
-    JAVA_URL="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz" \
+    JAVA_URL="https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz" \
     JAVA_VERSION="8" \
-    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.5.2-SNAPSHOT.zip" \
-    OPENHAB_VERSION="2.5.2-snapshot"
+    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.5.3-SNAPSHOT.zip" \
+    OPENHAB_VERSION="2.5.3-snapshot"
 
 # Set variables and locales
 ENV \
