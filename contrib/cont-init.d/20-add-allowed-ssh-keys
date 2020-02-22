@@ -1,6 +1,6 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
-cat > /openhab/userdata/etc/keys.properties <<EOF
+cat > "${OPENHAB_USERDATA}/etc/keys.properties" <<EOF
 #
 # For security reason, the default auto-signed key is disabled.
 #

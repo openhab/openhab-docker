@@ -1,5 +1,5 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 sed -i \
     "s/\#org.apache.karaf.shell:sshHost\s*=.*/org.apache.karaf.shell:sshHost=0.0.0.0/g" \
-    /openhab/conf/services/runtime.cfg
+    "${OPENHAB_CONF}/services/runtime.cfg"
