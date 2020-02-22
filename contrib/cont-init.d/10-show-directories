@@ -1,5 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
-ls -l /openhab
-
-ls -l /openhab/userdata
+ls -l "${OPENHAB_HOME}"
+ls -l "${OPENHAB_USERDATA}"

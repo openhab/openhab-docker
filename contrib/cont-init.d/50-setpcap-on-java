@@ -1,0 +1,3 @@
+#!/bin/bash -ex
+
+setcap 'cap_net_bind_service=+ep' "${JAVA_HOME}/bin/java"

@@ -1,6 +1,6 @@
 # openHAB Docker Containers
 
-![](images/openhab.png)
+![openHAB logo](https://github.com/openhab/openhab-docker/raw/master/images/openhab.png)
 
 [![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.5.2.svg)](https://microbadger.com/images/openhab/openhab:2.5.2 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.5.2.svg)](https://microbadger.com/#/images/openhab/openhab:2.5.2) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -34,12 +34,12 @@ Table of Contents
 
 ## Introduction
 
-Repository for building Docker containers for [openHAB](http://openhab.org) (Home Automation Server).
+Repository for building Docker containers for [openHAB](https://openhab.org) (Home Automation Server).
 Comments, suggestions and contributions are welcome!
 
 ## Docker Image
 
-[![dockeri.co](http://dockeri.co/image/openhab/openhab)](https://hub.docker.com/r/openhab/openhab/)
+[![dockeri.co](https://dockeri.co/image/openhab/openhab)](https://hub.docker.com/r/openhab/openhab/)
 
 ## Image variants
 
@@ -389,12 +389,13 @@ Some openHAB functionality may depend on unlimited strength which can be enabled
 Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
 
 * Debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
-* Alpine: [OpenJDK (Cryptographic Cautions)](http://openjdk.java.net/groups/security)
+* Alpine: [OpenJDK (Cryptographic Cautions)](https://openjdk.java.net/groups/security)
 
 The following addons are known to depend on the unlimited cryptographic strength policy:
 
 * Eclipse IoT Market
 * KM200 binding
+* Loxone binding
 * MQTT binding
 
 ## Parameters
@@ -428,7 +429,7 @@ All messages shown during the update are also logged to `userdata/logs/update.lo
 
 ## Building the images
 
-Checkout the GitHub repository, change to a directory containing Dockerfiles (e.g. `2.4.0/debian`) and then run these commands to build and run a amd64 image:
+Checkout the GitHub repository, change to a directory containing Dockerfiles (e.g. `2.5.2/debian`) and then run these commands to build and run a amd64 image:
 
 ```shell
 $ docker build -f Dockerfile-amd64 -t openhab/openhab .
@@ -443,7 +444,7 @@ $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
 ## Executing shell scripts before openHAB is started
 
-It is sometimes useful to run shell scripts after the "userdata" directory is created, but before karaf itself is launched.
+It is sometimes useful to run shell scripts after the "userdata" directory is created, but before Karaf itself is launched.
 One such case is creating SSH host keys, and allowing access to the system from the outside via SSH.
 Exemplary scripts can be found in the [contrib](https://github.com/openhab/openhab-docker/tree/master/contrib) directory
 
@@ -470,8 +471,8 @@ This can be done by either using a volume mount (see the examples above) or crea
 [10-show-directories](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/10-show-directories)
 
 ```shell
-ls -l /openhab
-ls -l /openhab/userdata
+ls -l "${OPENHAB_HOME}"
+ls -l "${OPENHAB_USERDATA}"
 ```
 
 ### Set a defined host key for the image
@@ -479,7 +480,7 @@ ls -l /openhab/userdata
 [20-set-host-key](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-set-host-key)
 
 ```shell
-cat > /openhab/userdata/etc/host.key <<EOF
+cat > "${OPENHAB_USERDATA}/etc/host.key" <<EOF
 -----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCrOe8O7r9uOjKu
 ... your key here ...
@@ -495,7 +496,7 @@ EOF
 ```shell
 sed -i \
     "s/\#org.apache.karaf.shell:sshHost\s*=.*/org.apache.karaf.shell:sshHost=0.0.0.0/g" \
-    /openhab/conf/services/runtime.cfg
+    "${OPENHAB_CONF}/services/runtime.cfg"
 ```
 
 ### Set a defined host key for the image
@@ -503,7 +504,7 @@ sed -i \
 [20-add-allowed-ssh-keys](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-add-allowed-ssh-keys)
 
 ```shell
-cat > /openhab/userdata/etc/keys.properties <<EOF
+cat > "${OPENHAB_USERDATA}/etc/keys.properties" <<EOF
 openhab=A...your-ssh-public-key-here...B,_g_:admingroup
 
 _g_\:admingroup = group,admin,manager,viewer
@@ -518,24 +519,23 @@ EOF
 ```shell
 if [ ! -z ${OHC_UUID} ]
 then
-    mkdir -p /openhab/userdata
-    echo ${OHC_UUID} > /openhab/userdata/uuid
+    mkdir -p "${OPENHAB_USERDATA}"
+    echo ${OHC_UUID} > "${OPENHAB_USERDATA}/uuid"
 fi
 
 if [ ! -z ${OHC_SECRET} ]
 then
-    mkdir -p /openhab/userdata/openhabcloud
-    echo ${OHC_SECRET} > /openhab/userdata/openhabcloud/secret
+    mkdir -p "${OPENHAB_USERDATA}/openhabcloud"
+    echo ${OHC_SECRET} > "${OPENHAB_USERDATA}/openhabcloud/secret"
 fi
 ```
-
 
 ### Give pcap permissions to the Java process
 
 [50-setpcap-on-java](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/50-setpcap-on-java)
 
 ```shell
-setcap 'cap_net_bind_service=+ep' /usr/lib/java-8/bin/java
+setcap 'cap_net_bind_service=+ep' "${JAVA_HOME}/bin/java"
 ```
 
 ## Contributing

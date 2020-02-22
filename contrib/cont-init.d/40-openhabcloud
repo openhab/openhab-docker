@@ -1,13 +1,13 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 if [ ! -z ${OHC_UUID} ]
 then
-    mkdir -p /openhab/userdata
-    echo ${OHC_UUID} > /openhab/userdata/uuid
+    mkdir -p "${OPENHAB_USERDATA}"
+    echo ${OHC_UUID} > "${OPENHAB_USERDATA}/uuid"
 fi
 
 if [ ! -z ${OHC_SECRET} ]
 then
-    mkdir -p /openhab/userdata/openhabcloud
-    echo ${OHC_SECRET} > /openhab/userdata/openhabcloud/secret
+    mkdir -p "${OPENHAB_USERDATA}/openhabcloud"
+    echo ${OHC_SECRET} > "${OPENHAB_USERDATA}/openhabcloud/secret"
 fi
