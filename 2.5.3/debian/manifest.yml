@@ -1,0 +1,18 @@
+image: openhab/openhab:2.5.3-debian
+tags: ['2.5.3', '2.5.3-debian', 'latest', 'latest-debian', 'milestone', 'milestone-debian']
+manifests:
+  -
+    image: openhab/openhab:2.5.3-amd64-debian
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: openhab/openhab:2.5.3-armhf-debian
+    platform:
+      architecture: arm
+      os: linux
+  -
+    image: openhab/openhab:2.5.3-arm64-debian
+    platform:
+      architecture: arm64
+      os: linux

@@ -1,0 +1,18 @@
+image: openhab/openhab:2.5.3-alpine
+tags: ['2.5.3-alpine', 'latest-alpine', 'milestone-alpine']
+manifests:
+  -
+    image: openhab/openhab:2.5.3-amd64-alpine
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: openhab/openhab:2.5.3-armhf-alpine
+    platform:
+      architecture: arm
+      os: linux
+  -
+    image: openhab/openhab:2.5.3-arm64-alpine
+    platform:
+      architecture: arm64
+      os: linux

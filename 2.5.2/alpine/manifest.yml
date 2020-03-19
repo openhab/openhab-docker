@@ -1,5 +1,5 @@
 image: openhab/openhab:2.5.2-alpine
-tags: ['2.5.2-alpine', 'latest-alpine', 'milestone-alpine']
+tags: ['2.5.2-alpine']
 manifests:
   -
     image: openhab/openhab:2.5.2-amd64-alpine
