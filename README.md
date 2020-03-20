@@ -83,6 +83,7 @@ Comments, suggestions and contributions are welcome!
 * `arm64` for ARMv8 devices 64 Bit (not Raspberry Pi 3/4)
 
 Newer Docker versions (1.10.0+) have multi-architecture support which allows for omitting the architecture from the tag.
+There is no armhf Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture.
 
 **Distributions:**
 

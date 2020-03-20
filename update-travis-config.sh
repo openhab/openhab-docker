@@ -29,7 +29,8 @@ print_static_configuration() {
 	  - ./install-manifest-tool.sh
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-	  - ARCHES="amd64 armhf arm64"
+	  - source ./update-functions.sh
+	  - ARCHES="$(arches $VERSION $DIST)"
 	install:
 	  - for ARCH in $ARCHES; do
 	        docker build --build-arg VCS_REF=$TRAVIS_COMMIT --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VERSION=$VERSION -f $VERSION/$DIST/Dockerfile-$ARCH -t $DOCKER_REPO:$VERSION-$ARCH-$DIST $VERSION/$DIST;
