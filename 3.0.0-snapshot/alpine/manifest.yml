@@ -7,11 +7,6 @@ manifests:
       architecture: amd64
       os: linux
   -
-    image: openhab/openhab:3.0.0-snapshot-armhf-alpine
-    platform:
-      architecture: arm
-      os: linux
-  -
     image: openhab/openhab:3.0.0-snapshot-arm64-alpine
     platform:
       architecture: arm64

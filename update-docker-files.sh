@@ -43,7 +43,7 @@ print_baseimage() {
 	2.*|3.*)
 		openhab_url=$(eval "echo $openhab2_release_url")
 		;;
-	default)
+	*)
 		openhab_url="error"
 		;;
 	esac
@@ -62,7 +62,7 @@ print_baseimage() {
 		arm64)
 			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz"
 			;;
-		default)
+		*)
 			java_url="error"
 			;;
 		esac
@@ -79,13 +79,13 @@ print_baseimage() {
 		arm64)
 			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz"
 			;;
-		default)
+		*)
 			java_url="error"
 			;;
 		esac
 		;;
-	default)
-	        java_version="error"
+	*)
+		java_version="error"
 		java_url="error"
 		;;
 	esac
@@ -98,7 +98,7 @@ print_baseimage() {
 	debian)
 		base_image="debian-debootstrap:$arch-buster"
 		;;
-	default)
+	*)
 		base_image="error"
 		;;
 	esac
@@ -315,7 +315,7 @@ print_expose_ports() {
 		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
 		expose_ports="8080 8443 8101 5007"
 		;;
-	default)
+	*)
 		expose_comment="Error"
 		expose_ports="error"
 		;;
@@ -354,7 +354,7 @@ print_command() {
 		CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]
 		EOI
 		;;
-	default)
+	*)
 		cat >> $1 <<-'EOI'
 		CMD ["./start.sh"]
 		EOI
@@ -363,7 +363,7 @@ print_command() {
 }
 
 generate_docker_files() {
-	for arch in $(arches)
+	for arch in $(arches "$version" "$base")
 	do
 		# Generate Dockerfile
 		file="$version/$base/Dockerfile-$arch"
@@ -445,22 +445,27 @@ generate_manifest() {
 	image: $(docker_repo):$version-$base
 	tags: [$tags]
 	manifests:
-	  -
-	    image: $(docker_repo):$version-amd64-$base
-	    platform:
-	      architecture: amd64
-	      os: linux
-	  -
-	    image: $(docker_repo):$version-armhf-$base
-	    platform:
-	      architecture: arm
-	      os: linux
-	  -
-	    image: $(docker_repo):$version-arm64-$base
-	    platform:
-	      architecture: arm64
-	      os: linux
 EOI
+
+	for arch in $(arches "$version" "$base")
+	do
+		case $arch in
+		armhf)
+			docker_arch="arm"
+			;;
+		*)
+			docker_arch="$arch"
+			;;
+		esac
+
+		cat >> $1 <<-EOI
+		  -
+		    image: $(docker_repo):$version-$arch-$base
+		    platform:
+		      architecture: $docker_arch
+		      os: linux
+EOI
+	done
 }
 
 # Remove previously generated container files

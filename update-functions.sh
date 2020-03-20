@@ -3,7 +3,15 @@ set -eo pipefail
 
 # Supported architectures
 arches() {
-	echo "amd64 arm64 armhf"
+	version="$1"
+	base="$2"
+
+	if [[ "$version" =~ ^3.*$ ]] && [ "$base" == "alpine" ]; then
+		# There is no armhf Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture
+		echo "amd64 arm64"
+	else
+		echo "amd64 armhf arm64"
+	fi
 }
 
 # Supported base images
