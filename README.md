@@ -71,11 +71,7 @@ Comments, suggestions and contributions are welcome!
 * `2.2.0` Stable openHAB 2.2.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.2.0/debian/Dockerfile-amd64))
 * `2.3.0` Stable openHAB 2.3.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.3.0/debian/Dockerfile-amd64))
 * `2.4.0` Stable openHAB 2.4.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.4.0/debian/Dockerfile-amd64))
-* `2.5.0` Stable openHAB 2.5.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.0/debian/Dockerfile-amd64))
-* `2.5.1` Stable openHAB 2.5.1 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.1/debian/Dockerfile-amd64))
-* `2.5.2` Stable openHAB 2.5.2 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.2/debian/Dockerfile-amd64))
-* `2.5.3` Stable openHAB 2.5.3 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.3/debian/Dockerfile-amd64))
-* `2.5.4` Stable openHAB 2.5.4 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.4/debian/Dockerfile-amd64))
+* `2.5.0` - `2.5.4` Stable openHAB 2.5.x version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.4/debian/Dockerfile-amd64))
 * `2.5.5-snapshot` Experimental openHAB 2.5.5 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.5-snapshot/debian/Dockerfile-amd64))
 * `3.0.0-snapshot` Experimental openHAB 3.0.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0-snapshot/debian/Dockerfile-amd64))
 

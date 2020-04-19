@@ -54,3 +54,11 @@ last_milestone_version() {
 build_versions() {
 	echo "$(stable_versions) $(milestone_versions) $(snapshot_versions)"
 }
+
+validate_readme_constraints() {
+	count=$(wc -m <README.md)
+	if [[ $count -ge 25000 ]]; then
+		echo "README.md contains $count characters which exceeds the 25000 character limit of Docker Hub"
+		exit 1;
+	fi
+}
