@@ -26,10 +26,11 @@ Table of Contents
          * [User and group identifiers](#user-and-group-identifiers)
          * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
       * [Parameters](#parameters)
-         * [Passing devices with symlinks](#Passing-devices-with-symlinks)
+         * [Passing devices with symlinks](#passing-devices-with-symlinks)
       * [Upgrading](#upgrading)
       * [Building the images](#building-the-images)
       * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
+      * [Common problems](#common-problems)
       * [Contributing](#contributing)
       * [License](#license)
 
@@ -413,7 +414,7 @@ The following addons are known to depend on the unlimited cryptographic strength
 * `-v /openhab/userdata` - openHAB userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
 
-#### Passing devices with symlinks
+### Passing devices with symlinks
 
 On Linux, if you pass a device with a symlink or any non standard name (e.g. /dev/ttyZWave), some addons require the device name to follow the Linux serial port naming rules (e.g. "ttyACM0", "ttyUSB0" or "ttyUSB-9999") or will otherwise fail to discover the device.
 
@@ -556,6 +557,42 @@ fi
 ```shell
 setcap 'cap_net_bind_service=+ep' "${JAVA_HOME}/bin/java"
 ```
+
+## Common problems
+
+### Error: KARAF_ETC is not valid
+
+This error message indicates that the data in the volumes is not properly initialized.
+The error is usually the result of a permissions issue or already putting files into volumes without the volumes having been initialized by the container first.
+When mounting directories into the container, check that these directories exist, are completely empty and are owned by the same `USER_ID` and `GROUP_ID` as configured in the container ENV variables.
+
+### Missing some preinstalled package
+
+Docker containers are kept as small as possible intentionally to decrease download times and the number of potential vulnerabilities for everyone.
+If you want additional packages installed, create your own container based on this container.
+Another option is to install the package by [executing a shell script before openHAB is started](#executing-shell-scripts-before-openhab-is-started).
+
+### No logging after "Launching the openHAB runtime..."
+
+By default this will always be the last logged message.
+A console logger can be [configured](#server-mode) for more detailed logging.
+
+### OpenMediaVault
+
+The default filesystem mount flags of OpenMediaVault contain the `noexec` flag which interferes with the serial library used by openHAB.
+To be able to use serial devices with openHAB, make sure the `userdata` volume mounted by the container is not backed by a filesystem having the `noexec` flag.
+See the [OMV documentation](https://openmediavault.readthedocs.io/en/5.x/various/fs_env_vars.html) on how to remove the `noexec` flag from an existing filesystem.
+
+### Portainer
+
+The default values of ENV variables are always stored by Portainer (see [portainer/portainer#2952](https://github.com/portainer/portainer/issues/2952)).
+This causes issues such as endless restart loops when upgrading the container with Portainer.
+To resolve this issue when upgrading openHAB, first remove all default (non-overriden) ENV variables before starting the new container.
+
+### SELinux
+
+When using the container on a Linux distribution with SELinux enabled (CentOS/Fedora/RHEL), add the `:z` or `:Z` option to volumes to give the container write permissions.
+For more information on this see the [Docker documentation](https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label).
 
 ## Contributing
 
