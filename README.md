@@ -588,7 +588,7 @@ See the [OMV documentation](https://openmediavault.readthedocs.io/en/5.x/various
 
 The default values of ENV variables are always stored by Portainer (see [portainer/portainer#2952](https://github.com/portainer/portainer/issues/2952)).
 This causes issues such as endless restart loops when upgrading the container with Portainer.
-To resolve this issue when upgrading openHAB, first remove all default (non-overriden) ENV variables before starting the new container.
+To resolve this issue when upgrading openHAB, first remove all default (non-overridden) ENV variables before starting the new container.
 
 ### SELinux
 
