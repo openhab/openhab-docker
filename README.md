@@ -26,6 +26,7 @@ Table of Contents
          * [User and group identifiers](#user-and-group-identifiers)
          * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
       * [Parameters](#parameters)
+         * [Passing devices with symlinks](#Passing-devices-with-symlinks)
       * [Upgrading](#upgrading)
       * [Building the images](#building-the-images)
       * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
@@ -411,6 +412,22 @@ The following addons are known to depend on the unlimited cryptographic strength
 * `-v /openhab/conf` - openHAB configs
 * `-v /openhab/userdata` - openHAB userdata directory
 * `--device=/dev/ttyUSB0` - attach your devices like RFXCOM or Z-Wave Sticks to the container
+
+#### Passing devices with symlinks
+
+On Linux, if you pass a device with a symlink or any non standard name (e.g. /dev/ttyZWave), some addons require the device name to follow the Linux serial port naming rules (e.g. "ttyACM0", "ttyUSB0" or "ttyUSB-9999") or will otherwise fail to discover the device.
+
+This can be achieved by mapping the devices to a compliant name like this:
+
+```shell
+docker run \
+(...)
+--device=/dev/ttyZWave:/dev/ttyACM0
+--device=/dev/ttyZigbee:/dev/ttyACM1
+(...)
+```
+
+More information about serial ports and symlinks can be found [here](https://www.openhab.org/docs/administration/serial.html).
 
 ## Upgrading
 
