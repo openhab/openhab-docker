@@ -30,6 +30,7 @@ print_static_configuration() {
 	  - docker info
 	  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 	  - source ./update-functions.sh
+	  - validate_readme_constraints
 	  - ARCHES="$(arches $VERSION $DIST)"
 	install:
 	  - for ARCH in $ARCHES; do
