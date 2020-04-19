@@ -2,7 +2,7 @@
 
 ![openHAB logo](https://github.com/openhab/openhab-docker/raw/master/images/openhab.png)
 
-[![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.5.3.svg)](https://microbadger.com/images/openhab/openhab:2.5.3 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.5.3.svg)](https://microbadger.com/#/images/openhab/openhab:2.5.3) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build state](https://travis-ci.org/openhab/openhab-docker.svg?branch=master)](https://travis-ci.org/openhab/openhab-docker) [![](https://images.microbadger.com/badges/image/openhab/openhab:2.5.4.svg)](https://microbadger.com/images/openhab/openhab:2.5.4 "Get your own image badge on microbadger.com") [![Docker Label](https://images.microbadger.com/badges/version/openhab/openhab:2.5.4.svg)](https://microbadger.com/#/images/openhab/openhab:2.5.4) [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/) [![Join the chat at https://gitter.im/openhab/openhab-docker](https://badges.gitter.im/openhab/openhab-docker.svg)](https://gitter.im/openhab/openhab-docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![GitHub issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues) [![GitHub forks](https://img.shields.io/github/forks/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/network) [![GitHub stars](https://img.shields.io/github/stars/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/stargazers) [![CodeFactor](https://www.codefactor.io/repository/github/openhab/openhab-docker/badge)](https://www.codefactor.io/repository/github/openhab/openhab-docker) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=31868624)](https://www.bountysource.com/teams/openhab/issues?tracker_ids=31868624)
 
@@ -75,7 +75,8 @@ Comments, suggestions and contributions are welcome!
 * `2.5.1` Stable openHAB 2.5.1 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.1/debian/Dockerfile-amd64))
 * `2.5.2` Stable openHAB 2.5.2 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.2/debian/Dockerfile-amd64))
 * `2.5.3` Stable openHAB 2.5.3 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.3/debian/Dockerfile-amd64))
-* `2.5.4-snapshot` Experimental openHAB 2.5.4 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.4-snapshot/debian/Dockerfile-amd64))
+* `2.5.4` Stable openHAB 2.5.4 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.4/debian/Dockerfile-amd64))
+* `2.5.5-snapshot` Experimental openHAB 2.5.5 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.5-snapshot/debian/Dockerfile-amd64))
 * `3.0.0-snapshot` Experimental openHAB 3.0.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0-snapshot/debian/Dockerfile-amd64))
 
 **Architectures:**
@@ -94,7 +95,7 @@ There is no armhf Alpine image for openHAB 3 because the openjdk11 package is un
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
-If you are unsure about what your needs are, you probably want to use `openhab/openhab:2.5.3`.
+If you are unsure about what your needs are, you probably want to use `openhab/openhab:2.5.4`.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
@@ -106,7 +107,7 @@ Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com
 
 The following will run openHAB in demo mode on the host machine:
 
-`docker run --name openhab --net=host openhab/openhab:2.5.3`
+`docker run --name openhab --net=host openhab/openhab:2.5.4`
 
 _**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method.
 To properly run the container, please specify a **host volume** for the directories._
@@ -133,7 +134,7 @@ docker run \
         -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
         -d \
         --restart=always \
-        openhab/openhab:2.5.3
+        openhab/openhab:2.5.4
 ```
 
 #### Running from compose-file.yml
@@ -145,7 +146,7 @@ version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:2.5.3"
+    image: "openhab/openhab:2.5.4"
     restart: always
     network_mode: host
     volumes:
@@ -167,7 +168,7 @@ version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:2.5.3"
+    image: "openhab/openhab:2.5.4"
     restart: always
     network_mode: host
     volumes:
@@ -203,7 +204,7 @@ version: '2.2'
 services:
   openhab:
     container_name: openhab
-    image: "openhab/openhab:2.5.3"
+    image: "openhab/openhab:2.5.4"
     restart: always
     network_mode: host
     cap_add:
@@ -232,7 +233,7 @@ version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:2.5.3"
+    image: "openhab/openhab:2.5.4"
     restart: always
     ports:
       - "8080:8080"
@@ -263,7 +264,7 @@ docker run \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
   -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
-  openhab/openhab:2.5.3
+  openhab/openhab:2.5.4
 ```
 
 ### Automating Docker setup using Ansible (for advanced user)
@@ -279,7 +280,7 @@ Here is an example playbook in case you control your environment with Ansible. Y
     tags: openhab
     docker_container:
       name: openhab
-      image: openhab/openhab:2.5.3
+      image: openhab/openhab:2.5.4
       state: started
       detach: yes
       interactive: yes
@@ -321,7 +322,7 @@ The default password for the login is `habopen`.
 
 The container starts openHAB in server mode when no TTY is provided, example:
 
-`docker run --detach --name openhab openhab/openhab:2.5.3`
+`docker run --detach --name openhab openhab/openhab:2.5.4`
 
 When the container runs in server mode you can also add a console logger so it prints logging to stdout so you can check the logging of a container named "openhab" with:
 
@@ -336,13 +337,13 @@ To add the console logger, edit `userdata/etc/org.ops4j.pax.logging.cfg` and the
 
 When a TTY is provided openHAB is started with an interactive console, e.g.: 
 
-`docker run -it openhab/openhab:2.5.3`
+`docker run -it openhab/openhab:2.5.4`
 
 #### Debug mode
 
 The debug mode is started with the command:
 
-`docker run -it openhab/openhab:2.5.3 ./start_debug.sh`
+`docker run -it openhab/openhab:2.5.4 ./start_debug.sh`
 
 ## Environment variables
 
