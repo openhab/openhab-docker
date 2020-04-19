@@ -1,5 +1,5 @@
 image: openhab/openhab:2.5.3-debian
-tags: ['2.5.3', '2.5.3-debian', 'latest', 'latest-debian', 'milestone', 'milestone-debian']
+tags: ['2.5.3', '2.5.3-debian']
 manifests:
   -
     image: openhab/openhab:2.5.3-amd64-debian
