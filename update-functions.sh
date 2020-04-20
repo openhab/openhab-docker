@@ -1,19 +1,6 @@
 #!/bin/bash
 set -eo pipefail
 
-# Supported architectures
-arches() {
-	version="$1"
-	base="$2"
-
-	if [[ "$version" =~ ^3.*$ ]] && [ "$base" == "alpine" ]; then
-		# There is no armhf Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture
-		echo "amd64 arm64"
-	else
-		echo "amd64 armhf arm64"
-	fi
-}
-
 # Supported base images
 bases() {
 	echo "alpine debian"
@@ -21,6 +8,60 @@ bases() {
 
 docker_repo() {
 	echo "${DOCKER_REPO:=openhab/openhab}"
+}
+
+# Supported Docker platforms
+platforms() {
+	version="$1"
+	base="$2"
+
+	if [[ "$version" =~ ^3.*$ ]] && [ "$base" == "alpine" ]; then
+		# There is no linux/arm/v7 Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture
+		echo "linux/amd64,linux/arm64"
+	else
+		echo "linux/amd64,linux/arm64,linux/arm/v7"
+	fi
+}
+
+tags() {
+	version="$1"
+	base="$2"
+
+	tags=()
+
+	if [ "$base" == "debian" ]; then
+		tags+=("$(docker_repo):$version")
+	fi
+
+	tags+=("$(docker_repo):$version-$base")
+
+	if [ "$version" == "$(last_stable_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("$(docker_repo):latest")
+		fi
+		tags+=("$(docker_repo):latest-$base")
+	fi
+
+	milestone_maturity_version="$(last_milestone_version)"
+	if [ "$milestone_maturity_version" == "" ]; then
+		milestone_maturity_version="$(last_stable_version)"
+	fi
+
+	if [ "$version" == "$milestone_maturity_version" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("$(docker_repo):milestone")
+		fi
+		tags+=("$(docker_repo):milestone-$base")
+	fi
+
+	if [ "$version" == "$(last_snapshot_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("$(docker_repo):snapshot")
+		fi
+		tags+=("$(docker_repo):snapshot-$base")
+	fi
+
+	echo $(IFS=' '; echo "${tags[*]}")
 }
 
 last_stable_version() {
@@ -57,8 +98,8 @@ build_versions() {
 
 validate_readme_constraints() {
 	count=$(wc -m <README.md)
-	if [[ $count -ge 25000 ]]; then
+	if [ $count -gt 25000 ]; then
 		echo "README.md contains $count characters which exceeds the 25000 character limit of Docker Hub"
-		exit 1;
+		exit 1
 	fi
 }

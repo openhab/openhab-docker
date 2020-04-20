@@ -10,6 +10,18 @@ openhab2_milestone_url='https://openhab.jfrog.io/openhab/libs-milestone-local/or
 openhab2_snapshot_url='https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 openhab3_snapshot_url='https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 
+# Zulu 8 download URLs
+zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz'
+zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz'
+zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz'
+
+# Zulu 11 download URLs
+zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.37.17-ca-jdk11.0.6-linux_x64.tar.gz'
+zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch32hf.tar.gz'
+zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz'
+
+zulu_url_vars=(zulu8_amd64_url zulu8_armhf_url zulu8_arm64_url zulu11_amd64_url zulu11_armhf_url zulu11_arm64_url)
+
 # Generate header
 print_header() {
 	cat > $1 <<-EOI
@@ -48,55 +60,26 @@ print_baseimage() {
 		;;
 	esac
 
-	# Set download URL for openHAB version
+	# Set Java version based on openHAB versions
 	case $version in
 	1.*|2.*)
 		java_version="8"
-		case $arch in
-		amd64)
-			java_url="https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz"
-			;;
-		armhf)
-			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz"
-			;;
-		arm64)
-			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz"
-			;;
-		*)
-			java_url="error"
-			;;
-		esac
 		;;
 	3.*)
 		java_version="11"
-		case $arch in
-		amd64)
-			java_url="https://cdn.azul.com/zulu/bin/zulu11.37.17-ca-jdk11.0.6-linux_x64.tar.gz"
-			;;
-		armhf)
-			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch32hf.tar.gz"
-			;;
-		arm64)
-			java_url="https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz"
-			;;
-		*)
-			java_url="error"
-			;;
-		esac
 		;;
 	*)
 		java_version="error"
-		java_url="error"
 		;;
 	esac
 
 	# Set Docker base image based on distributions
 	case $base in
 	alpine)
-		base_image="alpine:$arch-v3.10"
+		base_image="alpine:3.11.5"
 		;;
 	debian)
-		base_image="debian-debootstrap:$arch-buster"
+		base_image="debian:10.3-slim"
 		;;
 	*)
 		base_image="error"
@@ -104,11 +87,10 @@ print_baseimage() {
 	esac
 
 	cat >> $1 <<-EOI
-	FROM multiarch/$base_image
+	FROM $base_image
 
 	# Set download urls
 	ENV \\
-	    JAVA_URL="$java_url" \\
 	    JAVA_VERSION="$java_version" \\
 	    OPENHAB_URL="$openhab_url" \\
 	    OPENHAB_VERSION="$version"
@@ -163,7 +145,7 @@ EOI
 print_basepackages_alpine() {
 	cat >> $1 <<-'EOI'
 	# Install basepackages
-	RUN apk upgrade --no-cache && \
+	RUN apk update --no-cache && \
 	    apk add --no-cache \
 	        arping \
 	        bash \
@@ -233,8 +215,20 @@ print_java_debian() {
 	# Install java
 	ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
 	# Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-	RUN wget -nv -O /tmp/java.tar.gz "${JAVA_URL}" && \
-	    mkdir -p "${JAVA_HOME}" && \
+	RUN mkdir -p "${JAVA_HOME}" && \
+EOI
+
+	for zulu_url_var in ${zulu_url_vars[@]}
+	do
+		cat >> $1 <<-EOI
+		    $zulu_url_var='${!zulu_url_var}' && \\
+EOI
+	done
+
+	cat >> $1 <<-'EOI'
+	    url_var="zulu${JAVA_VERSION}_$(dpkg --print-architecture)_url" && \
+	    eval "java_url=\$$url_var" && \
+	    wget -nv -O /tmp/java.tar.gz "${java_url}" && \
 	    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
 	    if [ "${JAVA_VERSION}" = "8" ]; then \
 	        sed -i 's/^#crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
@@ -363,109 +357,41 @@ print_command() {
 }
 
 generate_docker_files() {
-	for arch in $(arches "$version" "$base")
-	do
-		# Generate Dockerfile
-		file="$version/$base/Dockerfile-$arch"
-		mkdir -p $(dirname $file) 2>/dev/null
-		echo -n "Writing $file... "
-		print_header $file;
-		print_baseimage $file;
-		print_basemetadata $file;
+	# Generate Dockerfile
+	file="$version/$base/Dockerfile"
+	mkdir -p $(dirname $file) 2>/dev/null
+	echo -n "Writing $file... "
+	print_header $file;
+	print_baseimage $file;
+	print_basemetadata $file;
 
-		case $base in
-		alpine)
-			print_basepackages_alpine $file;
-			print_java_alpine $file;
-			;;
-		debian)
-			print_basepackages_debian $file;
-			print_java_debian $file;
-			;;
-		esac
+	case $base in
+	alpine)
+		print_basepackages_alpine $file;
+		print_java_alpine $file;
+		;;
+	debian)
+		print_basepackages_debian $file;
+		print_java_debian $file;
+		;;
+	esac
 
-		case $version in
-		1.*)
-			print_openhab_install_oh1 $file;
-			print_volumes_oh1 $file
-			;;
-		2.*|3.*)
-			print_openhab_install_oh2 $file;
-			print_volumes_oh2 $file
-			;;
-		esac
+	case $version in
+	1.*)
+		print_openhab_install_oh1 $file;
+		print_volumes_oh1 $file
+		;;
+	2.*|3.*)
+		print_openhab_install_oh2 $file;
+		print_volumes_oh2 $file
+		;;
+	esac
 
-		print_expose_ports $file
-		print_entrypoint $file
-		print_command $file
+	print_expose_ports $file
+	print_entrypoint $file
+	print_command $file
 
-		echo "done"
-	done
-}
-
-generate_manifest() {
-	tags=()
-
-	if [ "$base" == "debian" ]; then
-		tags+=("'$version'")
-	fi
-
-	tags+=("'$version-$base'")
-
-	if [ "$version" == "$(last_stable_version)" ]; then
-		if [ "$base" == "debian" ]; then
-			tags+=("'latest'")
-		fi
-		tags+=("'latest-$base'")
-	fi
-
-	milestone_maturity_version="$(last_milestone_version)"
-	if [ "$milestone_maturity_version" == "" ]; then
-		milestone_maturity_version="$(last_stable_version)"
-	fi
-
-	if [ "$version" == "$milestone_maturity_version" ]; then
-		if [ "$base" == "debian" ]; then
-			tags+=("'milestone'")
-		fi
-		tags+=("'milestone-$base'")
-	fi
-
-	if [ "$version" == "$(last_snapshot_version)" ]; then
-		if [ "$base" == "debian" ]; then
-			tags+=("'snapshot'")
-		fi
-		tags+=("'snapshot-$base'")
-	fi
-
-	tags=$(IFS=,; echo "${tags[*]}")
-	tags="${tags//,/, }"
-
-	cat >> $1 <<-EOI
-	image: $(docker_repo):$version-$base
-	tags: [$tags]
-	manifests:
-EOI
-
-	for arch in $(arches "$version" "$base")
-	do
-		case $arch in
-		armhf)
-			docker_arch="arm"
-			;;
-		*)
-			docker_arch="$arch"
-			;;
-		esac
-
-		cat >> $1 <<-EOI
-		  -
-		    image: $(docker_repo):$version-$arch-$base
-		    platform:
-		      architecture: $docker_arch
-		      os: linux
-EOI
-	done
+	echo "done"
 }
 
 # Remove previously generated container files
@@ -478,9 +404,6 @@ do
 	do
 		# Generate Dockerfile per architecture
 		generate_docker_files
-
-		# Generate multi-architecture manifest
-		generate_manifest "$version/$base/manifest.yml"
 
 		# Copy base specific entrypoint.sh
 		case $base in
