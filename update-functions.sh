@@ -57,8 +57,8 @@ build_versions() {
 
 validate_readme_constraints() {
 	count=$(wc -m <README.md)
-	if [[ $count -ge 25000 ]]; then
+	if [ $count -gt 25000 ]; then
 		echo "README.md contains $count characters which exceeds the 25000 character limit of Docker Hub"
-		exit 1;
+		exit 1
 	fi
 }

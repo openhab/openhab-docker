@@ -44,6 +44,9 @@ print_static_configuration() {
 	            docker push $DOCKER_REPO:$VERSION-$ARCH-$DIST;
 	        done;
 	        manifest-tool push from-spec $VERSION/$DIST/manifest.yml;
+	        if [ "${SYNC_README:=false}" == "true" ] && [ "$VERSION" == "$(last_stable_version)" ] && [ "$DIST" == "debian" ]; then
+	            ./sync-docker-hub-readme.sh;
+	        fi
 	    fi
 	jobs:
 	  fast_finish: true
