@@ -4,7 +4,7 @@ set -eo pipefail
 . update-functions.sh
 
 file=README.md
-dockerfile_url='https://github.com/openhab/openhab-docker/blob/master/${version}/debian/Dockerfile-amd64'
+dockerfile_url='https://github.com/openhab/openhab-docker/blob/master/${version}/debian/Dockerfile'
 
 generate_version_list() {
 	for version in $(build_versions)
@@ -33,7 +33,7 @@ update_version_list() {
 	generate="false"
 	while IFS= read -r line
 	do
-		if [[ $line =~ ^.*\(\[Dockerfile\]\(https://github.com/openhab/openhab-docker/blob/master/.+/debian/Dockerfile-amd64\)\)$ ]]; then
+		if [[ $line =~ ^.*\(\[Dockerfile\]\(https://github.com/openhab/openhab-docker/blob/master/.+/debian/Dockerfile\)\)$ ]]; then
 			generate="true"
 		else
 			if [ "$generate" == "true" ]; then

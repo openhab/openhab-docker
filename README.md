@@ -6,33 +6,32 @@
 
 [![GitHub issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues) [![GitHub forks](https://img.shields.io/github/forks/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/network) [![GitHub stars](https://img.shields.io/github/stars/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/stargazers) [![CodeFactor](https://www.codefactor.io/repository/github/openhab/openhab-docker/badge)](https://www.codefactor.io/repository/github/openhab/openhab-docker) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=31868624)](https://www.bountysource.com/teams/openhab/issues?tracker_ids=31868624)
 
-Table of Contents
-=================
+# Table of Contents
 
-   * [openHAB Docker Containers](#openhab-docker-containers)
-      * [Introduction](#introduction)
-      * [Image variants](#image-variants)
-      * [Usage](#usage)
-         * [Starting with Docker named volumes (for beginners)](#starting-with-docker-named-volumes-for-beginners)
-            * [Running from command line](#running-from-command-line)
-            * [Running from compose-file.yml](#running-from-compose-fileyml)
-         * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
-         * [Running on Windows and macOS](#running-on-windows-and-macos)
-         * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
-         * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
-         * [Accessing the console](#accessing-the-console)
-         * [Startup modes](#startup-modes)
-      * [Environment variables](#environment-variables)
-         * [User and group identifiers](#user-and-group-identifiers)
-         * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
-      * [Parameters](#parameters)
-         * [Passing devices with symlinks](#passing-devices-with-symlinks)
-      * [Upgrading](#upgrading)
-      * [Building the images](#building-the-images)
-      * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
-      * [Common problems](#common-problems)
-      * [Contributing](#contributing)
-      * [License](#license)
+* [openHAB Docker Containers](#openhab-docker-containers)
+  * [Introduction](#introduction)
+  * [Image variants](#image-variants)
+  * [Usage](#usage)
+     * [Starting with Docker named volumes (for beginners)](#starting-with-docker-named-volumes-for-beginners)
+        * [Running from command line](#running-from-command-line)
+        * [Running from compose-file.yml](#running-from-compose-fileyml)
+     * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
+     * [Running on Windows and macOS](#running-on-windows-and-macos)
+     * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
+     * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
+     * [Accessing the console](#accessing-the-console)
+     * [Startup modes](#startup-modes)
+  * [Environment variables](#environment-variables)
+     * [User and group identifiers](#user-and-group-identifiers)
+     * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
+  * [Parameters](#parameters)
+     * [Passing devices with symlinks](#passing-devices-with-symlinks)
+  * [Upgrading](#upgrading)
+  * [Building the images](#building-the-images)
+  * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
+  * [Common problems](#common-problems)
+  * [Contributing](#contributing)
+  * [License](#license)
 
 ## Introduction
 
@@ -48,7 +47,6 @@ Comments, suggestions and contributions are welcome!
 * For specific versions use:
   - `openhab/openhab:<version>`
   - `openhab/openhab:<version>-<distribution>`
-  - `openhab/openhab:<version>-<architecture>-<distribution>`
 
 * For the latest stable release use:
   - `openhab/openhab`
@@ -65,35 +63,36 @@ Comments, suggestions and contributions are welcome!
 
 **Versions:**
 
-* `1.8.3` Stable openHAB 1.8.3 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/1.8.3/debian/Dockerfile-amd64))
-* `2.0.0` Stable openHAB 2.0.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.0.0/debian/Dockerfile-amd64))
-* `2.1.0` Stable openHAB 2.1.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.1.0/debian/Dockerfile-amd64))
-* `2.2.0` Stable openHAB 2.2.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.2.0/debian/Dockerfile-amd64))
-* `2.3.0` Stable openHAB 2.3.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.3.0/debian/Dockerfile-amd64))
-* `2.4.0` Stable openHAB 2.4.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.4.0/debian/Dockerfile-amd64))
-* `2.5.0` - `2.5.4` Stable openHAB 2.5.x version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.4/debian/Dockerfile-amd64))
-* `2.5.5-snapshot` Experimental openHAB 2.5.5 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.5-snapshot/debian/Dockerfile-amd64))
-* `3.0.0-snapshot` Experimental openHAB 3.0.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0-snapshot/debian/Dockerfile-amd64))
-
-**Architectures:**
-
-* `amd64` for most desktop computers (e.g. x64, x86-64, x86_64)
-* `armhf` for ARMv7 devices 32 Bit (e.g. most Raspberry Pi 1/2/3/4)
-* `arm64` for ARMv8 devices 64 Bit (not Raspberry Pi 3/4)
-
-Newer Docker versions (1.10.0+) have multi-architecture support which allows for omitting the architecture from the tag.
-There is no armhf Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture.
+* `1.8.3` Stable openHAB 1.8.3 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/1.8.3/debian/Dockerfile))
+* `2.0.0` Stable openHAB 2.0.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.0.0/debian/Dockerfile))
+* `2.1.0` Stable openHAB 2.1.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.1.0/debian/Dockerfile))
+* `2.2.0` Stable openHAB 2.2.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.2.0/debian/Dockerfile))
+* `2.3.0` Stable openHAB 2.3.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.3.0/debian/Dockerfile))
+* `2.4.0` Stable openHAB 2.4.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.4.0/debian/Dockerfile))
+* `2.5.0` - `2.5.4` Stable openHAB 2.5.x version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.4/debian/Dockerfile))
+* `2.5.5-snapshot` Experimental openHAB 2.5.5 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.5-snapshot/debian/Dockerfile))
+* `3.0.0-snapshot` Experimental openHAB 3.0.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0-snapshot/debian/Dockerfile))
 
 **Distributions:**
 
 * `debian` for Debian 10 "buster" (default when not specified in tag)
-* `alpine` for Alpine 3.10
+* `alpine` for Alpine 3.11
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
 If you are unsure about what your needs are, you probably want to use `openhab/openhab:2.5.4`.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
+
+**Architectures:**
+
+The following architectures are supported (automatically determined):
+
+* `amd64` for most desktop computers (e.g. x64, x86-64, x86_64)
+* `armhf` for ARMv7 devices 32 Bit (e.g. most Raspberry Pi 1/2/3/4)
+* `arm64` for ARMv8 devices 64 Bit (not Raspberry Pi 3/4)
+
+There is no armhf Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture.
 
 ## Usage
 
@@ -120,17 +119,17 @@ For more information visit [Manage data in containers](https://docs.docker.com/e
 
 ```shell
 docker run \
-        --name openhab \
-        --net=host \
-        -v /etc/localtime:/etc/localtime:ro \
-        -v /etc/timezone:/etc/timezone:ro \
-        -v openhab_addons:/openhab/addons \
-        -v openhab_conf:/openhab/conf \
-        -v openhab_userdata:/openhab/userdata \
-        -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
-        -d \
-        --restart=always \
-        openhab/openhab:2.5.4
+  --name openhab \
+  --net=host \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v openhab_addons:/openhab/addons \
+  -v openhab_conf:/openhab/conf \
+  -v openhab_userdata:/openhab/userdata \
+  -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
+  -d \
+  --restart=always \
+  openhab/openhab:2.5.4
 ```
 
 #### Running from compose-file.yml
@@ -446,17 +445,29 @@ All messages shown during the update are also logged to `userdata/logs/update.lo
 
 ## Building the images
 
-Checkout the GitHub repository, change to a directory containing Dockerfiles (e.g. `2.5.2/debian`) and then run these commands to build and run a amd64 image:
+Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `2.5.4/debian`) and then run these commands to build and run a Docker image for your current architecture:
 
 ```shell
-$ docker build -f Dockerfile-amd64 -t openhab/openhab .
+$ docker build --tag openhab/openhab .
 $ docker run openhab/openhab
 ```
 
-To be able to build images for other architectures (e.g. armhf/arm64 on amd64) QEMU User Emulation first needs to be registered with:
+To be able to build the same image for other architectures (e.g. armhf/arm64 on amd64) Docker CE 19.03 with BuildKit support can be used.
+
+First enable BuildKit support, configure QEMU binary formats and a builder using:
 
 ```shell
-$ docker run --rm --privileged multiarch/qemu-user-static:register --reset
+$ echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+$ export DOCKER_CLI_EXPERIMENTAL=enabled
+$ docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+$ sudo systemctl restart docker
+$ docker buildx create --name builder --use
+```
+
+Change to a directory containing a Dockerfile (e.g. `2.5.4/debian`) and then use the following command to build a armhf image:
+
+```
+$ docker buildx build --platform linux/arm/v7 --tag openhab/openhab --load .
 ```
 
 ## Executing shell scripts before openHAB is started
@@ -478,7 +489,6 @@ and add a volume mount to your startup:
   -v /etc/cont-init.d:/etc/cont-init.d \
   ...
 ```
-
 
 and put your scripts into that directory.
 This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the official ones.
