@@ -11,8 +11,8 @@ FROM alpine:3.11.5
 # Set download urls
 ENV \
     JAVA_VERSION="8" \
-    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.5.5-SNAPSHOT.zip" \
-    OPENHAB_VERSION="2.5.5-snapshot"
+    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.5.5%2Fopenhab-2.5.5.zip" \
+    OPENHAB_VERSION="2.5.5"
 
 # Set variables and locales
 ENV \
