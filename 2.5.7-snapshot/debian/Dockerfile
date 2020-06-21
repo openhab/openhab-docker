@@ -11,8 +11,8 @@ FROM debian:10.3-slim
 # Set download urls
 ENV \
     JAVA_VERSION="8" \
-    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.5.0%2Fopenhab-2.5.0.zip" \
-    OPENHAB_VERSION="2.5.0"
+    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.5.7-SNAPSHOT.zip" \
+    OPENHAB_VERSION="2.5.7-snapshot"
 
 # Set variables and locales
 ENV \

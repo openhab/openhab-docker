@@ -11,8 +11,8 @@ FROM alpine:3.11.5
 # Set download urls
 ENV \
     JAVA_VERSION="8" \
-    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.1.0%2Fopenhab-2.1.0.zip" \
-    OPENHAB_VERSION="2.1.0"
+    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.5.6%2Fopenhab-2.5.6.zip" \
+    OPENHAB_VERSION="2.5.6"
 
 # Set variables and locales
 ENV \
@@ -98,8 +98,8 @@ RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
 # Expose volume with configuration and userdata dir
 VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 
-# Expose HTTP, HTTPS and Console ports
-EXPOSE 8080 8443 8101
+# Expose HTTP, HTTPS, Console and LSP ports
+EXPOSE 8080 8443 8101 5007
 
 # Set working directory and entrypoint
 WORKDIR ${OPENHAB_HOME}
