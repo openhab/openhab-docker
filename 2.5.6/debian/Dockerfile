@@ -6,13 +6,13 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM alpine:3.11.5
+FROM debian:10.3-slim
 
 # Set download urls
 ENV \
     JAVA_VERSION="8" \
-    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.0.0%2Fopenhab-2.0.0.zip" \
-    OPENHAB_VERSION="2.0.0"
+    OPENHAB_URL="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F2.5.6%2Fopenhab-2.5.6.zip" \
+    OPENHAB_VERSION="2.5.6"
 
 # Set variables and locales
 ENV \
@@ -52,33 +52,49 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     maintainer="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
-RUN apk update --no-cache && \
-    apk add --no-cache \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
         arping \
-        bash \
         ca-certificates \
         curl \
         fontconfig \
-        libcap \
-        nss \
-        shadow \
-        su-exec \
+        gosu \
+        libcap2-bin \
+        locales \
+        locales-all \
+        netbase \
+        procps \
         tini \
-        ttf-dejavu \
-        openjdk${JAVA_VERSION} \
         unzip \
         wget \
         zip && \
     chmod u+s /usr/sbin/arping && \
-    rm -rf /var/cache/apk/*
+    ln -s -f /bin/true /usr/bin/chfn && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+# Install java
 ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
-RUN if [ "${JAVA_VERSION}" = "8" ]; then \
-        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
+# Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
+RUN mkdir -p "${JAVA_HOME}" && \
+    zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz' && \
+    zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz' && \
+    zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz' && \
+    zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.37.17-ca-jdk11.0.6-linux_x64.tar.gz' && \
+    zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch32hf.tar.gz' && \
+    zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz' && \
+    url_var="zulu${JAVA_VERSION}_$(dpkg --print-architecture)_url" && \
+    eval "java_url=\$$url_var" && \
+    wget -nv -O /tmp/java.tar.gz "${java_url}" && \
+    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
+    if [ "${JAVA_VERSION}" = "8" ]; then \
+        sed -i 's/^#crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
     elif [ "${JAVA_VERSION}" = "11" ]; then \
         sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"; \
-    fi
+    fi && \
+    rm /tmp/java.tar.gz && \
+    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
+    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
@@ -98,8 +114,8 @@ RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
 # Expose volume with configuration and userdata dir
 VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 
-# Expose HTTP, HTTPS and Console ports
-EXPOSE 8080 8443 8101
+# Expose HTTP, HTTPS, Console and LSP ports
+EXPOSE 8080 8443 8101 5007
 
 # Set working directory and entrypoint
 WORKDIR ${OPENHAB_HOME}
@@ -108,4 +124,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Execute command
-CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]
+CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]

@@ -72,6 +72,10 @@ stable_versions() {
 	grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sort --unique --version-sort
 }
 
+stable_minor_versions() {
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' versions | sed -E 's/^([0-9]+\.[0-9]+).+/\1/' | sort --unique --version-sort
+}
+
 snapshot_versions() {
 	grep -E '^[0-9]+\.[0-9]+\.[0-9]+-snapshot$' versions | sort --unique --version-sort || echo ""
 }
@@ -93,7 +97,13 @@ last_milestone_version() {
 }
 
 build_versions() {
-	echo "$(stable_versions) $(milestone_versions) $(snapshot_versions)"
+	stable_minor1="$(stable_minor_versions | tail -n 3 | head -n 1)"
+	stable_minor2="$(stable_minor_versions | tail -n 2 | head -n 1)"
+	stable_minor3="$(stable_minor_versions | tail -n 1)"
+	build_stable_minor1="$(stable_versions | grep -E "^$stable_minor1" | tail -n 1)"
+	build_stable_minor2="$(stable_versions | grep -E "^$stable_minor2" | tail -n 1)"
+	build_stable_minor3="$(stable_versions | grep -E "^$stable_minor3" | tail -n 3 | xargs)"
+	echo "$build_stable_minor1 $build_stable_minor2 $build_stable_minor3 $(milestone_versions) $(snapshot_versions)"
 }
 
 validate_readme_constraints() {
