@@ -76,7 +76,7 @@ Comments, suggestions and contributions are welcome!
 **Distributions:**
 
 * `debian` for Debian 10 "buster" (default when not specified in tag)
-* `alpine` for Alpine 3.11
+* `alpine` for Alpine 3.12
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
