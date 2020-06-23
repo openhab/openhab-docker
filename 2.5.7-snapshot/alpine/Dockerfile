@@ -6,15 +6,14 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM alpine:3.11.5
+FROM alpine:3.12.0
 
-# Set download urls
+# Set version variables
 ENV \
     JAVA_VERSION="8" \
-    OPENHAB_URL="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-2.5.7-SNAPSHOT.zip" \
     OPENHAB_VERSION="2.5.7-snapshot"
 
-# Set variables and locales
+# Set other variables
 ENV \
     CRYPTO_POLICY="limited" \
     EXTRA_JAVA_OPTS="" \
@@ -82,7 +81,8 @@ RUN if [ "${JAVA_VERSION}" = "8" ]; then \
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
+RUN timestamped_version=$(wget -qO- "https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/2.5.7-SNAPSHOT/maven-metadata.xml" | grep -m 1 '<value>' | sed -E 's/.*<value>(.+)<\/value>/\1/') && \
+    wget -nv -O /tmp/openhab.zip "https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/2.5.7-SNAPSHOT/openhab-${timestamped_version}.zip" && \
     unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
     rm /tmp/openhab.zip && \
     if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \

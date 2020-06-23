@@ -56,33 +56,23 @@ initialize_volume() {
 }
 
 # Initialize empty volumes and update userdata
-case ${OPENHAB_VERSION} in
-  1.*)
-      initialize_volume "${OPENHAB_HOME}/configurations" "${OPENHAB_HOME}/dist/configurations"
-    ;;
-  2.*|3.*)
-      initialize_volume "${OPENHAB_CONF}" "${OPENHAB_HOME}/dist/conf"
-      initialize_volume "${OPENHAB_USERDATA}" "${OPENHAB_HOME}/dist/userdata"
+initialize_volume "${OPENHAB_CONF}" "${OPENHAB_HOME}/dist/conf"
+initialize_volume "${OPENHAB_USERDATA}" "${OPENHAB_HOME}/dist/userdata"
 
-      # Update userdata if versions do not match
-      if [ ! -z $(cmp "${OPENHAB_USERDATA}/etc/version.properties" "${OPENHAB_HOME}/dist/userdata/etc/version.properties") ]; then
-        echo "Image and userdata versions differ! Starting an upgrade." | tee "${OPENHAB_LOGDIR}/update.log"
+# Update userdata if versions do not match
+if [ ! -z $(cmp "${OPENHAB_USERDATA}/etc/version.properties" "${OPENHAB_HOME}/dist/userdata/etc/version.properties") ]; then
+  echo "Image and userdata versions differ! Starting an upgrade." | tee "${OPENHAB_LOGDIR}/update.log"
 
-        # Make a backup of userdata
-        backup_file=userdata-$(date +"%FT%H-%M-%S").tar
-        if [ ! -d "${OPENHAB_BACKUPS}" ]; then
-          mkdir "${OPENHAB_BACKUPS}"
-        fi
-        tar -c -f "${OPENHAB_BACKUPS}/${backup_file}" --exclude "backup/*" "${OPENHAB_USERDATA}"
-        echo "You can find backup of userdata in ${OPENHAB_BACKUPS}/${backup_file}" | tee -a "${OPENHAB_LOGDIR}/update.log"
+  # Make a backup of userdata
+  backup_file=userdata-$(date +"%FT%H-%M-%S").tar
+  if [ ! -d "${OPENHAB_BACKUPS}" ]; then
+    mkdir "${OPENHAB_BACKUPS}"
+  fi
+  tar -c -f "${OPENHAB_BACKUPS}/${backup_file}" --exclude "backup/*" "${OPENHAB_USERDATA}"
+  echo "You can find backup of userdata in ${OPENHAB_BACKUPS}/${backup_file}" | tee -a "${OPENHAB_LOGDIR}/update.log"
 
-        exec "${OPENHAB_HOME}/runtime/bin/update" 2>&1 | tee -a "${OPENHAB_LOGDIR}/update.log"
-      fi
-    ;;
-  *)
-      echo "openHAB version ${OPENHAB_VERSION} not supported!"
-    ;;
-esac
+  exec "${OPENHAB_HOME}/runtime/bin/update" 2>&1 | tee -a "${OPENHAB_LOGDIR}/update.log"
+fi
 
 # Set openhab folder permission
 chown -R openhab:openhab "${OPENHAB_HOME}"

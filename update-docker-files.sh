@@ -4,21 +4,24 @@ set -eo pipefail
 . update-functions.sh
 
 # Distribution download URLs
-openhab1_release_url='https://bintray.com/artifact/download/openhab/bin/distribution-${version}-runtime.zip'
-openhab2_release_url='https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F${version}%2Fopenhab-${version}.zip'
-openhab2_milestone_url='https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/${version}/openhab-${version}.zip'
+openhab_release_url='https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F${version}%2Fopenhab-${version}.zip'
+openhab_milestone_url='https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/${version}/openhab-${version}.zip'
 openhab2_snapshot_url='https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 openhab3_snapshot_url='https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 
+# Maven download URLs
+openhab_mvn_metadata_url='https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/${version}/maven-metadata.xml'
+openhab_mvn_snapshot_url='https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/${version}/openhab-${timestamped_version}.zip'
+
 # Zulu 8 download URLs
-zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.42.0.23-ca-jdk8.0.232-linux_x64.tar.gz'
-zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch32hf.tar.gz'
-zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.42.0.195-ca-jdk1.8.0_232-linux_aarch64.tar.gz'
+zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.46.0.19-ca-jdk8.0.252-linux_x64.tar.gz'
+zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf.tar.gz'
+zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch64.tar.gz'
 
 # Zulu 11 download URLs
-zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.37.17-ca-jdk11.0.6-linux_x64.tar.gz'
-zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch32hf.tar.gz'
-zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz'
+zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.39.15-ca-jdk11.0.7-linux_x64.tar.gz'
+zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.39.61-ca-jdk11.0.7-linux_aarch32hf.tar.gz'
+zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.39.61-ca-jdk11.0.7-linux_aarch64.tar.gz'
 
 zulu_url_vars=(zulu8_amd64_url zulu8_armhf_url zulu8_arm64_url zulu11_amd64_url zulu11_armhf_url zulu11_arm64_url)
 
@@ -38,61 +41,26 @@ EOI
 
 # Print selected image
 print_baseimage() {
-	# Set download URL for openHAB version
-	case $version in
-	1.*)
-		openhab_url=$(eval "echo $openhab1_release_url")
-		;;
-	2.*.M*|2.*.RC*|3.*.M*|3.*.RC*)
-		openhab_url=$(eval "echo $openhab2_milestone_url")
-		;;
-	2.*-snapshot)
-		openhab_url=$(eval "echo $openhab2_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
-		;;
-	3.*-snapshot)
-		openhab_url=$(eval "echo $openhab3_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
-		;;
-	2.*|3.*)
-		openhab_url=$(eval "echo $openhab2_release_url")
-		;;
-	*)
-		openhab_url="error"
-		;;
-	esac
-
 	# Set Java version based on openHAB versions
 	case $version in
-	1.*|2.*)
-		java_version="8"
-		;;
-	3.*)
-		java_version="11"
-		;;
-	*)
-		java_version="error"
-		;;
+	2.*) java_version="8";;
+	3.*) java_version="11";;
+	*)   java_version="error";;
 	esac
 
 	# Set Docker base image based on distributions
 	case $base in
-	alpine)
-		base_image="alpine:3.11.5"
-		;;
-	debian)
-		base_image="debian:10.3-slim"
-		;;
-	*)
-		base_image="error"
-		;;
+	alpine) base_image="alpine:3.12.0";;
+	debian) base_image="debian:10.4-slim";;
+	*)      base_image="error";;
 	esac
 
 	cat >> $1 <<-EOI
 	FROM $base_image
 
-	# Set download urls
+	# Set version variables
 	ENV \\
 	    JAVA_VERSION="$java_version" \\
-	    OPENHAB_URL="$openhab_url" \\
 	    OPENHAB_VERSION="$version"
 
 EOI
@@ -101,7 +69,7 @@ EOI
 # Print metadata
 print_basemetadata() {
 	cat >> $1 <<-'EOI'
-	# Set variables and locales
+	# Set other variables
 	ENV \
 	    CRYPTO_POLICY="limited" \
 	    EXTRA_JAVA_OPTS="" \
@@ -209,6 +177,7 @@ print_java_alpine() {
 
 EOI
 }
+
 # Install Java for Debian
 print_java_debian() {
 	cat >> $1 <<-'EOI'
@@ -242,26 +211,51 @@ EOI
 EOI
 }
 
-# Install openHAB 1.x
-print_openhab_install_oh1() {
-	cat >> $1 <<-'EOI'
-	# Install openHAB
-	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
-	    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" && \
-	    rm /tmp/openhab.zip && \
-	    mkdir -p "${OPENHAB_HOME}/dist" && \
-	    cp -a "${OPENHAB_HOME}/configurations" "${OPENHAB_HOME}/dist" && \
-	    echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
+print_openhab_install() {
+	case $version in
+	*.M*|*.RC*)
+		openhab_url=$(eval "echo $openhab_milestone_url")
+		;;
+	2.*-snapshot)
+		openhab_url=$(eval "echo $openhab2_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
+		;;
+	3.*-snapshot)
+		openhab_url=$(eval "echo $openhab3_snapshot_url" | sed 's/snapshot/SNAPSHOT/g')
+		;;
+	*)
+		openhab_url=$(eval "echo $openhab_release_url")
+		;;
+	esac
 
-EOI
-}
-
-# Install openHAB 2.x
-print_openhab_install_oh2() {
 	cat >> $1 <<-'EOI'
 	# Install openHAB
 	# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
-	RUN wget -nv -O /tmp/openhab.zip "${OPENHAB_URL}" && \
+EOI
+
+	# Travis CI fails to download from ci.openhab.org so download Maven snapshots as workaround
+	case $version in
+	*-snapshot)
+		original_version=$version
+		version=${version/snapshot/SNAPSHOT}
+		timestamped_version='${timestamped_version}'
+		metadata_url="$(eval "echo $openhab_mvn_metadata_url")"
+		openhab_url="$(eval "echo $openhab_mvn_snapshot_url")"
+
+		cat >> $1 <<-EOI
+		RUN timestamped_version=\$(wget -qO- "${metadata_url}" | grep -m 1 '<value>' | sed -E 's/.*<value>(.+)<\/value>/\1/') && \\
+		    wget -nv -O /tmp/openhab.zip "${openhab_url}" && \\
+EOI
+
+		version=$original_version
+		;;
+	*)
+		cat >> $1 <<-EOI
+		RUN wget -nv -O /tmp/openhab.zip "${openhab_url}" && \\
+EOI
+		;;
+	esac
+
+	cat >> $1 <<-'EOI'
 	    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
 	    rm /tmp/openhab.zip && \
 	    if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \
@@ -277,17 +271,8 @@ print_openhab_install_oh2() {
 EOI
 }
 
-# Add volumes for openHAB 1.x
-print_volumes_oh1() {
-	cat >> $1 <<-'EOI'
-	# Expose volume with configuration and userdata dir
-	VOLUME ${OPENHAB_HOME}/configurations ${OPENHAB_HOME}/addons
-
-EOI
-}
-
-# Add volumes for openHAB 2.x
-print_volumes_oh2() {
+# Add volumes for openHAB
+print_volumes() {
 	cat >> $1 <<-'EOI'
 	# Expose volume with configuration and userdata dir
 	VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
@@ -296,28 +281,9 @@ EOI
 }
 
 print_expose_ports() {
-	case $version in
-	1.*)
-		expose_comment="Expose HTTP and HTTPS ports"
-		expose_ports="8080 8443"
-		;;
-	2.0.0|2.1.0)
-		expose_comment="Expose HTTP, HTTPS and Console ports"
-		expose_ports="8080 8443 8101"
-		;;
-	2.*|3.*)
-		expose_comment="Expose HTTP, HTTPS, Console and LSP ports"
-		expose_ports="8080 8443 8101 5007"
-		;;
-	*)
-		expose_comment="Error"
-		expose_ports="error"
-		;;
-	esac
-
-	cat >> $1 <<-EOI
-	# $expose_comment
-	EXPOSE $expose_ports
+	cat >> $1 <<-'EOI'
+	# Expose HTTP, HTTPS, Console and LSP ports
+	EXPOSE 8080 8443 8101 5007
 
 EOI
 }
@@ -356,8 +322,8 @@ print_command() {
 	esac
 }
 
-generate_docker_files() {
-	# Generate Dockerfile
+# Generate Dockerfile
+generate_docker_file() {
 	file="$version/$base/Dockerfile"
 	mkdir -p $(dirname $file) 2>/dev/null
 	echo -n "Writing $file... "
@@ -376,17 +342,8 @@ generate_docker_files() {
 		;;
 	esac
 
-	case $version in
-	1.*)
-		print_openhab_install_oh1 $file;
-		print_volumes_oh1 $file
-		;;
-	2.*|3.*)
-		print_openhab_install_oh2 $file;
-		print_volumes_oh2 $file
-		;;
-	esac
-
+	print_openhab_install $file;
+	print_volumes $file
 	print_expose_ports $file
 	print_entrypoint $file
 	print_command $file
@@ -395,15 +352,15 @@ generate_docker_files() {
 }
 
 # Remove previously generated container files
-rm -rf ./1.* ./2.* ./3.*
+rm -rf ./2.* ./3.*
 
 # Generate new container files
 for version in $(build_versions)
 do
 	for base in $(bases)
 	do
-		# Generate Dockerfile per architecture
-		generate_docker_files
+		# Generate Dockerfile
+		generate_docker_file
 
 		# Copy base specific entrypoint.sh
 		case $base in
@@ -411,9 +368,7 @@ do
 			debian) cp "entrypoint-debian.sh" "$version/$base/entrypoint.sh";;
 		esac
 
-		# Copy version specific update script
-		case $version in
-			2.*|3.*) cp "openhab2-update.sh" "$version/$base/update.sh";;
-		esac
+		# Copy update script
+		cp "openhab-update.sh" "$version/$base/update.sh"
 	done
 done
