@@ -9,10 +9,6 @@ openhab_milestone_url='https://openhab.jfrog.io/openhab/libs-milestone-local/org
 openhab2_snapshot_url='https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 openhab3_snapshot_url='https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 
-# Maven download URLs
-openhab_mvn_metadata_url='https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/${version}/maven-metadata.xml'
-openhab_mvn_snapshot_url='https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/${version}/openhab-${timestamped_version}.zip'
-
 # Zulu 8 download URLs
 zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.46.0.19-ca-jdk8.0.252-linux_x64.tar.gz'
 zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf.tar.gz'
@@ -232,28 +228,9 @@ print_openhab_install() {
 	# Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 EOI
 
-	# Travis CI fails to download from ci.openhab.org so download Maven snapshots as workaround
-	case $version in
-	*-snapshot)
-		original_version=$version
-		version=${version/snapshot/SNAPSHOT}
-		timestamped_version='${timestamped_version}'
-		metadata_url="$(eval "echo $openhab_mvn_metadata_url")"
-		openhab_url="$(eval "echo $openhab_mvn_snapshot_url")"
-
-		cat >> $1 <<-EOI
-		RUN timestamped_version=\$(wget -qO- "${metadata_url}" | grep -m 1 '<value>' | sed -E 's/.*<value>(.+)<\/value>/\1/') && \\
-		    wget -nv -O /tmp/openhab.zip "${openhab_url}" && \\
+	cat >> $1 <<-EOI
+	RUN wget -nv -O /tmp/openhab.zip "${openhab_url}" && \\
 EOI
-
-		version=$original_version
-		;;
-	*)
-		cat >> $1 <<-EOI
-		RUN wget -nv -O /tmp/openhab.zip "${openhab_url}" && \\
-EOI
-		;;
-	esac
 
 	cat >> $1 <<-'EOI'
 	    unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
