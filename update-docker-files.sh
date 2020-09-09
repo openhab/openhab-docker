@@ -10,14 +10,14 @@ openhab2_snapshot_url='https://ci.openhab.org/job/openHAB-Distribution/lastSucce
 openhab3_snapshot_url='https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip'
 
 # Zulu 8 download URLs
-zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.46.0.19-ca-jdk8.0.252-linux_x64.tar.gz'
-zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf.tar.gz'
-zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch64.tar.gz'
+zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.48.0.53-ca-jdk8.0.265-linux_x64.tar.gz'
+zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.48.3.246-ca-jdk8.0.265-linux_aarch32hf.tar.gz'
+zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.48.3.246-ca-jdk8.0.265-linux_aarch64.tar.gz'
 
 # Zulu 11 download URLs
-zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.39.15-ca-jdk11.0.7-linux_x64.tar.gz'
-zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.39.61-ca-jdk11.0.7-linux_aarch32hf.tar.gz'
-zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.39.61-ca-jdk11.0.7-linux_aarch64.tar.gz'
+zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.41.23-ca-jdk11.0.8-linux_x64.tar.gz'
+zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch32hf.tar.gz'
+zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch64.tar.gz'
 
 zulu_url_vars=(zulu8_amd64_url zulu8_armhf_url zulu8_arm64_url zulu11_amd64_url zulu11_armhf_url zulu11_arm64_url)
 
@@ -47,7 +47,7 @@ print_baseimage() {
 	# Set Docker base image based on distributions
 	case $base in
 	alpine) base_image="alpine:3.12.0";;
-	debian) base_image="debian:10.4-slim";;
+	debian) base_image="debian:10.5-slim";;
 	*)      base_image="error";;
 	esac
 

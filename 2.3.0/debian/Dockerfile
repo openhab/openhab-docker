@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM debian:10.4-slim
+FROM debian:10.5-slim
 
 # Set version variables
 ENV \
@@ -76,12 +76,12 @@ RUN apt-get update && \
 ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 RUN mkdir -p "${JAVA_HOME}" && \
-    zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.46.0.19-ca-jdk8.0.252-linux_x64.tar.gz' && \
-    zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch32hf.tar.gz' && \
-    zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.46.0.225-ca-jdk8.0.252-linux_aarch64.tar.gz' && \
-    zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.39.15-ca-jdk11.0.7-linux_x64.tar.gz' && \
-    zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.39.61-ca-jdk11.0.7-linux_aarch32hf.tar.gz' && \
-    zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.39.61-ca-jdk11.0.7-linux_aarch64.tar.gz' && \
+    zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.48.0.53-ca-jdk8.0.265-linux_x64.tar.gz' && \
+    zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.48.3.246-ca-jdk8.0.265-linux_aarch32hf.tar.gz' && \
+    zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.48.3.246-ca-jdk8.0.265-linux_aarch64.tar.gz' && \
+    zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.41.23-ca-jdk11.0.8-linux_x64.tar.gz' && \
+    zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch32hf.tar.gz' && \
+    zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch64.tar.gz' && \
     url_var="zulu${JAVA_VERSION}_$(dpkg --print-architecture)_url" && \
     eval "java_url=\$$url_var" && \
     wget -nv -O /tmp/java.tar.gz "${java_url}" && \
