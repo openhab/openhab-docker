@@ -85,7 +85,7 @@ last_snapshot_version() {
 }
 
 next_stable_version() {
-	sed 's/-snapshot//' <<< last_snapshot_version
+	sed 's/-snapshot//' <<< $(last_snapshot_version)
 }
 
 milestone_versions() {
