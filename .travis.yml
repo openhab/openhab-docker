@@ -53,15 +53,15 @@ env:
     - VERSION=2.3.0 DIST=debian
     - VERSION=2.4.0 DIST=alpine
     - VERSION=2.4.0 DIST=debian
-    - VERSION=2.5.7 DIST=alpine
-    - VERSION=2.5.7 DIST=debian
     - VERSION=2.5.8 DIST=alpine
     - VERSION=2.5.8 DIST=debian
     - VERSION=2.5.9 DIST=alpine
     - VERSION=2.5.9 DIST=debian
+    - VERSION=2.5.10 DIST=alpine
+    - VERSION=2.5.10 DIST=debian
     - VERSION=3.0.0.M1 DIST=alpine
     - VERSION=3.0.0.M1 DIST=debian
-    - VERSION=2.5.10-snapshot DIST=alpine
-    - VERSION=2.5.10-snapshot DIST=debian
+    - VERSION=2.5.11-snapshot DIST=alpine
+    - VERSION=2.5.11-snapshot DIST=debian
     - VERSION=3.0.0-snapshot DIST=alpine
     - VERSION=3.0.0-snapshot DIST=debian
