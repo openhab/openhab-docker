@@ -71,6 +71,7 @@ Comments, suggestions and contributions are welcome!
 * `2.4.0` Stable openHAB 2.4.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.4.0/debian/Dockerfile))
 * `2.5.0` - `2.5.10` Stable openHAB 2.5.x version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.10/debian/Dockerfile))
 * `3.0.0.M1` Experimental openHAB 3.0.0.M1 Milestone version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0.M1/debian/Dockerfile))
+* `3.0.0.M2` Experimental openHAB 3.0.0.M2 Milestone version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0.M2/debian/Dockerfile))
 * `2.5.11-snapshot` Experimental openHAB 2.5.11 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.11-snapshot/debian/Dockerfile))
 * `3.0.0-snapshot` Experimental openHAB 3.0.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0-snapshot/debian/Dockerfile))
 
