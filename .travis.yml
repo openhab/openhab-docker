@@ -63,6 +63,8 @@ env:
     - VERSION=3.0.0.M1 DIST=debian
     - VERSION=3.0.0.M2 DIST=alpine
     - VERSION=3.0.0.M2 DIST=debian
+    - VERSION=3.0.0.M3 DIST=alpine
+    - VERSION=3.0.0.M3 DIST=debian
     - VERSION=2.5.11-snapshot DIST=alpine
     - VERSION=2.5.11-snapshot DIST=debian
     - VERSION=3.0.0-snapshot DIST=alpine
