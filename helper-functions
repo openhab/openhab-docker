@@ -1,0 +1,241 @@
+#!/bin/bash
+set -eo pipefail
+
+BUILDER=""
+DISTRO_REPO="${DISTRO_REPO:=openhab/openhab-distro}"
+VERSIONS=""
+
+get_released_versions_from_tags() {
+	git ls-remote --refs --tags "git://github.com/${DISTRO_REPO}.git" | grep -E '.+/tags/[0-9]+\.[0-9]+\.[0-9]+(\.(M|RC)[0-9]+)?$' | sed -E 's#.+/tags/(.+)#\1#g' || echo ""
+}
+
+get_snapshot_version_from_pom() {
+	local branch_name="$1"
+	curl -sS "https://raw.githubusercontent.com/${DISTRO_REPO}/${branch_name}/pom.xml" | grep -E '^    <version>' | grep 'SNAPSHOT' | sed -E 's#.+<version>(.+)-SNAPSHOT</version>#\1-snapshot#g' || echo ""
+}
+
+get_snapshot_versions_from_poms() {
+	get_snapshot_version_from_pom '2.5.x'
+	get_snapshot_version_from_pom 'master'
+}
+
+get_versions() {
+	(get_released_versions_from_tags && get_snapshot_versions_from_poms) | sort --unique --version-sort
+}
+
+VERSIONS=$(get_versions)
+
+# Supported base images
+bases() {
+	echo "debian alpine"
+}
+
+docker_repo() {
+	echo "${DOCKER_REPO:=openhab/openhab}"
+}
+
+# Supported Docker platforms
+platforms() {
+	local version="$1"
+	local base="$2"
+
+	if [[ "$version" =~ ^3.*$ ]] && [ "$base" == "alpine" ]; then
+		# There is no linux/arm/v7 Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture
+		echo "linux/amd64,linux/arm64"
+	else
+		echo "linux/amd64,linux/arm64,linux/arm/v7"
+	fi
+}
+
+tags() {
+	local version="$1"
+	local base="$2"
+
+	local tags=()
+
+	if [ "$base" == "debian" ]; then
+		tags+=("$(docker_repo):$version")
+	fi
+
+	tags+=("$(docker_repo):$version-$base")
+
+	if [ "$version" == "$(last_stable_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("$(docker_repo):latest")
+		fi
+		tags+=("$(docker_repo):latest-$base")
+	fi
+
+	milestone_maturity_version="$(last_milestone_version)"
+	if [ "$milestone_maturity_version" == "" ]; then
+		milestone_maturity_version="$(last_stable_version)"
+	fi
+
+	if [ "$version" == "$milestone_maturity_version" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("$(docker_repo):milestone")
+		fi
+		tags+=("$(docker_repo):milestone-$base")
+	fi
+
+	if [ "$version" == "$(last_snapshot_version)" ]; then
+		if [ "$base" == "debian" ]; then
+			tags+=("$(docker_repo):snapshot")
+		fi
+		tags+=("$(docker_repo):snapshot-$base")
+	fi
+
+	echo $(IFS=' '; echo "${tags[*]}")
+}
+
+last_stable_version() {
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' <<< $VERSIONS | tail -n 1
+}
+
+stable_versions() {
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' <<< $VERSIONS
+}
+
+last_stable_minor_versions() {
+	local minor_versions=$(grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' <<< $VERSIONS | sed -E 's/^([0-9]+\.[0-9]+).+/\1/' | sort --unique --version-sort)
+	for minor_version in $minor_versions; do
+		stable_versions | grep -E "^$minor_version" | tail -n 1
+	done
+}
+
+snapshot_versions() {
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS || echo ""
+}
+
+last_snapshot_version() {
+	grep -E '^[0-9]+\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1 || echo ""
+}
+
+next_stable_version() {
+	sed 's/-snapshot//' <<< $(last_snapshot_version)
+}
+
+milestone_versions() {
+	grep -E "$(next_stable_version)\.(M|RC)[0-9]+$" <<< $VERSIONS | tail -n 3 || echo ""
+}
+
+last_milestone_version() {
+	grep -E "$(next_stable_version)\.(M|RC)[0-9]+$" <<< $VERSIONS | tail -n 1 || echo ""
+}
+
+generate_readme_versions() {
+	local text="$1"
+	local versions="$(echo "$2" | sort --reverse --version-sort | head -n 2)"
+
+	if [ "$versions" != "" ]; then
+		echo "* $text"
+		for version in $versions; do
+			case $version in
+			*-snapshot)	echo "  * \`$version\`";;
+			*)			echo "  * \`$version\` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/$version))";;
+			esac
+		done
+	fi
+}
+
+update_readme() {
+	local file=README.md
+
+	local generate="false"
+	while IFS= read -r line
+	do
+		if [[ $line =~ ^\*\ \*\*Stable:\*\*.+$ ]]; then
+			generate="true"
+		else
+			if [ "$generate" == "true" ]; then
+				if [ "$line" == "" ]; then
+					generate="false"
+
+					generate_readme_versions \
+						'**Stable:** Thoroughly tested semi-annual official releases of openHAB. Use the stable version for your production environment if you do not need the latest enhancements and prefer a robust system.' \
+						"$(last_stable_minor_versions)"
+					generate_readme_versions \
+						'**Milestone:** Intermediary releases of the next openHAB version which are released about once a month. They include recently added features and bugfixes and are a good compromise between the current stable version and the bleeding-edge and potentially unstable snapshot version.' \
+						"$(milestone_versions)"
+					generate_readme_versions \
+						'**Snapshot:** Usually 1 or 2 days old and include the latest code. Use these for testing out very recent changes using the latest code. Be aware that some snapshots might be unstable so use these in production at your own risk!' \
+						"$(snapshot_versions)"
+					echo
+				fi
+			else
+				echo "$line"
+			fi
+		fi
+	done < $file > $file.new && mv $file.new $file
+
+	sed -i "s#openhab/openhab:[0-9]*\.[0-9]*\.[0-9]*#openhab/openhab:$(last_stable_version)#g" $file
+	sed -i "s#OPENHAB_VERSION=[0-9]*\.[0-9]*\.[0-9]*#OPENHAB_VERSION=$(last_stable_version)#g" $file
+}
+
+validate_readme_constraints() {
+	local count=$(wc -m <README.md)
+	if [ $count -gt 25000 ]; then
+		echo "README.md contains $count characters which exceeds the 25000 character limit of Docker Hub" >&2
+		exit 1
+	else
+		echo "README.md contains $count characters which is below the 25000 character limit of Docker Hub"
+	fi
+}
+
+update_dockerhub_readme() {
+	# Acquire token for Docker Hub API
+	local login_payload="{\"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}"
+	local token=$(curl -s -H "Content-Type: application/json" -X POST -d "${login_payload}" https://hub.docker.com/v2/users/login/ | sed -E 's#\{"token": "(.+)"\}#\1#g')
+
+	# Send a PATCH request to update the description of the repository
+	echo "Updating README for $(docker_repo) on Docker Hub"
+	local readme_filepath="./README.md"
+	local repo_url="https://hub.docker.com/v2/repositories/$(docker_repo)/"
+	local response_code=$(curl -s --write-out %{response_code} --output /dev/null -H "Authorization: JWT ${token}" -X PATCH --data-urlencode full_description@${readme_filepath} ${repo_url})
+
+	if [ $response_code -eq 200 ]; then
+		echo "Successfully updated README for $(docker_repo) on Docker Hub"
+	else
+		echo "Failed to update README for $(docker_repo) on Docker Hub (Response code: $response_code)" >&2
+		exit 1
+	fi
+}
+
+prepare_builder() {
+	if [ "$BUILDER" == "" ]; then
+		(docker buildx inspect builder &> /dev/null && echo -e "\nReusing existing builder") || \
+			(docker buildx create --name builder --use &> /dev/null && echo -e "\nCreated builder")
+		BUILDER="builder"
+	fi
+}
+
+build() {
+	prepare_builder
+
+	local openhab_version="${1/SNAPSHOT/snapshot}"
+	local dist="$2"
+	local push="$3"
+
+	local java_version=""
+	case $openhab_version in
+	2.*) java_version="8";;
+	*)   java_version="11";;
+	esac
+
+	local build_arg_options="--build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=$java_version --build-arg OPENHAB_VERSION=$openhab_version"
+	local tags=$(tags $openhab_version $dist)
+	local tag_options=${tags//$(docker_repo)/--tag $(docker_repo)}
+	local build_options="$build_arg_options --platform $(platforms $openhab_version $dist) $tag_options --progress plain $push"
+	local dockerfile_path="./$dist"
+	local build_command="docker buildx build $build_options $dockerfile_path"
+
+	echo
+	echo "Building openHAB $openhab_version $dist Docker image"
+	echo
+	set -x
+
+	$build_command
+
+	{ set +x; } 2> /dev/null
+	echo
+}

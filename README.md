@@ -1,6 +1,6 @@
 # openHAB Docker Containers
 
-![openHAB logo](https://github.com/openhab/openhab-docker/raw/master/images/openhab.png)
+![openHAB logo](https://github.com/openhab/openhab-docker/raw/master/openhab.png)
 
 [![Build Status](https://ci.openhab.org/job/openHAB-Docker/badge/icon)](https://ci.openhab.org/job/openHAB-Docker/)
 [![EPL-2.0](https://img.shields.io/badge/license-EPL%202-green.svg)](https://opensource.org/licenses/EPL-2.0)
@@ -35,12 +35,11 @@
      * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
   * [Parameters](#parameters)
      * [Passing devices with symlinks](#passing-devices-with-symlinks)
-  * [Upgrading](#upgrading)
-  * [Building the images](#building-the-images)
   * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
+  * [Upgrading](#upgrading)
   * [Common problems](#common-problems)
+  * [Building the images](#building-the-images)
   * [Contributing](#contributing)
-  * [License](#license)
 
 ## Introduction
 
@@ -72,16 +71,14 @@ Comments, suggestions and contributions are welcome!
 
 **Versions:**
 
-* `2.4.0` Stable openHAB 2.4.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.4.0/debian/Dockerfile))
-* `2.5.0` - `2.5.11` Stable openHAB 2.5.x version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.11/debian/Dockerfile))
-* `3.0.0` Stable openHAB 3.0.0 version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.0.0/debian/Dockerfile))
-* `2.5.12-snapshot` Experimental openHAB 2.5.12 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/2.5.12-snapshot/debian/Dockerfile))
-* `3.1.0-snapshot` Experimental openHAB 3.1.0 SNAPSHOT version ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/3.1.0-snapshot/debian/Dockerfile))
+* **Stable:** Thoroughly tested semi-annual official releases of openHAB. Use the stable version for your production environment if you do not need the latest enhancements and prefer a robust system.
+  * `3.0.0` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.0.0))
+  * `2.5.11` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/2.5.11))
 
 **Distributions:**
 
-* `debian` for Debian 10 "buster" (default when not specified in tag)
-* `alpine` for Alpine 3.12
+* `debian` for Debian 10 "buster" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/debian/Dockerfile))
+* `alpine` for Alpine 3.12 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/alpine/Dockerfile))
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
@@ -429,50 +426,6 @@ docker run \
 
 More information about serial ports and symlinks can be found [here](https://www.openhab.org/docs/administration/serial.html).
 
-## Upgrading
-
-Upgrading OH requires changes to the user mapped in userdata folder.
-The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `dist/userdata/etc/version.properties` in the Docker image.
-
-The steps performed are:
-* Create a `userdata/backup` folder if one does not exist.
-* Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
-* Show update notes and warnings.
-* Execute update pre/post commands.
-* Copy userdata system files from `dist/userdata/etc` to `userdata/etc`.
-* Update KAR files in `addons`.
-* Delete the contents of `userdata/cache` and `userdata/tmp`.
-
-The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
-All messages shown during the update are also logged to `userdata/logs/update.log`.
-
-## Building the images
-
-Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `3.0.0/debian`) and then run these commands to build and run a Docker image for your current platform:
-
-```shell
-$ docker build --tag openhab/openhab .
-$ docker run openhab/openhab
-```
-
-To be able to build the same image for other platforms (e.g. arm/v7, arm64 on amd64) Docker CE 19.03 with BuildKit support can be used.
-
-First enable BuildKit support, configure QEMU binary formats and a builder using:
-
-```shell
-$ echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
-$ export DOCKER_CLI_EXPERIMENTAL=enabled
-$ docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
-$ sudo systemctl restart docker
-$ docker buildx create --name builder --use
-```
-
-Change to a directory containing a Dockerfile (e.g. `3.0.0/debian`) and then use the following command to build a armhf image:
-
-```
-$ docker buildx build --platform linux/arm/v7 --tag openhab/openhab --load .
-```
-
 ## Executing shell scripts before openHAB is started
 
 It is sometimes useful to run shell scripts after the "userdata" directory is created, but before Karaf itself is launched.
@@ -495,6 +448,23 @@ and add a volume mount to your startup:
 
 and put your scripts into that directory.
 This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the official ones.
+
+## Upgrading
+
+Upgrading OH requires changes to the user mapped in userdata folder.
+The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `dist/userdata/etc/version.properties` in the Docker image.
+
+The steps performed are:
+* Create a `userdata/backup` folder if one does not exist.
+* Create a full backup of userdata as a dated tar file saved to `userdata/backup`. The `userdata/backup` folder is excluded from this backup.
+* Show update notes and warnings.
+* Execute update pre/post commands.
+* Copy userdata system files from `dist/userdata/etc` to `userdata/etc`.
+* Update KAR files in `addons`.
+* Delete the contents of `userdata/cache` and `userdata/tmp`.
+
+The steps performed are the same as those performed by running the upgrade script that comes with OH, except the backup is performed differently and the latest openHAB runtime is not downloaded.
+All messages shown during the update are also logged to `userdata/logs/update.log`.
 
 ## Common problems
 
@@ -531,6 +501,37 @@ To resolve this issue when upgrading openHAB, first remove all default (non-over
 
 When using the container on a Linux distribution with SELinux enabled (CentOS/Fedora/RHEL), add the `:z` or `:Z` option to volumes to give the container write permissions.
 For more information on this see the [Docker documentation](https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label).
+
+## Building the images
+
+Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `/debian`) and then run these commands to build and run a Docker image for your current platform:
+
+```shell
+$ docker build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=3.0.0 --tag openhab/openhab .
+$ docker run openhab/openhab
+```
+
+To be able to build the same image for other platforms (e.g. arm/v7, arm64 on amd64) Docker CE 19.03 with BuildKit support can be used.
+
+First enable BuildKit support, configure QEMU binary formats and a builder using:
+
+```shell
+$ echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
+$ export DOCKER_CLI_EXPERIMENTAL=enabled
+$ docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+$ sudo systemctl restart docker
+$ docker buildx create --name builder --use
+```
+
+Change to a directory containing a Dockerfile (e.g. `/debian`) and then use the following command to build an ARMv7 image:
+
+```
+$ docker buildx build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=3.0.0 --platform linux/arm/v7 --tag openhab/openhab --load .
+```
+
+The `build` script in the root of the repository helps to simplify building the openHAB images with BuildKit.
+It can be used to build the images of multiple openHAB versions and correctly tag and push them to a Docker registry.
+Execute `./build -h` for usage instructions and examples.
 
 ## Contributing
 

@@ -1,0 +1,105 @@
+#!/bin/bash
+set -eo pipefail
+
+source helper-functions
+
+filter_options() {
+	local options="$1"
+	local valid_options="$2"
+	local fallback="$3"
+
+	local filtered=()
+	for valid_option in $valid_options; do
+		for option in $options; do
+			if [ "$option" == "$valid_option" ]; then
+				filtered+=("$option")
+			fi
+		done
+	done
+
+	local result="$(IFS=' '; echo "${filtered[*]}")"
+	if [ "$result" == "" ]; then
+		echo "$fallback"
+	else
+		echo "$result"
+	fi
+}
+
+resolve_version_tags() {
+	local latest_version=$(last_stable_version)
+	local milestone_version="$(last_milestone_version)"
+	if [ "$milestone_version" == "" ]; then
+		milestone_version="$(last_stable_version)"
+	fi
+	local snapshot_version=$(last_snapshot_version)
+
+	local results=()
+	for s in $@; do
+		local result="$s"
+		if [ "$result" == "latest" ]; then
+			result="$latest_version"
+		elif [ "$result" == "milestone" ]; then
+			result="$milestone_version"
+		elif [ "$result" == "snapshot" ]; then
+			result="$snapshot_version"
+		fi
+		results+=("$result")
+	done
+
+	echo "$(IFS=' '; echo "${results[*]}")"
+}
+
+print_help() {
+	local snapshot_2x=$(grep -E '^2\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1)
+	local stable_2x=$(grep -E '^2\.[0-9]+\.[0-9]+$' <<< $VERSIONS | tail -n 1)
+
+	local snapshot_3x=$(grep -E '^3\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1)
+	local stable_3x=$(grep -E '^3\.[0-9]+\.[0-9]+$' <<< $VERSIONS | tail -n 1)
+
+	cat <<-EOI
+Usage: ./build [OPTIONS]
+
+Builds openHAB Docker images using BuildKit.
+
+When no options are provided the latest snapshot images are build for all Docker platforms.
+To build other versions or only the images of a specific base image add these to the options.
+To push the images to the Docker registry ($(docker_repo)) add --push
+Log in to the Docker Registry with "docker login" before building and pushing the images.
+
+Examples:
+
+Build the Debian and Alpine $snapshot_3x images:
+    ./build
+
+Build the Debian $snapshot_3x images:
+    ./build debian
+
+Build the Alpine $snapshot_2x images:
+    ./build $snapshot_2x alpine
+
+Build the $stable_2x and $stable_3x Debian/Alpine images and push them to $(docker_repo):
+    ./build $stable_2x $stable_3x --push
+
+Build the latest/snapshot Debian images by resolving the versions ("milestone" can also be resolved):
+    ./build latest snapshot debian
+
+EOI
+}
+
+main() {
+	local versions=$(filter_options "$(resolve_version_tags "${*/-SNAPSHOT/-snapshot}")" "$VERSIONS" "$(last_snapshot_version)")
+	local bases=$(filter_options "$*" "$(bases)" "$(bases)")
+	local push=$(filter_options "$*" "--push" "")
+
+	for version in $versions; do
+		for base in $bases; do
+			build $version $base $push
+		done
+	done
+}
+
+if [ "$1" == "-h" ] ||  [ "$1" == "--help" ]; then
+	print_help
+else
+	main "$@"
+fi
