@@ -6,12 +6,12 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM debian:10.5-slim
+FROM alpine:3.12.0
 
 # Set version variables
 ENV \
     JAVA_VERSION="11" \
-    OPENHAB_VERSION="3.0.0.M2"
+    OPENHAB_VERSION="3.0.0.M5"
 
 # Set other variables
 ENV \
@@ -51,53 +51,37 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     maintainer="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+RUN apk update --no-cache && \
+    apk add --no-cache \
         arping \
+        bash \
         ca-certificates \
         curl \
         fontconfig \
-        gosu \
-        libcap2-bin \
-        locales \
-        locales-all \
-        netbase \
-        procps \
+        libcap \
+        nss \
+        shadow \
+        su-exec \
         tini \
+        ttf-dejavu \
+        openjdk${JAVA_VERSION} \
         unzip \
         wget \
         zip && \
     chmod u+s /usr/sbin/arping && \
-    ln -s -f /bin/true /usr/bin/chfn && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/cache/apk/*
 
-# Install java
-ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-RUN mkdir -p "${JAVA_HOME}" && \
-    zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.48.0.53-ca-jdk8.0.265-linux_x64.tar.gz' && \
-    zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.48.3.246-ca-jdk8.0.265-linux_aarch32hf.tar.gz' && \
-    zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.48.3.246-ca-jdk8.0.265-linux_aarch64.tar.gz' && \
-    zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.41.23-ca-jdk11.0.8-linux_x64.tar.gz' && \
-    zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch32hf.tar.gz' && \
-    zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch64.tar.gz' && \
-    url_var="zulu${JAVA_VERSION}_$(dpkg --print-architecture)_url" && \
-    eval "java_url=\$$url_var" && \
-    wget -nv -O /tmp/java.tar.gz "${java_url}" && \
-    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
-    if [ "${JAVA_VERSION}" = "8" ]; then \
-        sed -i 's/^#crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
+ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
+RUN if [ "${JAVA_VERSION}" = "8" ]; then \
+        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
     elif [ "${JAVA_VERSION}" = "11" ]; then \
         sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"; \
-    fi && \
-    rm /tmp/java.tar.gz && \
-    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
-    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
+    fi
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip "https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/3.0.0.M2/openhab-3.0.0.M2.zip" && \
+RUN wget -nv -O /tmp/openhab.zip "https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/3.0.0.M5/openhab-3.0.0.M5.zip" && \
     unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
     rm /tmp/openhab.zip && \
     if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \
@@ -123,4 +107,4 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Execute command
-CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]
+CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]

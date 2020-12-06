@@ -59,12 +59,12 @@ env:
     - VERSION=2.5.9 DIST=debian
     - VERSION=2.5.10 DIST=alpine
     - VERSION=2.5.10 DIST=debian
-    - VERSION=3.0.0.M2 DIST=alpine
-    - VERSION=3.0.0.M2 DIST=debian
     - VERSION=3.0.0.M3 DIST=alpine
     - VERSION=3.0.0.M3 DIST=debian
     - VERSION=3.0.0.M4 DIST=alpine
     - VERSION=3.0.0.M4 DIST=debian
+    - VERSION=3.0.0.M5 DIST=alpine
+    - VERSION=3.0.0.M5 DIST=debian
     - VERSION=2.5.11-snapshot DIST=alpine
     - VERSION=2.5.11-snapshot DIST=debian
     - VERSION=3.0.0-snapshot DIST=alpine
