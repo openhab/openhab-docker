@@ -6,7 +6,7 @@
 #                       PLEASE DO NOT EDIT IT DIRECTLY.
 # ------------------------------------------------------------------------------
 #
-FROM alpine:3.12.0
+FROM alpine:3.12.2
 
 # Set version variables
 ENV \
