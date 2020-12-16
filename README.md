@@ -331,10 +331,12 @@ When the container runs in server mode you can also add a console logger so it p
 
 `docker logs openhab`
 
-To add the console logger, edit `userdata/etc/org.ops4j.pax.logging.cfg` and then:
+To use a console logger with openHAB 2.x, edit `userdata/etc/org.ops4j.pax.logging.cfg` and then:
 
 * Update the appenderRefs line to: `log4j2.rootLogger.appenderRefs = out, osgi, console`
 * Add the following line: `log4j2.rootLogger.appenderRef.console.ref = STDOUT`
+
+To use a console logger with openHAB 3.x, edit `userdata/etc/log4j2.xml` and add the following appender to the "Root logger" and "openhab.event" logger configurations: `<AppenderRef ref="STDOUT"/>`
 
 #### Regular mode
 
