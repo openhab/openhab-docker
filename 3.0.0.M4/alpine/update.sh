@@ -40,9 +40,12 @@ run_command() {
 
     case $command in
     'DEFAULT')
-      # Just rename the file, the update process adds back the new version
-      echo "  Adding '.bak' to $param1"
-      mv "$param1" "$param1.bak"
+      if [ -f "$param1" ]; then
+        echo "  Adding '.bak' to $param1"
+        mv "$param1" "$param1.bak"
+      fi
+      echo "  Using default file $param1"
+      cp "$(echo "$param1" | sed "s:${OPENHAB_HOME}:${OPENHAB_HOME}/dist:g")" "$param1"
     ;;
     'DELETE')
       # We should be strict and specific here, i.e only delete one file.
@@ -59,8 +62,18 @@ run_command() {
       fi
     ;;
     'MOVE')
-      echo "  Moving:   From $param1 to $param2"
-      mv "$param1" "$param2"
+      # Avoid error if file or directory does not exist
+      if [ -e "$param1" ]; then
+        echo "  Moving:   From $param1 to $param2"
+        file_dir=$(dirname "$param2")
+        # Create directory with same ownership as file
+        if [ ! -d file_dir ]; then
+          mkdir -p "$file_dir"
+          prev_user_group=$(ls -ld "$param1" | awk '{print $3 ":" $4}')
+          chown -R "$prev_user_group" "$file_dir"
+        fi
+        mv "$param1" "$param2"
+      fi
     ;;
     'REPLACE')
       # Avoid error if file does not exist
