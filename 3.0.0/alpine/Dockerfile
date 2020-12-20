@@ -11,7 +11,7 @@ FROM alpine:3.12.2
 # Set version variables
 ENV \
     JAVA_VERSION="11" \
-    OPENHAB_VERSION="3.0.0.RC2"
+    OPENHAB_VERSION="3.0.0"
 
 # Set other variables
 ENV \
@@ -81,7 +81,7 @@ RUN if [ "${JAVA_VERSION}" = "8" ]; then \
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip "https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/3.0.0.RC2/openhab-3.0.0.RC2.zip" && \
+RUN wget -nv -O /tmp/openhab.zip "https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F3.0.0%2Fopenhab-3.0.0.zip" && \
     unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
     rm /tmp/openhab.zip && \
     if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \

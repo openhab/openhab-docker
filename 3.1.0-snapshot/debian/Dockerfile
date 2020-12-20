@@ -11,7 +11,7 @@ FROM debian:10.7-slim
 # Set version variables
 ENV \
     JAVA_VERSION="11" \
-    OPENHAB_VERSION="3.0.0.RC1"
+    OPENHAB_VERSION="3.1.0-snapshot"
 
 # Set other variables
 ENV \
@@ -97,7 +97,7 @@ RUN mkdir -p "${JAVA_HOME}" && \
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
-RUN wget -nv -O /tmp/openhab.zip "https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/3.0.0.RC1/openhab-3.0.0.RC1.zip" && \
+RUN wget -nv -O /tmp/openhab.zip "https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-3.1.0-SNAPSHOT.zip" && \
     unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
     rm /tmp/openhab.zip && \
     if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \

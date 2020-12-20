@@ -17,10 +17,8 @@ generate_version_list() {
 		2.*-snapshot|3.*-snapshot)
 			echo "* \`$version\` Experimental openHAB $(echo $version | sed 's/-snapshot/ SNAPSHOT/g') version ([Dockerfile]($url))"
 			;;
-		$(last_stable_version))
-			echo "* \`2.5.0\` - \`$version\` Stable openHAB $(echo $version | sed -E 's/^([0-9]+)\.([0-9])+\.([0-9])+$/\1\.\2\.x/g') version ([Dockerfile]($url))"
-			;;
 		2.5.*)
+			echo "* \`2.5.0\` - \`$version\` Stable openHAB $(echo $version | sed -E 's/^([0-9]+)\.([0-9])+\.([0-9])+$/\1\.\2\.x/g') version ([Dockerfile]($url))"
 			;;
 		*)
 			echo "* \`$version\` Stable openHAB $version version ([Dockerfile]($url))"
