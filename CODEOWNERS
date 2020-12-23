@@ -1,0 +1,5 @@
+# This file helps GitHub doing automatic review requests for new PRs.
+# It should always list the active Docker maintainers.
+
+# Assign all PRs to the Docker maintainers:
+*       @openhab/docker-maintainers
