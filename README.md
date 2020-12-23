@@ -89,15 +89,15 @@ If you are unsure about what your needs are, you probably want to use `openhab/o
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
-**Architectures:**
+**Platforms:**
 
-The following architectures are supported (automatically determined):
+The following Docker platforms are supported (automatically determined):
 
-* `amd64` for most desktop computers (e.g. x64, x86-64, x86_64)
-* `armhf` for ARMv7 devices 32 Bit (e.g. most Raspberry Pi 1/2/3/4)
-* `arm64` for ARMv8 devices 64 Bit (not Raspberry Pi 3/4)
+* `linux/amd64`
+* `linux/arm64`
+* `linux/arm/v7`
 
-There is no armhf Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture.
+There is no `linux/arm/v7` Alpine image for openHAB 3 because the openjdk11 package is unavailable for this platform.
 
 ## Usage
 
@@ -308,13 +308,9 @@ Here is an example playbook in case you control your environment with Ansible. Y
 
 You can connect to a console of an already running openHAB container with following command:
 
-* `docker ps` - lists all your currently running container
-* `docker exec -it openhab /openhab/runtime/bin/client` - connect to openHAB container by name
-* `docker exec -it openhab /openhab/runtime/bin/client -p habopen` - connect to openHAB container by name and use `habopen` as password (**not recommended** because this makes the password visible in the command history and process list)
-* `docker exec -it c4ad98f24423 /openhab/runtime/bin/client` - connect to openHAB container by id
-* `docker attach openhab` - attach to openHAB container by name, input only works when starting the container with `-it` (or `stdin_open: true` and `tty: true` with Docker Compose)
+`docker exec -it openhab /openhab/runtime/bin/client`
 
-The default password for the login is `habopen`.
+The default password for the login is: `habopen`
 
 ### Startup modes
 
@@ -452,14 +448,14 @@ All messages shown during the update are also logged to `userdata/logs/update.lo
 
 ## Building the images
 
-Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `3.0.0/debian`) and then run these commands to build and run a Docker image for your current architecture:
+Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `3.0.0/debian`) and then run these commands to build and run a Docker image for your current platform:
 
 ```shell
 $ docker build --tag openhab/openhab .
 $ docker run openhab/openhab
 ```
 
-To be able to build the same image for other architectures (e.g. armhf/arm64 on amd64) Docker CE 19.03 with BuildKit support can be used.
+To be able to build the same image for other platforms (e.g. arm/v7, arm64 on amd64) Docker CE 19.03 with BuildKit support can be used.
 
 First enable BuildKit support, configure QEMU binary formats and a builder using:
 
@@ -481,7 +477,7 @@ $ docker buildx build --platform linux/arm/v7 --tag openhab/openhab --load .
 
 It is sometimes useful to run shell scripts after the "userdata" directory is created, but before Karaf itself is launched.
 One such case is creating SSH host keys, and allowing access to the system from the outside via SSH.
-Exemplary scripts can be found in the [contrib](https://github.com/openhab/openhab-docker/tree/master/contrib) directory
+Exemplary scripts can be found in the [contrib/cont-init.d](https://github.com/openhab/openhab-docker/tree/master/contrib/cont-init.d) directory
 
 To use this, create a directory called
 
@@ -499,78 +495,6 @@ and add a volume mount to your startup:
 
 and put your scripts into that directory.
 This can be done by either using a volume mount (see the examples above) or creating your own images which inherit from the official ones.
-
-### Show the contents of the running Docker image
-
-[10-show-directories](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/10-show-directories)
-
-```shell
-ls -l "${OPENHAB_HOME}"
-ls -l "${OPENHAB_USERDATA}"
-```
-
-### Set a defined host key for the image
-
-[20-set-host-key](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-set-host-key)
-
-```shell
-cat > "${OPENHAB_USERDATA}/etc/host.key" <<EOF
------BEGIN PRIVATE KEY-----
-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCrOe8O7r9uOjKu
-... your key here ...
-c2woMmUlKznoVPczYMncRJ3oBg==
------END PRIVATE KEY-----
-EOF
-```
-
-### Open access from external hosts
-
-[20-open-ssh-server](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-open-ssh-server)
-
-```shell
-sed -i \
-    "s/\#org.apache.karaf.shell:sshHost\s*=.*/org.apache.karaf.shell:sshHost=0.0.0.0/g" \
-    "${OPENHAB_CONF}/services/runtime.cfg"
-```
-
-### Set a defined host key for the image
-
-[20-add-allowed-ssh-keys](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/20-add-allowed-ssh-keys)
-
-```shell
-cat > "${OPENHAB_USERDATA}/etc/keys.properties" <<EOF
-openhab=A...your-ssh-public-key-here...B,_g_:admingroup
-
-_g_\:admingroup = group,admin,manager,viewer
-
-EOF
-```
-
-### Configure credentials for openHAB cloud
-
-[40-openhabcloud](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/40-openhabcloud)
-
-```shell
-if [ ! -z ${OHC_UUID} ]
-then
-    mkdir -p "${OPENHAB_USERDATA}"
-    echo ${OHC_UUID} > "${OPENHAB_USERDATA}/uuid"
-fi
-
-if [ ! -z ${OHC_SECRET} ]
-then
-    mkdir -p "${OPENHAB_USERDATA}/openhabcloud"
-    echo ${OHC_SECRET} > "${OPENHAB_USERDATA}/openhabcloud/secret"
-fi
-```
-
-### Give pcap permissions to the Java process
-
-[50-setpcap-on-java](https://github.com/openhab/openhab-docker/blob/master/contrib/cont-init.d/50-setpcap-on-java)
-
-```shell
-setcap 'cap_net_bind_service=+ep' "${JAVA_HOME}/bin/java"
-```
 
 ## Common problems
 
