@@ -2,9 +2,11 @@ name: Build images
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches:
+      - 'master'
   pull_request:
-    branches: [ $default-branch ]
+    branches:
+      - 'master'
   workflow_dispatch:
 
 jobs:
@@ -23,7 +25,6 @@ jobs:
         run: docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
 
       - name: Set up Docker Buildx
-        id: buildx
         uses: docker/setup-buildx-action@v1
 
       - name: Build images
