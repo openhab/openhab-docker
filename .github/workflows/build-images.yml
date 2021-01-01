@@ -1,0 +1,30 @@
+name: Build images
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+       tag: ["latest", "snapshot"]
+       distribution: ["alpine", "debian"]
+    name: ${{ matrix.tag }}-${{ matrix.distribution }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        run: docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build images
+        run: ./build ${{ matrix.tag }} ${{ matrix.distribution }}

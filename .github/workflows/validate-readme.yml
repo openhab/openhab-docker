@@ -1,0 +1,19 @@
+name: Validate README.md
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    name: validate
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Validate README.md
+      run: bash -c 'source helper-functions && validate_readme_constraints'
