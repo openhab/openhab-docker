@@ -76,7 +76,7 @@ Comments, suggestions and contributions are welcome!
   * `2.5.11` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/2.5.11))
 * **Snapshot:** Usually 1 or 2 days old and include the latest code. Use these for testing out very recent changes using the latest code. Be aware that some snapshots might be unstable so use these in production at your own risk!
   * `3.1.0-snapshot`
-  * `2.5.12-snapshot`
+  * `3.0.1-snapshot`
 
 **Distributions:**
 
