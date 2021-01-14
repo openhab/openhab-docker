@@ -1,6 +1,6 @@
 # openHAB Docker Containers
 
-![openHAB logo](https://github.com/openhab/openhab-docker/raw/master/openhab.png)
+![openHAB logo](https://github.com/openhab/openhab-docker/raw/main/openhab.png)
 
 [![Build Status](https://ci.openhab.org/job/openHAB-Docker/badge/icon)](https://ci.openhab.org/job/openHAB-Docker/)
 [![EPL-2.0](https://img.shields.io/badge/license-EPL%202-green.svg)](https://opensource.org/licenses/EPL-2.0)
@@ -80,8 +80,8 @@ Comments, suggestions and contributions are welcome!
 
 **Distributions:**
 
-* `debian` for Debian 10 "buster" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/debian/Dockerfile))
-* `alpine` for Alpine 3.12 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/master/alpine/Dockerfile))
+* `debian` for Debian 10 "buster" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/debian/Dockerfile))
+* `alpine` for Alpine 3.12 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/alpine/Dockerfile))
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 
@@ -433,7 +433,7 @@ More information about serial ports and symlinks can be found [here](https://www
 
 It is sometimes useful to run shell scripts after the "userdata" directory is created, but before Karaf itself is launched.
 One such case is creating SSH host keys, and allowing access to the system from the outside via SSH.
-Exemplary scripts can be found in the [contrib/cont-init.d](https://github.com/openhab/openhab-docker/tree/master/contrib/cont-init.d) directory
+Exemplary scripts can be found in the [contrib/cont-init.d](https://github.com/openhab/openhab-docker/tree/main/contrib/cont-init.d) directory
 
 To use this, create a directory called
 
@@ -538,4 +538,4 @@ Execute `./build -h` for usage instructions and examples.
 
 ## Contributing
 
-[Contribution guidelines](https://github.com/openhab/openhab-docker/blob/master/CONTRIBUTING.md)
+[Contribution guidelines](https://github.com/openhab/openhab-docker/blob/main/CONTRIBUTING.md)
