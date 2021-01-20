@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 🤔 openHAB Docker Support/Usage Question
+    url: https://community.openhab.org/tags/c/setup-configuration-and-use/docker
+    about: Ask anything about how to use the openHAB Docker images here
+  - name: 📖 openHAB Documentation
+    url: https://www.openhab.org/docs/
+    about: Official openHAB documentation
+  - name: 🐋 Docker Documentation
+    url: https://docs.docker.com/
+    about: Official Docker documentation
