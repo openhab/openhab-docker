@@ -73,10 +73,10 @@ Comments, suggestions and contributions are welcome!
 
 * **Stable:** Thoroughly tested semi-annual official releases of openHAB. Use the stable version for your production environment if you do not need the latest enhancements and prefer a robust system.
   * `3.0.1` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.0.1))
-  * `2.5.11` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/2.5.11))
+  * `2.5.12` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/2.5.12))
 * **Snapshot:** Usually 1 or 2 days old and include the latest code. Use these for testing out very recent changes using the latest code. Be aware that some snapshots might be unstable so use these in production at your own risk!
   * `3.1.0-snapshot`
-  * `2.5.12-snapshot`
+  * `2.5.13-snapshot`
 
 **Distributions:**
 
