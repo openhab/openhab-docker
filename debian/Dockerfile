@@ -110,6 +110,9 @@ VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 # Expose HTTP, HTTPS, Console and LSP ports
 EXPOSE 8080 8443 8101 5007
 
+# Set healthcheck
+HEALTHCHECK --interval=5m --timeout=5s --retries=3 CMD curl -f http://localhost:${OPENHAB_HTTP_PORT}/ || exit 1
+
 # Set working directory and entrypoint
 WORKDIR ${OPENHAB_HOME}
 COPY entrypoint /entrypoint
