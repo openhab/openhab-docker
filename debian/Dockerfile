@@ -55,6 +55,7 @@ RUN apt-get update && \
         unzip \
         wget \
         zip && \
+    c_rehash && \
     chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn && \
     apt-get clean && \
