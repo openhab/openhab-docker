@@ -11,7 +11,7 @@ setup() {
   oh_version="$(echo "${OPENHAB_VERSION}" | sed 's/snapshot/SNAPSHOT/')"
   milestone_version="$(echo "${oh_version}" | awk -F'.' '{print $4}')"
 
-  # Choose bintray for releases, jenkins for snapshots and artifactory for milestones or release candidates.
+  # Download snapshots from Jenkins and download milestones and releases using openHAB redirect.
   if test "${oh_version#*-SNAPSHOT}" != "${oh_version}"; then
     addons_download_location="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons/target/openhab-addons-${oh_version}.kar"
     legacy_addons_download_location="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons-legacy/target/openhab-addons-legacy-${oh_version}.kar"
@@ -19,11 +19,11 @@ setup() {
     echo "You are already on openHAB $current_version" >&2
     exit 1
   elif [ -n "$milestone_version" ]; then
-    addons_download_location="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
-    legacy_addons_download_location="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab-addons-legacy/${oh_version}/openhab-addons-legacy-${oh_version}.kar"
+    addons_download_location="https://www.openhab.org/download/milestones/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
+    legacy_addons_download_location="https://www.openhab.org/download/milestones/org/openhab/distro/openhab-addons-legacy/${oh_version}/openhab-addons-legacy-${oh_version}.kar"
   else
-    addons_download_location="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab-addons%2F${oh_version}%2Fopenhab-addons-${oh_version}.kar"
-    legacy_addons_download_location="https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab-addons-legacy%2F${oh_version}%2Fopenhab-addons-legacy-${oh_version}.kar"
+    addons_download_location="https://www.openhab.org/download/releases/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
+    legacy_addons_download_location="https://www.openhab.org/download/releases/org/openhab/distro/openhab-addons-legacy/${oh_version}/openhab-addons-legacy-${oh_version}.kar"
   fi
 }
 
