@@ -75,8 +75,8 @@ Comments, suggestions and contributions are welcome!
   * `3.0.2` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.0.2))
   * `2.5.12` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/2.5.12))
 * **Milestone:** Intermediary releases of the next openHAB version which are released about once a month. They include recently added features and bugfixes and are a good compromise between the current stable version and the bleeding-edge and potentially unstable snapshot version.
+  * `3.1.0.M4` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.1.0.M4))
   * `3.1.0.M3` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.1.0.M3))
-  * `3.1.0.M2` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.1.0.M2))
 * **Snapshot:** Usually 1 or 2 days old and include the latest code. Use these for testing out very recent changes using the latest code. Be aware that some snapshots might be unstable so use these in production at your own risk!
   * `3.1.0-snapshot`
   * `2.5.13-snapshot`
