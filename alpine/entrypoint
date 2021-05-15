@@ -78,13 +78,11 @@ fi
 chown -R openhab:openhab "${OPENHAB_HOME}"
 sync
 
-# Run s6-style init continuation scripts if existent
-if [ -d /etc/cont-init.d ]
-then
-    for script in $(find /etc/cont-init.d -type f | grep -v \~ | sort)
-    do
-        . "${script}"
-    done
+# Run s6-style init continuation scripts if dir exists and s6 is not installed
+if [ -d /etc/cont-init.d ] && [ $(ls /bin/s6-* 2>/dev/null | wc -l) == 0 ]; then
+  for script in $(find /etc/cont-init.d -type f | grep -v \~ | sort); do
+    . "${script}"
+  done
 fi
 
 # sync again after continuation scripts have been run
@@ -92,8 +90,8 @@ sync
 
 # Use server mode with the default command when there is no pseudo-TTY
 if [ "$interactive" == "false" ] && [ "$(IFS=" "; echo "$@")" == "su-exec openhab tini -s ./start.sh" ]; then
-    command=($@ server)
-    exec "${command[@]}"
+  command=($@ server)
+  exec "${command[@]}"
 else
-    exec "$@"
+  exec "$@"
 fi
