@@ -349,6 +349,7 @@ The debug mode is started with the command:
 ## Environment variables
 
 * `EXTRA_JAVA_OPTS`=""
+* `EXTRA_SHELL_OPTS`=""
 * `LC_ALL`=en_US.UTF-8
 * `LANG`=en_US.UTF-8
 * `LANGUAGE`=en_US.UTF-8
