@@ -50,11 +50,10 @@ resolve_version_tags() {
 }
 
 print_help() {
-	local snapshot_2x=$(grep -E '^2\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1)
-	local stable_2x=$(grep -E '^2\.[0-9]+\.[0-9]+$' <<< $VERSIONS | tail -n 1)
-
 	local snapshot_3x=$(grep -E '^3\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1)
+	local milestone_3x=$(grep -E '^3\.[0-9]+\.[0-9]+.(M[0-9]+)$' <<< $VERSIONS | tail -n 1)
 	local stable_3x=$(grep -E '^3\.[0-9]+\.[0-9]+$' <<< $VERSIONS | tail -n 1)
+	local stable_30x=$(grep -E '^3\.0\.[0-9]+$' <<< $VERSIONS | tail -n 1)
 
 	cat <<-EOI
 Usage: ./build [OPTIONS]
@@ -74,11 +73,11 @@ Build the Debian and Alpine $snapshot_3x images:
 Build the Debian $snapshot_3x images:
     ./build debian
 
-Build the Alpine $snapshot_2x images:
-    ./build $snapshot_2x alpine
+Build the Alpine $milestone_3x images:
+    ./build $milestone_3x alpine
 
-Build the $stable_2x and $stable_3x Debian/Alpine images and push them to $(docker_repo):
-    ./build $stable_2x $stable_3x --push
+Build the $stable_30x and $stable_3x Debian/Alpine images and push them to $(docker_repo):
+    ./build $stable_30x $stable_3x --push
 
 Build the latest/snapshot Debian images by resolving the versions ("milestone" can also be resolved):
     ./build latest snapshot debian

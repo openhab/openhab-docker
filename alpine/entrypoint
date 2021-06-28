@@ -7,12 +7,7 @@ IFS=$'\n\t'
 # Configure Java unlimited strength cryptography
 if [ "${CRYPTO_POLICY}" = "unlimited" ]; then
   echo "Configuring OpenJDK ${JAVA_VERSION} unlimited strength cryptography policy..."
-  if [ "${JAVA_VERSION}" = "8" ]; then
-    java_security_file="${JAVA_HOME}/jre/lib/security/java.security"
-  elif [ "${JAVA_VERSION}" = "11" ]; then
-    java_security_file="${JAVA_HOME}/conf/security/java.security"
-  fi
-  sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${java_security_file}"
+  sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${JAVA_HOME}/conf/security/java.security"
 fi
 
 # Deleting instance.properties to avoid karaf PID conflict on restart

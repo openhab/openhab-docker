@@ -66,9 +66,6 @@ RUN apt-get update && \
 ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 RUN mkdir -p "${JAVA_HOME}" && \
-    zulu8_amd64_url='https://cdn.azul.com/zulu/bin/zulu8.54.0.21-ca-jdk8.0.292-linux_x64.tar.gz' && \
-    zulu8_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.54.0.21-ca-jdk8.0.292-linux_aarch32hf.tar.gz' && \
-    zulu8_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu8.54.0.21-ca-jdk8.0.292-linux_aarch64.tar.gz' && \
     zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.48.21-ca-jdk11.0.11-linux_x64.tar.gz' && \
     zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.48.21-ca-jdk11.0.11-linux_aarch32hf.tar.gz' && \
     zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.48.21-ca-jdk11.0.11-linux_aarch64.tar.gz' && \
@@ -76,11 +73,7 @@ RUN mkdir -p "${JAVA_HOME}" && \
     eval "java_url=\$$url_var" && \
     wget -nv -O /tmp/java.tar.gz "${java_url}" && \
     tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
-    if [ "${JAVA_VERSION}" = "8" ]; then \
-        sed -i 's/^#crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/jre/lib/security/java.security"; \
-    elif [ "${JAVA_VERSION}" = "11" ]; then \
-        sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"; \
-    fi && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security" && \
     rm /tmp/java.tar.gz && \
     update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
     update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
@@ -89,14 +82,11 @@ RUN mkdir -p "${JAVA_HOME}" && \
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
 RUN version="$(echo $OPENHAB_VERSION | sed 's/snapshot/SNAPSHOT/g')" && \
     if [ $(echo $version | grep -E '^.+\.(M|RC).+$') ]; then url="https://www.openhab.org/download/milestones/org/openhab/distro/openhab/${version}/openhab-${version}.zip"; \
-    elif [ $(echo $version | grep -E '^2\..+-SNAPSHOT$') ]; then url="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip"; \
     elif [ $(echo $version | grep -E '^3\..+-SNAPSHOT$') ]; then url="https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip"; \
     else url="https://www.openhab.org/download/releases/org/openhab/distro/openhab/${version}/openhab-${version}.zip"; fi && \
     wget -nv -O /tmp/openhab.zip "$url" && \
     unzip -q /tmp/openhab.zip -d "${OPENHAB_HOME}" -x "*.bat" "*.ps1" "*.psm1" && \
     rm /tmp/openhab.zip && \
-    if [ ! -f "${OPENHAB_HOME}/runtime/bin/update.lst" ]; then touch "${OPENHAB_HOME}/runtime/bin/update.lst"; fi && \
-    if [ ! -f "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst" ]; then wget -nv -O "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst" "https://raw.githubusercontent.com/openhab/openhab-distro/2.4.0/distributions/openhab/src/main/resources/bin/userdata_sysfiles.lst"; fi && \
     mkdir -p "${OPENHAB_LOGDIR}" && \
     touch "${OPENHAB_LOGDIR}/openhab.log" && \
     mkdir -p "${OPENHAB_HOME}/dist" && \
