@@ -165,6 +165,8 @@ update_readme() {
 		fi
 	done < $file > $file.new && mv $file.new $file
 
+	sed -i "s#version-[0-9]*\.[0-9]*\.[0-9]*-blue#version-$(last_stable_version)-blue#g" $file
+	sed -i "s#openhab/tags?name=[0-9]*\.[0-9]*\.[0-9]*#openhab/tags?name=$(last_stable_version)#g" $file
 	sed -i "s#openhab/openhab:[0-9]*\.[0-9]*\.[0-9]*#openhab/openhab:$(last_stable_version)#g" $file
 	sed -i "s#OPENHAB_VERSION=[0-9]*\.[0-9]*\.[0-9]*#OPENHAB_VERSION=$(last_stable_version)#g" $file
 }
