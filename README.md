@@ -81,10 +81,11 @@ Comments, suggestions and contributions are welcome!
 
 **Distributions:**
 
-* `debian` for Debian 10 "buster" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/debian/Dockerfile))
+* `debian` for Debian 11 "bullseye" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/debian/Dockerfile))
 * `alpine` for Alpine 3.14 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/alpine/Dockerfile))
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
+Older container images may use older versions of the Debian and Alpine base images.
 
 If you are unsure about what your needs are, you probably want to use `openhab/openhab:3.1.0`.
 
@@ -523,7 +524,7 @@ First enable BuildKit support, configure QEMU binary formats and a builder using
 ```shell
 $ echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
 $ export DOCKER_CLI_EXPERIMENTAL=enabled
-$ docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+$ docker run --privileged --rm tonistiigi/binfmt:qemu-v6.1.0 --install all
 $ sudo systemctl restart docker
 $ docker buildx create --name builder --use
 ```

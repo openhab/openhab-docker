@@ -182,26 +182,23 @@ validate_readme_constraints() {
 }
 
 update_dockerhub_readme() {
-	# Acquire token for Docker Hub API
-	local login_payload="{\"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}"
-	local token=$(curl -s -H "Content-Type: application/json" -X POST -d "${login_payload}" https://hub.docker.com/v2/users/login/ | sed -E 's#\{"token": "(.+)"\}#\1#g')
+	if [ "$(docker info 2>&1 | grep 'pushrm: Push Readme to container registry' | wc -l)" -eq "0" ]; then
+		# The pushrm plugin is available from https://github.com/christian-korneck/docker-pushrm
+		echo "Failed to update README for $(docker_repo) on Docker Hub (pushrm Docker CLI plugin not installed)" >&2
+		exit 1
+	fi
 
-	# Send a PATCH request to update the description of the repository
-	echo "Updating README for $(docker_repo) on Docker Hub"
-	local readme_filepath="./README.md"
-	local repo_url="https://hub.docker.com/v2/repositories/$(docker_repo)/"
-	local response_code=$(curl -s --write-out %{response_code} --output /dev/null -H "Authorization: JWT ${token}" -X PATCH --data-urlencode full_description@${readme_filepath} ${repo_url})
-
-	if [ $response_code -eq 200 ]; then
+	if docker pushrm $(docker_repo); then
 		echo "Successfully updated README for $(docker_repo) on Docker Hub"
 	else
-		echo "Failed to update README for $(docker_repo) on Docker Hub (Response code: $response_code)" >&2
+		echo "Failed to update README for $(docker_repo) on Docker Hub" >&2
 		exit 1
 	fi
 }
 
 prepare_builder() {
 	if [ "$BUILDER" == "" ]; then
+		docker run --privileged --rm tonistiigi/binfmt:qemu-v6.1.0 --install all &> /dev/null
 		(docker buildx inspect builder &> /dev/null && echo -e "\nReusing existing builder") || \
 			(docker buildx create --name builder --use &> /dev/null && echo -e "\nCreated builder")
 		BUILDER="builder"
