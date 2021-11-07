@@ -13,17 +13,14 @@ setup() {
 
   # Download snapshots from Jenkins and download milestones and releases using openHAB redirect.
   if test "${oh_version#*-SNAPSHOT}" != "${oh_version}"; then
-    addons_download_location="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons/target/openhab-addons-${oh_version}.kar"
-    legacy_addons_download_location="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons-legacy/target/openhab-addons-legacy-${oh_version}.kar"
+    addons_download_location="https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons/target/openhab-addons-${oh_version}.kar"
   elif [ "${oh_version}" = "$current_version" ]; then
     echo "You are already on openHAB $current_version" >&2
     exit 1
   elif [ -n "$milestone_version" ]; then
     addons_download_location="https://www.openhab.org/download/milestones/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
-    legacy_addons_download_location="https://www.openhab.org/download/milestones/org/openhab/distro/openhab-addons-legacy/${oh_version}/openhab-addons-legacy-${oh_version}.kar"
   else
     addons_download_location="https://www.openhab.org/download/releases/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
-    legacy_addons_download_location="https://www.openhab.org/download/releases/org/openhab/distro/openhab-addons-legacy/${oh_version}/openhab-addons-legacy-${oh_version}.kar"
   fi
 }
 
@@ -188,16 +185,6 @@ if [ -f "$addons_file" ]; then
   rm -f "${addons_file:?}"
   curl -Lf# "$addons_download_location" -o "${OPENHAB_HOME}/addons/openhab-addons-${oh_version}.kar" || {
       echo "Download of addons file failed, please find it on the openHAB website (www.openhab.org)" >&2
-  }
-fi
-
-# Do the same for the legacy addons file.
-legacy_addons_file="${OPENHAB_HOME}/addons/openhab-addons-legacy-${current_version}.kar"
-if [ -f "$legacy_addons_file" ]; then
-  echo "Found an openHAB legacy addons file, replacing with new version..."
-  rm -f "${legacy_addons_file:?}"
-  curl -Lf# "$legacy_addons_download_location" -o "${OPENHAB_HOME}/addons/openhab-addons-legacy-${oh_version}.kar" || {
-      echo "Download of legacy addons file failed, please find it on the openHAB website (www.openhab.org)" >&2
   }
 fi
 echo ""
