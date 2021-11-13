@@ -1,4 +1,4 @@
-FROM debian:10.11-slim
+FROM debian:11.1-slim
 
 ARG BUILD_DATE
 ARG VCS_REF
