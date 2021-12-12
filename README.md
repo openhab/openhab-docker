@@ -72,7 +72,7 @@ Comments, suggestions and contributions are welcome!
 
 * **Stable:** Thoroughly tested semi-annual official releases of openHAB. Use the stable version for your production environment if you do not need the latest enhancements and prefer a robust system.
   * `3.1.1` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.1.1))
-  * `3.0.3` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.0.3))
+  * `3.0.4` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.0.4))
 * **Milestone:** Intermediary releases of the next openHAB version which are released about once a month. They include recently added features and bugfixes and are a good compromise between the current stable version and the bleeding-edge and potentially unstable snapshot version.
   * `3.2.0.M5` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.2.0.M5))
   * `3.2.0.M4` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.2.0.M4))
