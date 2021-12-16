@@ -491,6 +491,12 @@ Another option is to install the package by [executing a shell script before ope
 By default this will always be the last logged message.
 A console logger can be [configured](#server-mode) for more detailed logging.
 
+### OpenJDK Client VM warning: No monotonic clock was available
+
+This error message may occur when running a recent openHAB container image on a Docker host with an outdated version of libseccomp2.
+The issue can be fixed by upgrading libseccomp2 on your Docker host to a more recent version.
+For more details see this [community thread](https://community.openhab.org/t/128865).
+
 ### OpenMediaVault
 
 The default filesystem mount flags of OpenMediaVault contain the `noexec` flag which interferes with the serial library used by openHAB.
