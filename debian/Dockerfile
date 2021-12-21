@@ -47,6 +47,7 @@ RUN apt-get update && \
         curl \
         fontconfig \
         gosu \
+        iputils-ping \
         libcap2-bin \
         locales \
         locales-all \
