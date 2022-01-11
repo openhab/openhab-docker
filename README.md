@@ -5,7 +5,7 @@
 [![Build Status](https://ci.openhab.org/job/openHAB-Docker/badge/icon)](https://ci.openhab.org/job/openHAB-Docker/)
 [![EPL-2.0](https://img.shields.io/badge/license-EPL%202-green.svg)](https://opensource.org/licenses/EPL-2.0)
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=31868624)](https://www.bountysource.com/teams/openhab/issues?tracker_ids=31868624)
-[![Docker Version](https://img.shields.io/badge/version-3.2.0-blue)](https://hub.docker.com/repository/docker/openhab/openhab/tags?name=3.2.0)
+[![Docker Version](https://img.shields.io/badge/version--blue)](https://hub.docker.com/repository/docker/openhab/openhab/tags?name=)
 [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/)
 [![GitHub Issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues)
@@ -70,11 +70,6 @@ Comments, suggestions and contributions are welcome!
 
 **Versions:**
 
-* **Stable:** Thoroughly tested semi-annual official releases of openHAB. Use the stable version for your production environment if you do not need the latest enhancements and prefer a robust system.
-  * `3.2.0` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.2.0))
-  * `3.1.1` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/3.1.1))
-* **Snapshot:** Usually 1 or 2 days old and include the latest code. Use these for testing out very recent changes using the latest code. Be aware that some snapshots might be unstable so use these in production at your own risk!
-  * `3.3.0-snapshot`
 
 **Distributions:**
 
@@ -84,7 +79,7 @@ Comments, suggestions and contributions are welcome!
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 Older container images may use older versions of the Debian and Alpine base images.
 
-If you are unsure about what your needs are, you probably want to use `openhab/openhab:3.2.0`.
+If you are unsure about what your needs are, you probably want to use `openhab/openhab:`.
 
 Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
 
@@ -106,7 +101,7 @@ There is no `linux/arm/v7` Alpine image for openHAB 3 because the openjdk11 pack
 
 The following will run openHAB in demo mode on the host machine:
 
-`docker run --name openhab --net=host openhab/openhab:3.2.0`
+`docker run --name openhab --net=host openhab/openhab:`
 
 _**NOTE:** Although this is the simplest method to getting openHAB up and running, but it is not the preferred method.
 To properly run the container, please specify a **host volume** for the directories._
@@ -133,7 +128,7 @@ docker run \
   -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
   -d \
   --restart=always \
-  openhab/openhab:3.2.0
+  openhab/openhab:
 ```
 
 #### Running from compose-file.yml
@@ -145,7 +140,7 @@ version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:3.2.0"
+    image: "openhab/openhab:"
     restart: always
     network_mode: host
     volumes:
@@ -167,7 +162,7 @@ version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:3.2.0"
+    image: "openhab/openhab:"
     restart: always
     network_mode: host
     volumes:
@@ -203,7 +198,7 @@ version: '2.2'
 services:
   openhab:
     container_name: openhab
-    image: "openhab/openhab:3.2.0"
+    image: "openhab/openhab:"
     restart: always
     network_mode: host
     cap_add:
@@ -232,7 +227,7 @@ version: '2.2'
 
 services:
   openhab:
-    image: "openhab/openhab:3.2.0"
+    image: "openhab/openhab:"
     restart: always
     ports:
       - "8080:8080"
@@ -263,7 +258,7 @@ docker run \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
   -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
-  openhab/openhab:3.2.0
+  openhab/openhab:
 ```
 
 ### Automating Docker setup using Ansible (for advanced user)
@@ -279,7 +274,7 @@ Here is an example playbook in case you control your environment with Ansible. Y
     tags: openhab
     docker_container:
       name: openhab
-      image: openhab/openhab:3.2.0
+      image: openhab/openhab:
       state: started
       detach: yes
       interactive: yes
@@ -317,7 +312,7 @@ The default password for the login is: `habopen`
 
 The container starts openHAB in server mode when no TTY is provided, example:
 
-`docker run --detach --name openhab openhab/openhab:3.2.0`
+`docker run --detach --name openhab openhab/openhab:`
 
 When the container runs in server mode you can also add a console logger so it prints logging to stdout so you can check the logging of a container named "openhab" with:
 
@@ -334,13 +329,13 @@ To use a console logger with openHAB 3.x, edit `userdata/etc/log4j2.xml` and add
 
 When a TTY is provided openHAB is started with an interactive console, e.g.: 
 
-`docker run -it openhab/openhab:3.2.0`
+`docker run -it openhab/openhab:`
 
 #### Debug mode
 
 The debug mode is started with the command:
 
-`docker run -it openhab/openhab:3.2.0 ./start_debug.sh`
+`docker run -it openhab/openhab: ./start_debug.sh`
 
 ## Environment variables
 
@@ -516,7 +511,7 @@ For more information on this see the [Docker documentation](https://docs.docker.
 Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `/debian`) and then run these commands to build and run a Docker image for your current platform:
 
 ```shell
-$ docker build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=3.2.0 --tag openhab/openhab .
+$ docker build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION= --tag openhab/openhab .
 $ docker run openhab/openhab
 ```
 
@@ -535,7 +530,7 @@ $ docker buildx create --name builder --use
 Change to a directory containing a Dockerfile (e.g. `/debian`) and then use the following command to build an ARMv7 image:
 
 ```
-$ docker buildx build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=3.2.0 --platform linux/arm/v7 --tag openhab/openhab --load .
+$ docker buildx build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION= --platform linux/arm/v7 --tag openhab/openhab --load .
 ```
 
 The `build` script in the root of the repository helps to simplify building the openHAB images with BuildKit.
