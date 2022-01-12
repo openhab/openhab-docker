@@ -138,6 +138,11 @@ generate_readme_versions() {
 update_readme() {
 	local file=README.md
 
+	if [ "$(last_stable_version)" == "" ]; then
+		echo "Cannot update $file because the last stable version is unknown!"
+		exit 1
+	fi
+
 	local generate="false"
 	while IFS= read -r line
 	do
