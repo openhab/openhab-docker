@@ -6,11 +6,11 @@ DISTRO_REPO="${DISTRO_REPO:=openhab/openhab-distro}"
 VERSIONS=""
 
 get_released_versions_from_tags() {
-	git ls-remote --refs --tags "git://github.com/${DISTRO_REPO}.git" | grep -E '.+/tags/[0-9]+\.[0-9]+\.[0-9]+(\.(M|RC)[0-9]+)?$' | sed -E 's#.+/tags/(.+)#\1#g' || echo ""
+	git ls-remote --refs --tags "https://github.com/${DISTRO_REPO}.git" | grep -E '.+/tags/[0-9]+\.[0-9]+\.[0-9]+(\.(M|RC)[0-9]+)?$' | sed -E 's#.+/tags/(.+)#\1#g' || echo ""
 }
 
 get_snapshot_versions_from_poms() {
-	local branch_names="$(git ls-remote --refs --heads "git://github.com/${DISTRO_REPO}.git" | grep -E '.+/heads/(main)$' | sed -E 's#.+/heads/(.+)#\1#g')"
+	local branch_names="$(git ls-remote --refs --heads "https://github.com/${DISTRO_REPO}.git" | grep -E '.+/heads/(main)$' | sed -E 's#.+/heads/(.+)#\1#g')"
 	for branch_name in $branch_names; do
 		curl -sS "https://raw.githubusercontent.com/${DISTRO_REPO}/${branch_name}/pom.xml" | grep -E '^    <version>' | grep 'SNAPSHOT' | sed -E 's#.+<version>(.+)-SNAPSHOT</version>#\1-snapshot#g' || echo ""
 	done
