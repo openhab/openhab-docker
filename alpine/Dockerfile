@@ -46,7 +46,9 @@ RUN apk update --no-cache && \
         bash \
         ca-certificates \
         curl \
+        eudev \
         fontconfig \
+        gcompat \
         libcap \
         nss \
         shadow \

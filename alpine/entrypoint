@@ -37,8 +37,10 @@ if ! id -u openhab >/dev/null 2>&1; then
   adduser -u $NEW_USER_ID -D -g '' -h ${OPENHAB_HOME} -G openhab openhab
   adduser openhab dialout
   adduser openhab uucp
-fi
 
+  chown root:uucp /var/lock
+  chmod g+w /var/lock
+fi
 
 initialize_volume() {
   volume="$1"
