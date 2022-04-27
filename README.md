@@ -141,7 +141,7 @@ docker run \
 
 #### Running from compose-file.yml
 
-Create the following `docker-compose.yml` for use of local directories and start the container with `docker-compose up -d`
+Create the following `docker-compose.yml` for use of local directories and start the container with `docker compose up -d`
 
 ```yaml
 version: '2.2'
@@ -163,7 +163,7 @@ services:
       EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
 ```
 
-Create the following `docker-compose.yml` for use of Docker volumes and start the container with `docker-compose up -d`
+Create the following `docker-compose.yml` for use of Docker volumes and start the container with `docker compose up -d`
 
 ```yml
 version: '2.2'
@@ -198,7 +198,7 @@ volumes:
 You can run all openHAB images with libpcap support.
 This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
 For that feature to work correctly, you need to run the image as **root user**.
-Create the following `docker-compose.yml` and start the container with `docker-compose up -d`
+Create the following `docker-compose.yml` and start the container with `docker compose up -d`
 
 ```yaml
 version: '2.2'
