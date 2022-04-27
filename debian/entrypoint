@@ -10,6 +10,11 @@ if [ "${CRYPTO_POLICY}" = "unlimited" ]; then
   sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${JAVA_HOME}/conf/security/java.security"
 fi
 
+# Set capabilities when available for add-ons using Pcap4J
+if capsh --print | grep -E 'Current:.+,cap_net_admin,cap_net_raw,.+' >/dev/null; then
+  setcap cap_net_raw,cap_net_admin=eip "${JAVA_HOME}/bin/java"
+fi
+
 # Deleting instance.properties to avoid karaf PID conflict on restart
 # See: https://github.com/openhab/openhab-docker/issues/99
 rm -f "${OPENHAB_HOME}/runtime/instances/instance.properties"
