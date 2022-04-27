@@ -195,9 +195,8 @@ volumes:
 
 ### Running openHAB with libpcap support
 
-You can run all openHAB images with libpcap support.
-This enables you to use the *Amazon Dashbutton Binding* in the Docker container.
-For that feature to work correctly, you need to run the image as **root user**.
+You can run all openHAB images with libpcap support by configuring additional capabilities.
+This allows for using the *Amazon Dash Button Binding* in the Docker container.
 Create the following `docker-compose.yml` and start the container with `docker compose up -d`
 
 ```yaml
@@ -218,12 +217,7 @@ services:
       - "./openhab_addons:/openhab/addons"
       - "./openhab_conf:/openhab/conf"
       - "./openhab_userdata:/openhab/userdata"
-    # The command node is very important. It overrides
-    # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
-    command: "tini -s ./start.sh server"
 ```
-
-*If you could provide a method to run libpcap support in user mode please open a pull request.*
 
 ### Running on Windows and macOS
 
