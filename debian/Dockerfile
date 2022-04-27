@@ -67,10 +67,15 @@ RUN apt-get update && \
 ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
 RUN mkdir -p "${JAVA_HOME}" && \
-    zulu11_amd64_url='https://cdn.azul.com/zulu/bin/zulu11.54.25-ca-jdk11.0.14.1-linux_x64.tar.gz' && \
-    zulu11_armhf_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.54.25-ca-jdk11.0.14.1-linux_aarch32hf.tar.gz' && \
-    zulu11_arm64_url='https://cdn.azul.com/zulu-embedded/bin/zulu11.54.25-ca-jdk11.0.14.1-linux_aarch64.tar.gz' && \
-    url_var="zulu${JAVA_VERSION}_$(dpkg --print-architecture)_url" && \
+    zulu11_version='zulu11.56.19-ca-jdk11.0.15' && \
+    zulu11_x86_64_url="https://cdn.azul.com/zulu/bin/${zulu11_version}-linux_x64.tar.gz" && \
+    zulu11_armv7l_url="https://cdn.azul.com/zulu-embedded/bin/${zulu11_version}-linux_aarch32hf.tar.gz" && \
+    zulu11_aarch64_url="https://cdn.azul.com/zulu-embedded/bin/${zulu11_version}-linux_aarch64.tar.gz" && \
+    zulu17_version='zulu17.34.19-ca-jdk17.0.3' && \
+    zulu17_x86_64_url="https://cdn.azul.com/zulu/bin/${zulu17_version}-linux_x64.tar.gz" && \
+    zulu17_armv7l_url="https://cdn.azul.com/zulu-embedded/bin/${zulu17_version}-linux_aarch32hf.tar.gz" && \
+    zulu17_aarch64_url="https://cdn.azul.com/zulu-embedded/bin/${zulu17_version}-linux_aarch64.tar.gz" && \
+    url_var="zulu${JAVA_VERSION}_$(arch)_url" && \
     eval "java_url=\$$url_var" && \
     wget -nv -O /tmp/java.tar.gz "${java_url}" && \
     tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
