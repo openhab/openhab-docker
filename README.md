@@ -82,7 +82,7 @@ Comments, suggestions and contributions are welcome!
 **Distributions:**
 
 * `debian` for Debian 11 "bullseye" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/debian/Dockerfile))
-* `alpine` for Alpine 3.15 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/alpine/Dockerfile))
+* `alpine` for Alpine 3.16 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/alpine/Dockerfile))
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).
 Older container images may use older versions of the Debian and Alpine base images.
