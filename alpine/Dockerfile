@@ -10,7 +10,6 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     EXTRA_SHELL_OPTS="" \
     GROUP_ID="9001" \
-    JAVA_VERSION="$JAVA_VERSION" \
     KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
@@ -22,7 +21,6 @@ ENV \
     OPENHAB_HTTPS_PORT="8443" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
     OPENHAB_USERDATA="/openhab/userdata" \
-    OPENHAB_VERSION="$OPENHAB_VERSION" \
     USER_ID="9001"
 
 # Basic build-time metadata as defined at http://label-schema.org
@@ -63,8 +61,8 @@ RUN apk update --no-cache && \
     rm -rf /var/cache/apk/*
 
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
-RUN sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"
+RUN JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk*) && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!

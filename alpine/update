@@ -8,7 +8,7 @@ setup() {
   fi
 
   current_version="$(awk '/openhab-distro/{print $3}' "${OPENHAB_USERDATA}/etc/version.properties")"
-  oh_version="$(echo "${OPENHAB_VERSION}" | sed 's/snapshot/SNAPSHOT/')"
+  oh_version="$(awk '/openhab-distro/{print $3}' "/openhab/dist/userdata/etc/version.properties")"
   milestone_version="$(echo "${oh_version}" | awk -F'.' '{print $4}')"
 
   # Download snapshots from Jenkins and download milestones and releases using openHAB redirect.
