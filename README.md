@@ -386,10 +386,7 @@ You can obtain your user and group ID by executing the `id --user` and `id --gro
 Due to local laws and export restrictions the containers use Java with a limited cryptographic strength policy.
 Some openHAB functionality may depend on unlimited strength which can be enabled by configuring the environment variable `CRYPTO_POLICY`=unlimited
 
-Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms:
-
-* Debian: [Zulu (Cryptography Extension Kit)](https://www.azul.com/products/zulu-and-zulu-enterprise/zulu-cryptography-extension-kit)
-* Alpine: [OpenJDK (Cryptographic Cautions)](https://openjdk.java.net/groups/security)
+Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms (see [OpenJDK (Cryptographic Cautions)](https://openjdk.java.net/groups/security)).
 
 The following addons are known to depend on the unlimited cryptographic strength policy:
 

@@ -10,7 +10,6 @@ ENV \
     EXTRA_JAVA_OPTS="" \
     EXTRA_SHELL_OPTS="" \
     GROUP_ID="9001" \
-    JAVA_VERSION="$JAVA_VERSION" \
     KARAF_EXEC="exec" \
     LC_ALL="en_US.UTF-8" \
     LANG="en_US.UTF-8" \
@@ -22,7 +21,6 @@ ENV \
     OPENHAB_HTTPS_PORT="8443" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
     OPENHAB_USERDATA="/openhab/userdata" \
-    OPENHAB_VERSION="$OPENHAB_VERSION" \
     USER_ID="9001"
 
 # Basic build-time metadata as defined at http://label-schema.org
@@ -64,25 +62,17 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install java
-ENV JAVA_HOME='/usr/lib/jvm/default-jvm'
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-RUN mkdir -p "${JAVA_HOME}" && \
-    zulu11_version='zulu11.56.19-ca-jdk11.0.15' && \
-    zulu11_x86_64_url="https://cdn.azul.com/zulu/bin/${zulu11_version}-linux_x64.tar.gz" && \
-    zulu11_armv7l_url="https://cdn.azul.com/zulu-embedded/bin/${zulu11_version}-linux_aarch32hf.tar.gz" && \
-    zulu11_aarch64_url="https://cdn.azul.com/zulu-embedded/bin/${zulu11_version}-linux_aarch64.tar.gz" && \
-    zulu17_version='zulu17.34.19-ca-jdk17.0.3' && \
-    zulu17_x86_64_url="https://cdn.azul.com/zulu/bin/${zulu17_version}-linux_x64.tar.gz" && \
-    zulu17_armv7l_url="https://cdn.azul.com/zulu-embedded/bin/${zulu17_version}-linux_aarch32hf.tar.gz" && \
-    zulu17_aarch64_url="https://cdn.azul.com/zulu-embedded/bin/${zulu17_version}-linux_aarch64.tar.gz" && \
-    url_var="zulu${JAVA_VERSION}_$(arch)_url" && \
-    eval "java_url=\$$url_var" && \
-    wget -nv -O /tmp/java.tar.gz "${java_url}" && \
-    tar --exclude='demo' --exclude='sample' --exclude='src.zip' -xf /tmp/java.tar.gz --strip-components=1 -C "${JAVA_HOME}" && \
+RUN wget -nv -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /usr/share/keyrings/adoptium.asc && \
+    echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y temurin-${JAVA_VERSION}-jdk && \
+    JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk*) && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security" && \
-    rm /tmp/java.tar.gz && \
-    update-alternatives --install /usr/bin/java java "${JAVA_HOME}/bin/java" 50 && \
-    update-alternatives --install /usr/bin/javac javac "${JAVA_HOME}/bin/javac" 50
+    rm "${JAVA_HOME}/src.zip" && \
+    rm "${JAVA_HOME}/lib/src.zip" && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
