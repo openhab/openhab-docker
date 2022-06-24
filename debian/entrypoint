@@ -12,6 +12,10 @@ if [ "${CRYPTO_POLICY}" = "unlimited" ]; then
   sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${JAVA_HOME}/conf/security/java.security"
 fi
 
+# Make sure the Adoptium cacerts are populated
+# p11-kit cannot find any modules during the linux/arm/v7 build
+/etc/ca-certificates/update.d/adoptium-cacerts
+
 # Set capabilities when available for add-ons using Pcap4J
 if capsh --print | grep -E 'Current:.+,cap_net_admin,cap_net_raw,.+' >/dev/null; then
   setcap cap_net_raw,cap_net_admin=eip "${JAVA_HOME}/bin/java"
