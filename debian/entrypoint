@@ -28,9 +28,14 @@ rm -f "${OPENHAB_HOME}/runtime/instances/instance.properties"
 # The instance.properties file in openHAB 3.x is installed in the tmp directory
 rm -f "${OPENHAB_USERDATA}/tmp/instances/instance.properties"
 
-# Add openhab user & handle possible device groups for different host systems
-# Container base image puts dialout on group id 20, uucp on id 10
-# GPIO Group for RPI access
+# Add openhab user and add user to groups for different host distros
+# Alpine:             audio=18,  dialout=20, uucp=14
+# CentOS/RedHat:      audio=63,  dialout=18, uucp=14
+# Debian/Ubuntu:      audio=29,  dialout=20, uucp=10
+# Linux from Scratch: audio=11,  dialout=10, uucp=32
+# openSUSE (old):     audio=17,  dialout=16, uucp=14
+# openSUSE (new):     audio=492, dialout=490
+# Raspberry Pi OS:    audio=29,  dialout=20, uucp=10, gpio=997
 NEW_USER_ID=${USER_ID:-9001}
 NEW_GROUP_ID=${GROUP_ID:-$NEW_USER_ID}
 echo "Starting with openhab user id: $NEW_USER_ID and group id: $NEW_GROUP_ID"
@@ -45,15 +50,25 @@ if ! id -u openhab >/dev/null 2>&1; then
   fi
   echo "Create user openhab with id ${NEW_USER_ID}"
   adduser -u $NEW_USER_ID --disabled-password --gecos '' --home "${OPENHAB_HOME}" --gid $NEW_GROUP_ID openhab
+  groupadd -g 11 audio2
   groupadd -g 14 uucp2
   groupadd -g 16 dialout2
+  groupadd -g 17 audio3
   groupadd -g 18 dialout3
   groupadd -g 32 uucp3
+  groupadd -g 63 audio4
+  groupadd -g 490 dialout4
+  groupadd -g 492 audio5
   groupadd -g 997 gpio
   adduser openhab audio
+  adduser openhab audio2
+  adduser openhab audio3
+  adduser openhab audio4
+  adduser openhab audio5
   adduser openhab dialout
   adduser openhab dialout2
   adduser openhab dialout3
+  adduser openhab dialout4
   adduser openhab gpio
   adduser openhab uucp
   adduser openhab uucp2
