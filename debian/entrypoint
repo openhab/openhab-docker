@@ -50,13 +50,14 @@ if ! id -u openhab >/dev/null 2>&1; then
   groupadd -g 18 dialout3
   groupadd -g 32 uucp3
   groupadd -g 997 gpio
+  adduser openhab audio
   adduser openhab dialout
-  adduser openhab uucp
-  adduser openhab uucp2
   adduser openhab dialout2
   adduser openhab dialout3
-  adduser openhab uucp3
   adduser openhab gpio
+  adduser openhab uucp
+  adduser openhab uucp2
+  adduser openhab uucp3
 fi
 
 initialize_volume() {
