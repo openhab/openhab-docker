@@ -6,8 +6,8 @@
 [![EPL-2.0](https://img.shields.io/badge/license-EPL%202-green.svg)](https://opensource.org/licenses/EPL-2.0)
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=31868624)](https://www.bountysource.com/teams/openhab/issues?tracker_ids=31868624)
 [![Docker Version](https://img.shields.io/badge/version-3.3.0-blue)](https://hub.docker.com/repository/docker/openhab/openhab/tags?name=3.3.0)
-[![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?maxAge=2592000)](https://hub.docker.com/r/openhab/openhab/)
+[![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?cacheSeconds=2592000)](https://hub.docker.com/r/openhab/openhab/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?cacheSeconds=2592000)](https://hub.docker.com/r/openhab/openhab/)
 [![GitHub Issues](https://img.shields.io/github/issues/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/issues)
 [![GitHub Stars](https://img.shields.io/github/stars/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/openhab/openhab-docker.svg)](https://github.com/openhab/openhab-docker/network)
@@ -45,11 +45,9 @@
 Repository for building Docker containers for [openHAB](https://openhab.org) (Home Automation Server).
 Comments, suggestions and contributions are welcome!
 
-## Docker Image
-
-[![dockeri.co](https://dockeri.co/image/openhab/openhab)](https://hub.docker.com/r/openhab/openhab/)
-
 ## Image variants
+
+The openHAB Docker images are available in the [openhab/openhab](https://hub.docker.com/r/openhab/openhab/) repository on Docker Hub.
 
 * For specific versions use:
   - `openhab/openhab:<version>`
