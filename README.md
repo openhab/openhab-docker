@@ -86,8 +86,6 @@ Older container images may use older versions of the Debian and Alpine base imag
 
 If you are unsure about what your needs are, you probably want to use `openhab/openhab:3.3.0`.
 
-Prebuilt Docker Images can be found here: [Docker Images](https://hub.docker.com/r/openhab/openhab)
-
 **Platforms:**
 
 The following Docker platforms are supported (automatically determined):
@@ -113,7 +111,8 @@ To properly run the container, please specify a **host volume** for the director
 
 ### Starting with Docker named volumes (for beginners)
 
-Following configuration uses Docker named data volumes. These volumes will survive, if you delete or upgrade your container.
+The following configuration uses Docker named data volumes.
+These volumes will survive, if you delete or upgrade your container.
 It is a good starting point for beginners.
 The volumes are created in the Docker volume directory.
 You can use `docker inspect openhab` to locate the directories (e.g. /var/lib/docker/volumes) on your host system.
@@ -130,6 +129,7 @@ docker run \
   -v openhab_addons:/openhab/addons \
   -v openhab_conf:/openhab/conf \
   -v openhab_userdata:/openhab/userdata \
+  -e "CRYPTO_POLICY=unlimited" \
   -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
   -d \
   --restart=always \
@@ -155,9 +155,10 @@ services:
       - "./openhab_conf:/openhab/conf"
       - "./openhab_userdata:/openhab/userdata"
     environment:
+      CRYPTO_POLICY: "unlimited"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
 ```
 
 Create the following `docker-compose.yml` for use of Docker volumes and start the container with `docker compose up -d`
@@ -177,9 +178,10 @@ services:
       - "openhab_conf:/openhab/conf"
       - "openhab_userdata:/openhab/userdata"
     environment:
+      CRYPTO_POLICY: "unlimited"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
 
 volumes:
   openhab_addons:
@@ -236,9 +238,10 @@ services:
       - "./openhab_conf:/openhab/conf"
       - "./openhab_userdata:/openhab/userdata"
     environment:
+      CRYPTO_POLICY: "unlimited"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
 ```
 
 ### Starting with Docker mounting a host directory (for advanced user)
@@ -256,13 +259,17 @@ docker run \
   -v /opt/openhab/addons:/openhab/addons \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
+  -e "CRYPTO_POLICY=unlimited" \
   -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
   openhab/openhab:3.3.0
 ```
 
 ### Automating Docker setup using Ansible (for advanced user)
 
-Here is an example playbook in case you control your environment with Ansible. You can test it by running `ansible-playbook -i mycontainerhost, -t openhab run-containers.yml`. The `:Z` at the end of volume lines is for SELinux systems. If run elsewhere, replace it with ro.
+Here is an example playbook in case you control your environment with Ansible.
+You can test it by running `ansible-playbook -i mycontainerhost, -t openhab run-containers.yml`.
+The `:Z` at the end of volume lines is for SELinux systems.
+If run elsewhere, replace it with ro.
 
 ```yaml
 - name: ensure containers are running
@@ -276,30 +283,29 @@ Here is an example playbook in case you control your environment with Ansible. Y
       image: openhab/openhab:3.3.0
       state: started
       detach: yes
-      interactive: yes
-      tty: yes
       ports:
         - 8080:8080
         - 8101:8101
         - 5007:5007
       volumes:
-        - /etc/localtime:/etc/localtime:ro
-        - /etc/timezone:/etc/timezone:ro
-        - /opt/openhab/addons:/openhab/addons:Z
-        - /opt/openhab/conf:/openhab/conf:Z
-        - /opt/openhab/userdata:/openhab/userdata:Z
+        - "/etc/localtime:/etc/localtime:ro"
+        - "/etc/timezone:/etc/timezone:ro"
+        - "/opt/openhab/addons:/openhab/addons:Z"
+        - "/opt/openhab/conf:/openhab/conf:Z"
+        - "/opt/openhab/userdata:/openhab/userdata:Z"
       keep_volumes: yes
       hostname: openhab.localnet
       memory: 512m
       pull: true
       restart_policy: unless-stopped
       env:
+        CRYPTO_POLICY="unlimited"
         EXTRA_JAVA_OPTS="-Duser.timezone=Europe/Berlin"
 ```
 
 ### Accessing the console
 
-You can connect to a console of an already running openHAB container with following command:
+You can connect to a console of an already running openHAB container with the following command:
 
 `docker exec -it openhab /openhab/runtime/bin/client`
 
@@ -338,6 +344,7 @@ The debug mode is started with the command:
 
 ## Environment variables
 
+* `CRYPTO_POLICY`=limited
 * `EXTRA_JAVA_OPTS`=""
 * `EXTRA_SHELL_OPTS`=""
 * `LC_ALL`=en_US.UTF-8
@@ -347,11 +354,10 @@ The debug mode is started with the command:
 * `OPENHAB_HTTPS_PORT`=8443
 * `USER_ID`=9001
 * `GROUP_ID`=9001
-* `CRYPTO_POLICY`=limited
 
 ### User and group identifiers
 
-Group id will default to the same value as the user id. 
+The group ID will default to the same value as the user ID.
 By default the openHAB user in the container is running with:
 
 * `uid=9001(openhab) gid=9001(openhab) groups=9001(openhab)`
@@ -366,7 +372,7 @@ useradd -u 9001 -g openhab -r -s /sbin/nologin openhab
 usermod -a -G openhab myownuser
 ```
 
-* Or run the Docker container with your own user AND passing the userid to openHAB through env
+* Or run the Docker container with your own user AND pass the uid and gid to openHAB with environment variables
 
 ```shell
 docker run \
@@ -385,12 +391,13 @@ Some openHAB functionality may depend on unlimited strength which can be enabled
 
 Before enabling this make sure this is allowed by local laws and you agree with the applicable license and terms (see [OpenJDK (Cryptographic Cautions)](https://openjdk.java.net/groups/security)).
 
-The following addons are known to depend on the unlimited cryptographic strength policy:
+The following functionality depends on the unlimited cryptographic strength policy:
 
-* Eclipse IoT Market
-* KM200 binding
-* Loxone binding
-* MQTT binding
+* KM200 Binding
+* Linky Binding
+* Loxone Binding
+* MQTT Binding
+* openHAB Marketplace
 
 ## Parameters
 
@@ -445,7 +452,7 @@ This can be done by either using a volume mount (see the examples above) or crea
 
 ## Upgrading
 
-Upgrading OH requires changes to the user mapped in userdata folder.
+Upgrading openHAB requires changes to the user mapped in userdata folder.
 The container will perform these steps automatically when it detects that the `userdata/etc/version.properties` is different from the version in `dist/userdata/etc/version.properties` in the Docker image.
 
 The steps performed are:
