@@ -21,7 +21,8 @@ if capsh --print | grep -E 'Current:.+,cap_net_admin,cap_net_raw,.+' >/dev/null;
   setcap cap_net_raw,cap_net_admin=eip "${JAVA_HOME}/bin/java"
 fi
 
-# Deleting instance.properties to avoid karaf PID conflict on restart
+# Delete stale nrjavaserial lock files and Karaf instance.properties to avoid PID conflicts on restarts
+rm -f /var/lock/LCK..*
 rm -f "${OPENHAB_USERDATA}/tmp/instances/instance.properties"
 
 # Add openhab user and add user to groups for different host distros
