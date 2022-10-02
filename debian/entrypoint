@@ -22,10 +22,6 @@ if capsh --print | grep -E 'Current:.+,cap_net_admin,cap_net_raw,.+' >/dev/null;
 fi
 
 # Deleting instance.properties to avoid karaf PID conflict on restart
-# See: https://github.com/openhab/openhab-docker/issues/99
-rm -f "${OPENHAB_HOME}/runtime/instances/instance.properties"
-
-# The instance.properties file in openHAB 3.x is installed in the tmp directory
 rm -f "${OPENHAB_USERDATA}/tmp/instances/instance.properties"
 
 # Add openhab user and add user to groups for different host distros
