@@ -25,7 +25,8 @@ ${JAVA_HOME}/lib/server
 EOI
 fi
 
-# Deleting instance.properties to avoid karaf PID conflict on restart
+# Delete stale nrjavaserial lock files and Karaf instance.properties to avoid PID conflicts on restarts
+rm -f /var/lock/LCK..*
 rm -f "${OPENHAB_USERDATA}/tmp/instances/instance.properties"
 
 # Add openhab user and add user to groups for different host distros
