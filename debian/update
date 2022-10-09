@@ -18,9 +18,9 @@ setup() {
     echo "You are already on openHAB $current_version" >&2
     exit 1
   elif [ -n "$milestone_version" ]; then
-    addons_download_location="https://www.openhab.org/download/milestones/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
+    addons_download_location="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
   else
-    addons_download_location="https://www.openhab.org/download/releases/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
+    addons_download_location="https://openhab.jfrog.io/openhab/libs-release/org/openhab/distro/openhab-addons/${oh_version}/openhab-addons-${oh_version}.kar"
   fi
 }
 
