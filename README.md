@@ -92,7 +92,7 @@ The following Docker platforms are supported (automatically determined):
 * `linux/arm64`
 * `linux/arm/v7`
 
-There is no `linux/arm/v7` Alpine image for openHAB 3 because the openjdk11 package is unavailable for this platform.
+There is no `linux/arm/v7` Alpine image for openHAB 3 (or newer) because the required openjdk package is unavailable for this platform.
 
 ## Usage
 
@@ -321,9 +321,9 @@ When the container runs in server mode you can also add a console logger so it p
 
 `docker logs openhab`
 
-To use a console logger with openHAB 3.x, edit `userdata/etc/log4j2.xml` and add the following appender to the "Root logger" and "openhab.event" logger configurations: `<AppenderRef ref="STDOUT"/>`
+To use a console logger with openHAB 3 (or newer), edit `userdata/etc/log4j2.xml` and add the following appender to the "Root logger" and "openhab.event" logger configurations: `<AppenderRef ref="STDOUT"/>`
 
-To use a console logger with openHAB 2.x, edit `userdata/etc/org.ops4j.pax.logging.cfg` and then:
+To use a console logger with openHAB 2, edit `userdata/etc/org.ops4j.pax.logging.cfg` and then:
 
 * Update the appenderRefs line to: `log4j2.rootLogger.appenderRefs = out, osgi, console`
 * Add the following line: `log4j2.rootLogger.appenderRef.console.ref = STDOUT`
