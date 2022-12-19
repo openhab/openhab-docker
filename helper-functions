@@ -36,8 +36,8 @@ platforms() {
 	local version="$1"
 	local base="$2"
 
-	if [[ "$version" =~ ^3.*$ ]] && [ "$base" == "alpine" ]; then
-		# There is no linux/arm/v7 Alpine image for openHAB 3 because the openjdk11 package is unavailable for this architecture
+	if [ "$base" == "alpine" ]; then
+		# There is no linux/arm/v7 Alpine image for openHAB 3 (or newer) because the required openjdk package is unavailable for this architecture
 		echo "linux/amd64,linux/arm64"
 	else
 		echo "linux/amd64,linux/arm64,linux/arm/v7"
@@ -217,7 +217,13 @@ build() {
 	local dist="$2"
 	local push="$3"
 
-	local build_arg_options="--build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=$openhab_version"
+	local java_version=""
+	case $openhab_version in
+	3.*) java_version="11";;
+	*)   java_version="17";;
+	esac
+
+	local build_arg_options="--build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=$java_version --build-arg OPENHAB_VERSION=$openhab_version"
 	local tags=$(tags $openhab_version $dist)
 	local tag_options=${tags//$(docker_repo)/--tag $(docker_repo)}
 	local build_options="$build_arg_options --platform $(platforms $openhab_version $dist) $tag_options --progress plain $push"

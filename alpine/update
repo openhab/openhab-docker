@@ -13,7 +13,7 @@ setup() {
 
   # Download snapshots from Jenkins and download milestones and releases using openHAB redirect.
   if test "${oh_version#*-SNAPSHOT}" != "${oh_version}"; then
-    addons_download_location="https://ci.openhab.org/job/openHAB3-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons/target/openhab-addons-${oh_version}.kar"
+    addons_download_location="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab-addons/target/openhab-addons-${oh_version}.kar"
   elif [ "${oh_version}" = "$current_version" ]; then
     echo "You are already on openHAB $current_version" >&2
     exit 1
