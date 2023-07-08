@@ -4,17 +4,13 @@ interactive=$(if test -t 0; then echo true; else echo false; fi)
 set -eux -o pipefail ${EXTRA_SHELL_OPTS-}
 IFS=$'\n\t'
 
-export JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk*)
+export JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk* | tail -n 1)
 
 # Configure Java unlimited strength cryptography
 if [ "${CRYPTO_POLICY}" = "unlimited" ]; then
   echo "Configuring Java unlimited strength cryptography policy..."
   sed -i 's/^crypto.policy=limited/crypto.policy=unlimited/' "${JAVA_HOME}/conf/security/java.security"
 fi
-
-# Make sure the Adoptium cacerts are populated
-# p11-kit cannot find any modules during the linux/arm/v7 build
-/etc/ca-certificates/update.d/adoptium-cacerts
 
 # Set capabilities when available for add-ons using Pcap4J
 if capsh --print | grep -E 'Current:.+,cap_net_admin,cap_net_raw,.+' >/dev/null; then

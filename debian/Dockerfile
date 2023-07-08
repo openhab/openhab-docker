@@ -1,4 +1,4 @@
-FROM debian:12.0-slim
+FROM debian:11.7-slim
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -50,6 +50,7 @@ RUN apt-get update && \
         locales \
         locales-all \
         netbase \
+        openjdk-${JAVA_VERSION}-jre-headless \
         procps \
         tini \
         unzip \
@@ -61,18 +62,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install java
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-RUN wget -nv -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /usr/share/keyrings/adoptium.asc && \
-    echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y temurin-${JAVA_VERSION}-jdk && \
-    JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk*) && \
-    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security" && \
-    rm "${JAVA_HOME}/src.zip" && \
-    rm "${JAVA_HOME}/lib/src.zip" && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk* | tail -n 1) && \
+    sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
