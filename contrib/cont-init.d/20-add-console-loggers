@@ -1,0 +1,10 @@
+#!/bin/bash
+
+CONFIG_FILE="${OPENHAB_USERDATA}/etc/log4j2.xml"
+OSGI_AREF='<AppenderRef ref="OSGI"/>'
+STDOUT_AREF='<AppenderRef ref="STDOUT"/>'
+
+if [ "$(grep "${STDOUT_AREF}" "${CONFIG_FILE}" | wc -l)" == "1" ]; then
+    echo "Adding console loggers to ${CONFIG_FILE}"
+    sed -i "s#${OSGI_AREF}#${OSGI_AREF}\n\t\t\t${STDOUT_AREF}#g" "${CONFIG_FILE}"
+fi
