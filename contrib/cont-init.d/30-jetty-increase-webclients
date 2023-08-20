@@ -1,0 +1,22 @@
+#!/bin/bash -ex
+
+[ -z ${MIN_SHARED} ] && MIN_SHARED=20
+[ -z ${MAX_SHARED} ] && MAX_SHARED=80
+[ -z ${MIN_CUSTOM} ] && MIN_CUSTOM=20
+[ -z ${MAX_CUSTOM} ] && MAX_CUSTOM=40
+
+sed -i \
+    "s/\org.openhab.webclient:minThreadsShared\s*=.*/org.openhab.webclient:minThreadsShared = ${MIN_SHARED}/g" \
+    "${OPENHAB_CONF}/services/runtime.cfg"
+
+sed -i \
+    "s/\org.openhab.webclient:maxThreadsShared\s*=.*/org.openhab.webclient:maxThreadsShared = ${MAX_SHARED}/g" \
+    "${OPENHAB_CONF}/services/runtime.cfg"
+
+sed -i \
+    "s/\org.openhab.webclient:minThreadsCustom\s*=.*/org.openhab.webclient:minThreadsCustom = ${MIN_CUSTOM}/g" \
+    "${OPENHAB_CONF}/services/runtime.cfg"
+
+sed -i \
+    "s/\org.openhab.webclient:maxThreadsCustom\s*=.*/org.openhab.webclient:maxThreadsCustom = ${MAX_CUSTOM}/g" \
+    "${OPENHAB_CONF}/services/runtime.cfg"
