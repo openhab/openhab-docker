@@ -36,7 +36,11 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.source="https://github.com/openhab/openhab-docker.git" \
     org.opencontainers.image.authors="openHAB <info@openhabfoundation.org>"
 
-# Install basepackages
+# https://github.com/hadolint/hadolint/wiki/DL4006
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
+# Install basepackages. Versions are "pinned" by using a pinned base image.
+# hadolint ignore=DL3018
 RUN apk update --no-cache && \
     apk add --no-cache \
         arping \
@@ -60,11 +64,13 @@ RUN apk update --no-cache && \
     rm -rf /var/cache/apk/*
 
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-RUN JAVA_HOME=$(ls -d /usr/lib/jvm/*jdk*) && \
+RUN JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -name "*jdk*" -type d) && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"
 
 # Install openHAB
 # Set permissions for openHAB. Export TERM variable. See issue #30 for details!
+# Single quotes are used on purpose, so $TERM is expanded when running the container.
+# hadolint ignore=SC2016
 RUN version="$(echo $OPENHAB_VERSION | sed 's/snapshot/SNAPSHOT/g')" && \
     if [ $(echo $version | grep -E '^.+\.(M|RC).+$') ]; then url="https://openhab.jfrog.io/openhab/libs-milestone-local/org/openhab/distro/openhab/${version}/openhab-${version}.zip"; \
     elif [ $(echo $version | grep -E '^4\..+-SNAPSHOT$') ]; then url="https://ci.openhab.org/job/openHAB-Distribution/lastSuccessfulBuild/artifact/distributions/openhab/target/openhab-${version}.zip"; \
