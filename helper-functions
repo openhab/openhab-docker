@@ -226,7 +226,8 @@ build() {
 	local build_arg_options="--build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=$java_version --build-arg OPENHAB_VERSION=$openhab_version"
 	local tags=$(tags $openhab_version $dist)
 	local tag_options=${tags//$(docker_repo)/--tag $(docker_repo)}
-	local build_options="$build_arg_options --platform $(platforms $openhab_version $dist) $tag_options --progress plain $push"
+	local output_options="--output type=image,oci-mediatypes=false,push=$([ "$push" == "--push" ] && echo true || echo false)"
+	local build_options="$build_arg_options --platform $(platforms $openhab_version $dist) $tag_options $output_options --progress plain --provenance=false"
 	local dockerfile_path="./$dist"
 	local build_command="docker buildx build $build_options $dockerfile_path"
 
