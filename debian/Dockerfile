@@ -24,18 +24,17 @@ ENV \
     USER_ID="9001"
 
 # Basic build-time metadata as defined at http://label-schema.org
-LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.docker.dockerfile="/Dockerfile" \
-    org.label-schema.license="EPL-2.0" \
-    org.label-schema.name="openHAB" \
-    org.label-schema.vendor="openHAB Foundation e.V." \
-    org.label-schema.version=$OPENHAB_VERSION \
-    org.label-schema.description="An open source, technology agnostic home automation platform" \
-    org.label-schema.url="https://www.openhab.com/" \
-    org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-type="Git" \
-    org.label-schema.vcs-url="https://github.com/openhab/openhab-docker.git" \
-    maintainer="openHAB <info@openhabfoundation.org>"
+LABEL org.opencontainers.image.created=$BUILD_DATE \
+    org.opencontainers.image.licenses="EPL-2.0" \
+    org.opencontainers.image.title="openHAB" \
+    org.opencontainers.image.vendor="openHAB Foundation e.V." \
+    org.opencontainers.image.version=$OPENHAB_VERSION \
+    org.opencontainers.image.description="An open source, technology agnostic home automation platform" \
+    org.opencontainers.image.url="https://www.openhab.org/" \
+    org.opencontainers.image.documentation="https://www.openhab.org/docs/installation/docker.html" \
+    org.opencontainers.image.revision=$VCS_REF \
+    org.opencontainers.image.source="https://github.com/openhab/openhab-docker.git" \
+    org.opencontainers.image.authors="openHAB <info@openhabfoundation.org>"
 
 # Install basepackages
 RUN apt-get update && \
