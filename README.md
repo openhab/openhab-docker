@@ -515,26 +515,23 @@ For more information on this see the [Docker documentation](https://docs.docker.
 Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `/debian`) and then run these commands to build and run a Docker image for your current platform:
 
 ```shell
-$ docker build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=4.0.3 --tag openhab/openhab .
+$ docker build --build-arg JAVA_VERSION=17 --build-arg OPENHAB_VERSION=4.0.3 --tag openhab/openhab .
 $ docker run openhab/openhab
 ```
 
-To be able to build the same image for other platforms (e.g. arm/v7, arm64 on amd64) Docker CE 19.03 with BuildKit support can be used.
+To be able to build the same image for other platforms (e.g. arm/v7, arm64 on amd64) Docker CE with BuildKit support can be used.
 
-First enable BuildKit support, configure QEMU binary formats and a builder using:
+First configure QEMU binary formats and a builder using:
 
 ```shell
-$ echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
-$ export DOCKER_CLI_EXPERIMENTAL=enabled
-$ docker run --privileged --rm tonistiigi/binfmt:qemu-v6.1.0 --install all
-$ sudo systemctl restart docker
+$ docker run --privileged --rm tonistiigi/binfmt:qemu-v8.0.4 --install all
 $ docker buildx create --name builder --use
 ```
 
 Change to a directory containing a Dockerfile (e.g. `/debian`) and then use the following command to build an ARMv7 image:
 
-```
-$ docker buildx build --build-arg JAVA_VERSION=11 --build-arg OPENHAB_VERSION=4.0.3 --platform linux/arm/v7 --tag openhab/openhab --load .
+```shell
+$ docker buildx build --build-arg JAVA_VERSION=17 --build-arg OPENHAB_VERSION=4.0.3 --platform linux/arm/v7 --tag openhab/openhab --load .
 ```
 
 The `build` script in the root of the repository helps to simplify building the openHAB images with BuildKit.
