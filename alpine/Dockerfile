@@ -23,7 +23,7 @@ ENV \
     OPENHAB_USERDATA="/openhab/userdata" \
     USER_ID="9001"
 
-# Basic build-time metadata as defined at http://label-schema.org
+# Basic build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.licenses="EPL-2.0" \
     org.opencontainers.image.title="openHAB" \
