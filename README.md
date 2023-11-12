@@ -4,7 +4,6 @@
 
 [![Build Status](https://ci.openhab.org/job/openHAB-Docker/badge/icon)](https://ci.openhab.org/job/openHAB-Docker/)
 [![EPL-2.0](https://img.shields.io/badge/license-EPL%202-green.svg)](https://opensource.org/licenses/EPL-2.0)
-[![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=31868624)](https://www.bountysource.com/teams/openhab/issues?tracker_ids=31868624)
 [![Docker Version](https://img.shields.io/badge/version-4.0.4-blue)](https://hub.docker.com/repository/docker/openhab/openhab/tags?name=4.0.4)
 [![Docker Stars](https://img.shields.io/docker/stars/openhab/openhab.svg?cacheSeconds=2592000)](https://hub.docker.com/r/openhab/openhab/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/openhab/openhab.svg?cacheSeconds=2592000)](https://hub.docker.com/r/openhab/openhab/)
