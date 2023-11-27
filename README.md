@@ -496,7 +496,7 @@ For more details see this [community thread](https://community.openhab.org/t/128
 
 The default filesystem mount flags of OpenMediaVault contain the `noexec` flag which interferes with the serial library used by openHAB.
 To be able to use serial devices with openHAB, make sure the `userdata` volume mounted by the container is not backed by a filesystem having the `noexec` flag.
-See the [OMV documentation](https://openmediavault.readthedocs.io/en/5.x/various/fs_env_vars.html) on how to remove the `noexec` flag from an existing filesystem.
+See the [OMV documentation](https://openmediavault.readthedocs.io/en/6.x/various/fs_env_vars.html) on how to remove the `noexec` flag from an existing filesystem.
 
 ### Portainer
 
