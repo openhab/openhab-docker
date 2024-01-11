@@ -70,8 +70,9 @@ The openHAB Docker images are available in the [openhab/openhab](https://hub.doc
 * **Stable:** Thoroughly tested semi-annual official releases of openHAB. Use the stable version for your production environment if you do not need the latest enhancements and prefer a robust system.
   * `4.1.1` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/4.1.1))
   * `4.0.4` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/4.0.4))
-* **Snapshot:** Usually 1 or 2 days old and include the latest code. Use these for testing out very recent changes using the latest code. Be aware that some snapshots might be unstable so use these in production at your own risk!
-  * `4.2.0-snapshot`
+* **Milestone:** Intermediary releases of the next openHAB version which are released about once a month. They include recently added features and bugfixes and are a good compromise between the current stable version and the bleeding-edge and potentially unstable snapshot version.
+  * `4.1.0.RC1` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/4.1.0.RC1))
+  * `4.1.0.M5` ([Release notes](https://github.com/openhab/openhab-distro/releases/tag/4.1.0.M5))
 
 **Distributions:**
 
