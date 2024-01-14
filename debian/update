@@ -170,9 +170,12 @@ do
   fi
 done < "${OPENHAB_HOME}/runtime/bin/userdata_sysfiles.lst"
 
-# Clearing the cache and tmp folders is necessary for upgrade.
+# Clearing the cache, marketplace and tmp folders is necessary for upgrade.
 echo "Clearing cache..."
 rm -rf "${OPENHAB_USERDATA:?}/cache"
+if [ $(get_version_number "${oh_version}") -ge $(get_version_number "4.2.0") ]; then
+  rm -rf "${OPENHAB_USERDATA:?}/marketplace"
+fi
 rm -rf "${OPENHAB_USERDATA:?}/tmp"
 
 # Perform version specific post-update commands
