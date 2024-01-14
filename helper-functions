@@ -12,7 +12,7 @@ get_released_versions_from_tags() {
 get_snapshot_versions_from_poms() {
 	local branch_names="$(git ls-remote --refs --heads "https://github.com/${DISTRO_REPO}.git" | grep -E '.+/heads/(main)$' | sed -E 's#.+/heads/(.+)#\1#g')"
 	for branch_name in $branch_names; do
-		curl -sS "https://raw.githubusercontent.com/${DISTRO_REPO}/${branch_name}/pom.xml" | grep -E '^    <version>' | grep 'SNAPSHOT' | sed -E 's#.+<version>(.+)-SNAPSHOT</version>#\1-snapshot#g' || echo ""
+		curl -sS "https://raw.githubusercontent.com/${DISTRO_REPO}/${branch_name}/pom.xml" | grep -E '^  <version>' | grep 'SNAPSHOT' | sed -E 's#.+<version>(.+)-SNAPSHOT</version>#\1-snapshot#g' || echo ""
 	done
 }
 
