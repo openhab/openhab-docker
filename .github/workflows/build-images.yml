@@ -19,7 +19,7 @@ jobs:
     name: ${{ matrix.tag }}-${{ matrix.distribution }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
@@ -28,7 +28,7 @@ jobs:
           config: ".github/hadolint.yml"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Build images
         run: ./build ${{ matrix.tag }} ${{ matrix.distribution }}
