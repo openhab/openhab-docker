@@ -393,6 +393,7 @@ Before enabling this make sure this is allowed by local laws and you agree with 
 
 The following functionality depends on the unlimited cryptographic strength policy:
 
+* air-Q Binding
 * KM200 Binding
 * Linky Binding
 * Loxone Binding
