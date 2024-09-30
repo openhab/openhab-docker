@@ -33,7 +33,7 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.url="https://www.openhab.org/" \
     org.opencontainers.image.documentation="https://www.openhab.org/docs/installation/docker.html" \
     org.opencontainers.image.revision=$VCS_REF \
-    org.opencontainers.image.source="https://github.com/openhab/openhab-docker.git" \
+    org.opencontainers.image.source="https://github.com/openhab/openhab-distro.git" \
     org.opencontainers.image.authors="openHAB <info@openhabfoundation.org>"
 
 # https://github.com/hadolint/hadolint/wiki/DL4006
