@@ -141,8 +141,6 @@ docker run \
 Create the following `docker-compose.yml` for use of local directories and start the container with `docker compose up -d`
 
 ```yaml
-version: '2.2'
-
 services:
   openhab:
     image: "openhab/openhab:4.2.2"
@@ -164,8 +162,6 @@ services:
 Create the following `docker-compose.yml` for use of Docker volumes and start the container with `docker compose up -d`
 
 ```yml
-version: '2.2'
-
 services:
   openhab:
     image: "openhab/openhab:4.2.2"
@@ -199,8 +195,6 @@ This allows for using the *Amazon Dash Button Binding* in the Docker container.
 Create the following `docker-compose.yml` and start the container with `docker compose up -d`
 
 ```yaml
-version: '2.2'
-
 services:
   openhab:
     container_name: openhab
@@ -224,8 +218,6 @@ The `host` networking driver only works on Linux hosts, and is not supported by 
 On Windows and macOS ports should be exposed by adding port options to commands (`-p 8080`) or by adding a ports section to `docker-compose.yml`.
 
 ```yaml
-version: '2.2'
-
 services:
   openhab:
     image: "openhab/openhab:4.2.2"
