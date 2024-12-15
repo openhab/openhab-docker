@@ -36,11 +36,12 @@ platforms() {
 	local version="$1"
 	local base="$2"
 
-	if [ "$base" == "alpine" ]; then
-		# There is no linux/arm/v7 Alpine image for openHAB 3 (or newer) because the required openjdk package is unavailable for this architecture
-		echo "linux/amd64,linux/arm64"
-	else
+	if [[ "$version" =~ ^4.*$ ]] && [ "$base" == "debian" ]; then
 		echo "linux/amd64,linux/arm64,linux/arm/v7"
+	else
+		# There are no linux/arm/v7 images for openHAB 5 (or newer) because this platform is no longer supported.
+		# There are no linux/arm/v7 Alpine images for openHAB 3 (or newer) because the required openjdk package is unavailable for this platform.
+		echo "linux/amd64,linux/arm64"
 	fi
 }
 
@@ -219,8 +220,8 @@ build() {
 
 	local java_version=""
 	case $openhab_version in
-	3.*) java_version="11";;
-	*)   java_version="17";;
+	4.*) java_version="17";;
+	*)   java_version="21";;
 	esac
 
 	local build_arg_options="--build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=$java_version --build-arg OPENHAB_VERSION=$openhab_version"

@@ -50,10 +50,10 @@ resolve_version_tags() {
 }
 
 print_help() {
-	local snapshot_4x=$(grep -E '^4\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1)
+	local snapshot_5x=$(grep -E '^5\.[0-9]+\.[0-9]+-snapshot$' <<< $VERSIONS | tail -n 1)
 	local milestone_4x=$(grep -E '^4\.[0-9]+\.[0-9]+.(M[0-9]+)$' <<< $VERSIONS | tail -n 1)
-	local stable_3x=$(grep -E '^3\.[0-9]+\.[0-9]+$' <<< $VERSIONS | tail -n 1)
-	local stable_40x=$(grep -E '^4\.0\.[0-9]+$' <<< $VERSIONS | tail -n 1)
+	local stable_42x=$(grep -E '^4\.2\.[0-9]+$' <<< $VERSIONS | tail -n 1)
+	local stable_43x=$(grep -E '^4\.3\.[0-9]+$' <<< $VERSIONS | tail -n 1)
 
 	cat <<-EOI
 Usage: ./build [OPTIONS]
@@ -67,17 +67,17 @@ Log in to the Docker Registry with "docker login" before building and pushing th
 
 Examples:
 
-Build the Debian and Alpine $snapshot_4x images:
+Build the Debian and Alpine $snapshot_5x images:
     ./build
 
-Build the Debian $snapshot_4x images:
+Build the Debian $snapshot_5x images:
     ./build debian
 
 Build the Alpine $milestone_4x images:
     ./build $milestone_4x alpine
 
-Build the $stable_40x and $stable_3x Debian/Alpine images and push them to $(docker_repo):
-    ./build $stable_40x $stable_3x --push
+Build the $stable_43x and $stable_42x Debian/Alpine images and push them to $(docker_repo):
+    ./build $stable_43x $stable_42x --push
 
 Build the latest/snapshot Debian images by resolving the versions ("milestone" can also be resolved):
     ./build latest snapshot debian
