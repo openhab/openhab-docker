@@ -89,9 +89,7 @@ The following Docker platforms are supported (automatically determined):
 
 * `linux/amd64`
 * `linux/arm64`
-* `linux/arm/v7`
-
-There is no `linux/arm/v7` Alpine image for openHAB 3 (or newer) because the required openjdk package is unavailable for this platform.
+* `linux/arm/v7` (Debian openHAB 4 (or older), Alpine openHAB 2 (or older))
 
 ## Usage
 
