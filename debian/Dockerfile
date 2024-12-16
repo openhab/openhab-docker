@@ -42,6 +42,14 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install basepackages. Versions are "pinned" by using a pinned base image.
 # hadolint ignore=DL3008
 RUN apt-get update && \
+    openjdk_package="openjdk-${JAVA_VERSION}-jre-headless" && \
+    apt-get install --no-install-recommends -y --dry-run "$openjdk_package" >/dev/null || openjdk_package="temurin-${JAVA_VERSION}-jre" && \
+    if [ $(echo "$openjdk_package" | grep -E '^temurin-.+$') ]; then \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y wget ca-certificates && \
+        wget -nv -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /usr/share/keyrings/adoptium.asc && \
+        echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
+        apt-get update; \
+    fi && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
         arping \
         ca-certificates \
@@ -53,7 +61,7 @@ RUN apt-get update && \
         locales \
         locales-all \
         netbase \
-        openjdk-${JAVA_VERSION}-jre-headless \
+        "$openjdk_package" \
         procps \
         tini \
         unzip \
@@ -66,7 +74,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-RUN JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -name "*jdk*" -type d) && \
+RUN JAVA_HOME=$(find /usr/lib/jvm -mindepth 1 -maxdepth 1 -type d) && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"
 
 # Install openHAB

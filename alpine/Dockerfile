@@ -64,7 +64,7 @@ RUN apk update --no-cache && \
     rm -rf /var/cache/apk/*
 
 # Limit JDK crypto policy by default to comply with local laws which may prohibit use of unlimited strength cryptography
-RUN JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -name "*jdk*" -type d) && \
+RUN JAVA_HOME=$(find /usr/lib/jvm -mindepth 1 -maxdepth 1 -type d) && \
     sed -i 's/^crypto.policy=unlimited/crypto.policy=limited/' "${JAVA_HOME}/conf/security/java.security"
 
 # Install openHAB
