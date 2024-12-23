@@ -86,6 +86,9 @@ RUN version="$(echo $OPENHAB_VERSION | sed 's/snapshot/SNAPSHOT/g')" && \
 COPY update ${OPENHAB_HOME}/runtime/bin/update
 RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
 
+# Workaround for broken /var/lock symlink, see: https://github.com/alpinelinux/docker-alpine/issues/433
+RUN mkdir /run/lock
+
 # Expose volume with configuration and userdata dir
 VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 
