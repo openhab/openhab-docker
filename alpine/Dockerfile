@@ -61,6 +61,8 @@ RUN apk update --no-cache && \
         unzip \
         wget \
         zip && \
+    # Install NodeJS only for openHAB >= 5
+    if [ $(echo "$OPENHAB_VERSION" | sed -E 's/^([0-9]+).*/\1/') -ge 5 ]; then apk add --no-cache nodejs; fi && \
     chmod u+s /usr/sbin/arping && \
     rm -rf /var/cache/apk/*
 
