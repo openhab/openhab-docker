@@ -57,6 +57,7 @@ RUN apk update --no-cache && \
         tini \
         ttf-dejavu \
         openjdk${JAVA_VERSION} \
+        nodejs \
         unzip \
         wget \
         zip && \
