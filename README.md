@@ -511,7 +511,7 @@ To be able to build the same image for other platforms (e.g. arm/v7, arm64 on am
 First configure QEMU binary formats and a builder using:
 
 ```shell
-$ docker run --privileged --rm tonistiigi/binfmt:qemu-v8.0.4 --install all
+$ docker run --privileged --rm tonistiigi/binfmt:qemu-v8.1.5 --install all
 $ docker buildx create --name builder --use
 ```
 
