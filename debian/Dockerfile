@@ -1,4 +1,4 @@
-FROM debian:12.8-slim
+FROM debian:12-slim
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -42,6 +42,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install basepackages. Versions are "pinned" by using a pinned base image.
 # hadolint ignore=DL3008
 RUN apt-get update && \
+    apt-get upgrade --yes && \
     openjdk_package="openjdk-${JAVA_VERSION}-jre-headless" && \
     apt-get install --no-install-recommends -y --dry-run "$openjdk_package" >/dev/null || openjdk_package="temurin-${JAVA_VERSION}-jre" && \
     if [ $(echo "$openjdk_package" | grep -E '^temurin-.+$') ]; then \

@@ -42,6 +42,7 @@ SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 # Install basepackages. Versions are "pinned" by using a pinned base image.
 # hadolint ignore=DL3018
 RUN apk update --no-cache && \
+    apk upgrade --no-cache && \
     apk add --no-cache \
         arping \
         bash \
