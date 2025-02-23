@@ -41,7 +41,8 @@ SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # Install basepackages. Versions are "pinned" by using a pinned base image.
 # hadolint ignore=DL3018
-RUN apk update --no-cache && \
+RUN version="$(echo "$OPENHAB_VERSION" | sed 's/snapshot/SNAPSHOT/g')" && \
+    apk update --no-cache && \
     apk add --no-cache \
         arping \
         bash \
@@ -56,10 +57,12 @@ RUN apk update --no-cache && \
         su-exec \
         tini \
         ttf-dejavu \
-        openjdk${JAVA_VERSION} \
+        openjdk"${JAVA_VERSION}" \
         unzip \
         wget \
         zip && \
+    # Install NodeJS only for openHAB 5 SNAPSHOT
+    if [ $(echo "$version" | grep -E '^5\..+-SNAPSHOT$') ]; then apk add --no-cache nodejs; fi && \
     chmod u+s /usr/sbin/arping && \
     rm -rf /var/cache/apk/*
 
