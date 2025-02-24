@@ -39,6 +39,11 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
 # https://github.com/hadolint/hadolint/wiki/DL4006
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# Workaround to use gosu from trixie to avoid CVE warnings
+RUN echo "workaround for outdated gosu binary in bookworm" && \
+    printf "Types: deb\nURIs: http://http.us.debian.org/debian\nSuites: trixie\nComponents: main\nSigned-By: /usr/share/keyrings/debian-archive-keyring.gpg\n" >  /etc/apt/sources.list.d/trixie.sources && \
+    printf "Package: *\nPin: release a=testing\nPin-Priority: 400\n" > /etc/apt/preferences.d/testing.pref
+
 # Install basepackages. Versions are "pinned" by using a pinned base image.
 # hadolint ignore=DL3008
 RUN apt-get update && \
@@ -56,7 +61,7 @@ RUN apt-get update && \
         ca-certificates \
         curl \
         fontconfig \
-        gosu \
+        gosu/trixie \
         iputils-ping \
         libcap2-bin \
         locales \
