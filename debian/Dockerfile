@@ -20,6 +20,7 @@ ENV \
     OPENHAB_HTTP_PORT="8080" \
     OPENHAB_HTTPS_PORT="8443" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
+    OPENHAB_RUNTIME="/openhab/runtime" \
     OPENHAB_USERDATA="/openhab/userdata" \
     USER_ID="9001"
 
@@ -66,6 +67,7 @@ RUN apt-get update && \
         procps \
         tini \
         unzip \
+        vim-tiny \
         wget \
         zip && \
     c_rehash && \
@@ -96,6 +98,11 @@ RUN version="$(echo $OPENHAB_VERSION | sed 's/snapshot/SNAPSHOT/g')" && \
     echo 'export TERM=${TERM:=dumb}' | tee -a ~/.bashrc
 COPY update ${OPENHAB_HOME}/runtime/bin/update
 RUN chmod +x ${OPENHAB_HOME}/runtime/bin/update
+
+# Add openhab-cli script from openhab-linuxpkg repo
+RUN wget -nv -O /usr/bin/openhab-cli "https://raw.githubusercontent.com/openhab/openhab-linuxpkg/refs/heads/main/resources/usr/bin/openhab-cli" && \
+    chmod +x /usr/bin/openhab-cli && \
+    ln -s /usr/bin/vim.tiny /usr/bin/vim
 
 # Expose volume with configuration and userdata dir
 VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
