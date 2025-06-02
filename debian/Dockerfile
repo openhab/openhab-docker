@@ -68,6 +68,8 @@ RUN apt-get update && \
         unzip \
         wget \
         zip && \
+    # Install NodeJS only for openHAB >= 5
+    if [ "$(echo $OPENHAB_VERSION | sed -E 's/^([0-9]+).*/\1/')" -ge 5 ]; then DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y nodejs; fi && \
     c_rehash && \
     chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn && \
