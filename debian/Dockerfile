@@ -1,3 +1,14 @@
+# Build su-exec used in the Docker image
+FROM debian:12-slim AS su-exec-builder
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y ca-certificates curl gcc libc-dev && \
+    curl -fsS -o "su-exec.c" "https://raw.githubusercontent.com/ncopa/su-exec/4c3bb42b093f14da70d8ab924b487ccfbb1397af/su-exec.c" && \
+    echo "d6c40440609a23483f12eb6295b5191e94baf08298a856bab6e15b10c3b82891 su-exec.c" | sha256sum -c - && \
+    gcc -Wall "su-exec.c" -o "su-exec"
+
+# Build the openHAB Docker image
 FROM debian:12-slim
 
 ARG BUILD_DATE
@@ -39,6 +50,9 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
 # https://github.com/hadolint/hadolint/wiki/DL4006
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# Copy su-exec from the builder
+COPY --from=su-exec-builder /su-exec /sbin/su-exec
+
 # Install basepackages. Versions are "pinned" by using a pinned base image.
 # hadolint ignore=DL3008
 RUN apt-get update && \
@@ -56,7 +70,6 @@ RUN apt-get update && \
         ca-certificates \
         curl \
         fontconfig \
-        gosu \
         iputils-ping \
         libcap2-bin \
         locales \
@@ -115,4 +128,4 @@ RUN chmod +x /entrypoint
 ENTRYPOINT ["/entrypoint"]
 
 # Execute command
-CMD ["gosu", "openhab", "tini", "-s", "./start.sh"]
+CMD ["su-exec", "openhab", "tini", "-s", "./start.sh"]
