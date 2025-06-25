@@ -204,7 +204,7 @@ update_dockerhub_readme() {
 
 prepare_builder() {
 	if [ "$BUILDER" == "" ]; then
-		docker run --privileged --rm tonistiigi/binfmt:qemu-v8.1.5 --install all &> /dev/null
+		docker run --privileged --rm tonistiigi/binfmt:qemu-v9.2.2 --install all &> /dev/null
 		(docker buildx inspect builder &> /dev/null && echo -e "\nReusing existing builder") || \
 			(docker buildx create --name builder --use &> /dev/null && echo -e "\nCreated builder")
 		BUILDER="builder"
