@@ -514,14 +514,14 @@ To be able to build the same image for other platforms (e.g. arm/v7, arm64 on am
 First configure QEMU binary formats and a builder using:
 
 ```shell
-$ docker run --privileged --rm tonistiigi/binfmt:qemu-v8.1.5 --install all
+$ docker run --privileged --rm tonistiigi/binfmt:qemu-v9.2.2 --install all
 $ docker buildx create --name builder --use
 ```
 
-Change to a directory containing a Dockerfile (e.g. `/debian`) and then use the following command to build an ARMv7 image:
+Change to a directory containing a Dockerfile (e.g. `/debian`) and then use the following command to build an ARM64 image:
 
 ```shell
-$ docker buildx build --build-arg JAVA_VERSION=17 --build-arg OPENHAB_VERSION=4.3.5 --platform linux/arm/v7 --tag openhab/openhab --load .
+$ docker buildx build --build-arg JAVA_VERSION=17 --build-arg OPENHAB_VERSION=4.3.5 --platform linux/arm64 --tag openhab/openhab --load .
 ```
 
 The `build` script in the root of the repository helps to simplify building the openHAB images with BuildKit.
