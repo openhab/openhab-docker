@@ -518,7 +518,7 @@ $ docker buildx create --name builder --use
 Change to a directory containing a Dockerfile (e.g. `/debian`) and then use the following command to build an ARM64 image:
 
 ```shell
-$ docker buildx build --build-arg JAVA_VERSION=17 --build-arg OPENHAB_VERSION=5.0.0 --platform linux/arm64 --tag openhab/openhab --load .
+$ docker buildx build --build-arg JAVA_VERSION=21 --build-arg OPENHAB_VERSION=5.0.0 --platform linux/arm64 --tag openhab/openhab --load .
 ```
 
 The `build` script in the root of the repository helps to simplify building the openHAB images with BuildKit.
