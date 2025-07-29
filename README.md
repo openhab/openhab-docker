@@ -502,7 +502,7 @@ For more information on this see the [Docker documentation](https://docs.docker.
 Checkout the GitHub repository, change to a directory containing a Dockerfile (e.g. `/debian`) and then run these commands to build and run a Docker image for your current platform:
 
 ```shell
-$ docker build --build-arg JAVA_VERSION=17 --build-arg OPENHAB_VERSION=5.0.0 --tag openhab/openhab .
+$ docker build --build-arg JAVA_VERSION=21 --build-arg OPENHAB_VERSION=5.0.0 --tag openhab/openhab .
 $ docker run openhab/openhab
 ```
 
