@@ -66,6 +66,7 @@ RUN apt-get update && \
         apt-get update; \
     fi && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+        adduser \
         arping \
         ca-certificates \
         curl \
