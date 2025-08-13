@@ -75,7 +75,7 @@ The openHAB Docker images are available in the [openhab/openhab](https://hub.doc
 
 **Distributions:**
 
-* `debian` for Debian 12 "bookworm" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/debian/Dockerfile))
+* `debian` for Debian 13 "trixie" (default when not specified in tag) ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/debian/Dockerfile))
 * `alpine` for Alpine 3.22 ([Dockerfile](https://github.com/openhab/openhab-docker/blob/main/alpine/Dockerfile))
 
 The Alpine images are substantially smaller than the Debian images but may be less compatible because OpenJDK is used (see [Prerequisites](https://www.openhab.org/docs/installation/#prerequisites) for known disadvantages).

@@ -1,5 +1,5 @@
 # Build su-exec used in the Docker image
-FROM debian:12-slim AS su-exec-builder
+FROM debian:13-slim AS su-exec-builder
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # hadolint ignore=DL3008
 RUN apt-get update && \
@@ -9,7 +9,7 @@ RUN apt-get update && \
     gcc -Wall "su-exec.c" -o "su-exec"
 
 # Build the openHAB Docker image
-FROM debian:12-slim
+FROM debian:13-slim
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -66,6 +66,7 @@ RUN apt-get update && \
         apt-get update; \
     fi && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
+        adduser \
         arping \
         ca-certificates \
         curl \
