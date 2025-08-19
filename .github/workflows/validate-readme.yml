@@ -15,7 +15,7 @@ jobs:
     name: validate
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Validate README.md
       run: bash -c 'source helper-functions && validate_readme_constraints'

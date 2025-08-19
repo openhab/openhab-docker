@@ -19,7 +19,7 @@ jobs:
     name: ${{ matrix.tag }}-${{ matrix.distribution }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
