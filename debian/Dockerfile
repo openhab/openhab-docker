@@ -1,5 +1,7 @@
 # Build su-exec used in the Docker image
-FROM debian:13-slim AS su-exec-builder
+ARG BASE_IMAGE=debian:13-slim
+# hadolint ignore=DL3006
+FROM ${BASE_IMAGE} AS su-exec-builder
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # hadolint ignore=DL3008
 RUN apt-get update && \
@@ -9,7 +11,9 @@ RUN apt-get update && \
     gcc -Wall "su-exec.c" -o "su-exec"
 
 # Build the openHAB Docker image
-FROM debian:13-slim
+ARG BASE_IMAGE=debian:13-slim
+# hadolint ignore=DL3006
+FROM ${BASE_IMAGE}
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -54,7 +58,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY --from=su-exec-builder /su-exec /sbin/su-exec
 
 # Install basepackages. Versions are "pinned" by using a pinned base image.
-# hadolint ignore=DL3008
+# hadolint ignore=DL3008,SC2143
 RUN apt-get update && \
     apt-get upgrade --yes && \
     openjdk_package="openjdk-${JAVA_VERSION}-jre-headless" && \

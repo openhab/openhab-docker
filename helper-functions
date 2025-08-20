@@ -27,9 +27,19 @@ bases() {
 	echo "debian alpine"
 }
 
+base_image() {
+	local version="$1"
+	local base="$2"
+
+	if [[ "$version" =~ ^4.*$ ]] && [ "$base" == "debian" ]; then
+		echo "--build-arg BASE_IMAGE=debian:12-slim"
+	fi
+}
+
 docker_repo() {
 	echo "${DOCKER_REPO:=openhab/openhab}"
 }
+
 
 # Supported Docker platforms
 platforms() {
@@ -224,7 +234,7 @@ build() {
 	*)   java_version="21";;
 	esac
 
-	local build_arg_options="--build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=$java_version --build-arg OPENHAB_VERSION=$openhab_version"
+	local build_arg_options="$(base_image $openhab_version $dist) --build-arg BUILD_DATE=$(date +"%Y-%m-%dT%H:%M:%SZ") --build-arg VCS_REF=$(git rev-parse HEAD) --build-arg JAVA_VERSION=$java_version --build-arg OPENHAB_VERSION=$openhab_version"
 	local tags=$(tags $openhab_version $dist)
 	local tag_options=${tags//$(docker_repo)/--tag $(docker_repo)}
 	local output_options="--output type=image,oci-mediatypes=false,push=$([ "$push" == "--push" ] && echo true || echo false)"
