@@ -61,14 +61,6 @@ COPY --from=su-exec-builder /su-exec /sbin/su-exec
 # hadolint ignore=DL3008,SC2143
 RUN apt-get update && \
     apt-get upgrade --yes && \
-    openjdk_package="openjdk-${JAVA_VERSION}-jre-headless" && \
-    apt-get install --no-install-recommends -y --dry-run "$openjdk_package" >/dev/null || openjdk_package="temurin-${JAVA_VERSION}-jre" && \
-    if [ $(echo "$openjdk_package" | grep -E '^temurin-.+$') ]; then \
-        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y wget ca-certificates && \
-        wget -nv -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /usr/share/keyrings/adoptium.asc && \
-        echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
-        apt-get update; \
-    fi && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
         adduser \
         arping \
@@ -80,12 +72,20 @@ RUN apt-get update && \
         locales \
         locales-all \
         netbase \
-        "$openjdk_package" \
         procps \
         tini \
         unzip \
         wget \
         zip && \
+    # Install OpenJDK or fallback to Temurin depending on package availability
+    openjdk_package="openjdk-${JAVA_VERSION}-jre-headless" && \
+    apt-get install -y --dry-run "$openjdk_package" >/dev/null || openjdk_package="temurin-${JAVA_VERSION}-jre" && \
+    if [ $(echo "$openjdk_package" | grep -E '^temurin-.+$') ]; then \
+        wget -nv -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /usr/share/keyrings/adoptium.asc && \
+        echo "deb [signed-by=/usr/share/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
+        apt-get update; \
+    fi && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y "$openjdk_package" && \
     # Install NodeJS only for openHAB >= 5
     if [ "$(echo $OPENHAB_VERSION | sed -E 's/^([0-9]+).*/\1/')" -ge 5 ]; then DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y nodejs; fi && \
     c_rehash && \
