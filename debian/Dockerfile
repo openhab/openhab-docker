@@ -58,7 +58,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 COPY --from=su-exec-builder /su-exec /sbin/su-exec
 
 # Install basepackages. Versions are "pinned" by using a pinned base image.
-# hadolint ignore=DL3008,SC2143
+# hadolint ignore=DL3008,DL3015,SC2143
 RUN apt-get update && \
     apt-get upgrade --yes && \
     DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
