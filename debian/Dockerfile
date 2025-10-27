@@ -89,6 +89,9 @@ RUN apt-get update && \
     # Install NodeJS only for openHAB >= 5
     if [ "$(echo $OPENHAB_VERSION | sed -E 's/^([0-9]+).*/\1/')" -ge 5 ]; then DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y nodejs; fi && \
     c_rehash && \
+    # Fix issue with (arp)ping tool under non-root user for Docker+LXC setups
+    # See: https://community.openhab.org/t/network-pingdevice-breaks-after-4-3-6-5-0-1-update-docker/166175
+    chmod u+s /bin/ping && \
     chmod u+s /usr/sbin/arping && \
     ln -s -f /bin/true /usr/bin/chfn && \
     apt-get clean && \
