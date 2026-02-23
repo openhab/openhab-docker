@@ -31,6 +31,7 @@
   * [Environment variables](#environment-variables)
      * [User and group identifiers](#user-and-group-identifiers)
      * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
+     * [Time zone configuration](#time-zone-configuration)
   * [Parameters](#parameters)
      * [Passing devices with symlinks](#passing-devices-with-symlinks)
   * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
@@ -377,6 +378,12 @@ The following functionality depends on the unlimited cryptographic strength poli
 * Loxone Binding
 * MQTT Binding
 * openHAB Marketplace
+
+### Time zone configuration
+
+By default, the container uses the time zone defined by the `TZ` environment variable (default: `Etc/UTC`).
+You can change this by setting `TZ` to a valid IANA time zone identifier (for example `Europe/Berlin`, `Europe/London`, `America/New_York`, `Asia/Tokyo`, etc.).
+A full list of valid identifiers can be found in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
 
 ## Parameters
 
