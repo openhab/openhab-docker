@@ -21,6 +21,7 @@ ENV \
     OPENHAB_HTTPS_PORT="8443" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
     OPENHAB_USERDATA="/openhab/userdata" \
+    TZ="Etc/UTC" \
     USER_ID="9001"
 
 # Basic build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -57,12 +58,15 @@ RUN apk update --no-cache && \
         su-exec \
         tini \
         ttf-dejavu \
+        tzdata \
         openjdk${JAVA_VERSION} \
         unzip \
         wget \
         zip && \
     # Install NodeJS only for openHAB >= 5
     if [ "$(echo $OPENHAB_VERSION | sed -E 's/^([0-9]+).*/\1/')" -ge 5 ]; then apk add --no-cache nodejs; fi && \
+    # Configure default time zone
+    ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && \
     # Fix issue with (arp)ping tool under non-root user for Docker+LXC setups
     # See: https://community.openhab.org/t/network-pingdevice-breaks-after-4-3-6-5-0-1-update-docker/166175
     chmod u+s /bin/ping && \
