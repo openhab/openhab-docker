@@ -21,6 +21,7 @@ ENV \
     OPENHAB_HTTPS_PORT="8443" \
     OPENHAB_LOGDIR="/openhab/userdata/logs" \
     OPENHAB_USERDATA="/openhab/userdata" \
+    TZ="Etc/UTC" \
     USER_ID="9001"
 
 # Basic build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -57,6 +58,7 @@ RUN apk update --no-cache && \
         su-exec \
         tini \
         ttf-dejavu \
+        tzdata \
         openjdk${JAVA_VERSION} \
         unzip \
         wget \

@@ -25,12 +25,13 @@
      * [Running openHAB with libpcap support](#running-openhab-with-libpcap-support)
      * [Running on Windows and macOS](#running-on-windows-and-macos)
      * [Starting with Docker mounting a host directory (for advanced user)](#starting-with-docker-mounting-a-host-directory-for-advanced-user)
-     * [Automating Docker setup using ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
+     * [Automating Docker setup using Ansible (for advanced user)](#automating-docker-setup-using-ansible-for-advanced-user)
      * [Accessing the console](#accessing-the-console)
      * [Startup modes](#startup-modes)
   * [Environment variables](#environment-variables)
      * [User and group identifiers](#user-and-group-identifiers)
      * [Java cryptographic strength policy](#java-cryptographic-strength-policy)
+     * [Time zone configuration](#time-zone-configuration)
   * [Parameters](#parameters)
      * [Passing devices with symlinks](#passing-devices-with-symlinks)
   * [Executing shell scripts before openHAB is started](#executing-shell-scripts-before-openhab-is-started)
@@ -121,13 +122,11 @@ For more information visit [Manage data in containers](https://docs.docker.com/e
 docker run \
   --name openhab \
   --net=host \
-  -v /etc/localtime:/etc/localtime:ro \
-  -v /etc/timezone:/etc/timezone:ro \
   -v openhab_addons:/openhab/addons \
   -v openhab_conf:/openhab/conf \
   -v openhab_userdata:/openhab/userdata \
   -e "CRYPTO_POLICY=unlimited" \
-  -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
+  -e "TZ=Europe/Berlin" \
   -d \
   --restart=always \
   openhab/openhab:5.1.3
@@ -144,16 +143,14 @@ services:
     restart: always
     network_mode: host
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
       - "./openhab_addons:/openhab/addons"
       - "./openhab_conf:/openhab/conf"
       - "./openhab_userdata:/openhab/userdata"
     environment:
       CRYPTO_POLICY: "unlimited"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
+      TZ: "Europe/Berlin"
 ```
 
 Create the following `docker-compose.yml` for use of Docker volumes and start the container with `docker compose up -d`
@@ -165,16 +162,14 @@ services:
     restart: always
     network_mode: host
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
       - "openhab_addons:/openhab/addons"
       - "openhab_conf:/openhab/conf"
       - "openhab_userdata:/openhab/userdata"
     environment:
       CRYPTO_POLICY: "unlimited"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
+      TZ: "Europe/Berlin"
 
 volumes:
   openhab_addons:
@@ -202,8 +197,6 @@ services:
       - NET_ADMIN
       - NET_RAW
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
       - "./openhab_addons:/openhab/addons"
       - "./openhab_conf:/openhab/conf"
       - "./openhab_userdata:/openhab/userdata"
@@ -228,9 +221,9 @@ services:
       - "./openhab_userdata:/openhab/userdata"
     environment:
       CRYPTO_POLICY: "unlimited"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
       OPENHAB_HTTP_PORT: "8080"
       OPENHAB_HTTPS_PORT: "8443"
+      TZ: "Europe/Berlin"
 ```
 
 ### Starting with Docker mounting a host directory (for advanced user)
@@ -243,13 +236,11 @@ The following `run` command will create the folders and copy the initial configu
 docker run \
   --name openhab \
   --net=host \
-  -v /etc/localtime:/etc/localtime:ro \
-  -v /etc/timezone:/etc/timezone:ro \
   -v /opt/openhab/addons:/openhab/addons \
   -v /opt/openhab/conf:/openhab/conf \
   -v /opt/openhab/userdata:/openhab/userdata \
   -e "CRYPTO_POLICY=unlimited" \
-  -e "EXTRA_JAVA_OPTS=-Duser.timezone=Europe/Berlin" \
+  -e "TZ=Europe/Berlin" \
   openhab/openhab:5.1.3
 ```
 
@@ -277,8 +268,6 @@ If run elsewhere, replace it with ro.
         - 8101:8101
         - 5007:5007
       volumes:
-        - "/etc/localtime:/etc/localtime:ro"
-        - "/etc/timezone:/etc/timezone:ro"
         - "/opt/openhab/addons:/openhab/addons:Z"
         - "/opt/openhab/conf:/openhab/conf:Z"
         - "/opt/openhab/userdata:/openhab/userdata:Z"
@@ -288,8 +277,8 @@ If run elsewhere, replace it with ro.
       pull: true
       restart_policy: unless-stopped
       env:
-        CRYPTO_POLICY="unlimited"
-        EXTRA_JAVA_OPTS="-Duser.timezone=Europe/Berlin"
+        CRYPTO_POLICY: "unlimited"
+        TZ: "Europe/Berlin"
 ```
 
 ### Accessing the console
@@ -343,6 +332,7 @@ The debug mode is started with the command:
 * `OPENHAB_HTTPS_PORT`=8443
 * `USER_ID`=9001
 * `GROUP_ID`=9001
+* `TZ`=Etc/UTC
 
 ### User and group identifiers
 
@@ -388,6 +378,12 @@ The following functionality depends on the unlimited cryptographic strength poli
 * Loxone Binding
 * MQTT Binding
 * openHAB Marketplace
+
+### Time zone configuration
+
+By default, the container uses the time zone defined by the `TZ` environment variable (default: `Etc/UTC`).
+You can change this by setting `TZ` to a valid IANA time zone identifier (for example `Europe/Berlin`, `Europe/London`, `America/New_York`, `Asia/Tokyo`, etc.).
+A full list of valid identifiers can be found in the [IANA Time Zone Database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
 
 ## Parameters
 
