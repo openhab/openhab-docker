@@ -128,7 +128,7 @@ VOLUME ${OPENHAB_CONF} ${OPENHAB_USERDATA} ${OPENHAB_HOME}/addons
 EXPOSE 8080 8443 8101 5007
 
 # Set healthcheck
-HEALTHCHECK --interval=5m --timeout=5s --retries=3 CMD curl -f http://localhost:${OPENHAB_HTTP_PORT}/ || exit 1
+HEALTHCHECK --interval=1m --timeout=10s --retries=3 --start-period=20m CMD curl -f http://localhost:${OPENHAB_HTTP_PORT}/ || exit 1
 
 # Set working directory and entrypoint
 WORKDIR ${OPENHAB_HOME}
