@@ -1,11 +1,30 @@
+# macOS
 .DS_Store
-.history
-.idea
+
+# Eclipse
+.classpath
+.factorypath
+.metadata/
 .project
-.settings
-.vscode
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+
+# Vim
+.vim/
+*.sw?
+tags
+
+# Editor history and temporary files
+.history/
 
 *.bak
 *.log
-*.swp
+*.orig
 *.tmp
+*~
