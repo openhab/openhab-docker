@@ -21,7 +21,7 @@ ARG JAVA_VERSION
 ARG OPENHAB_VERSION
 
 ENV \
-    CRYPTO_POLICY="limited" \
+    CRYPTO_POLICY="unlimited" \
     EXTRA_JAVA_OPTS="" \
     EXTRA_SHELL_OPTS="" \
     GROUP_ID="9001" \
